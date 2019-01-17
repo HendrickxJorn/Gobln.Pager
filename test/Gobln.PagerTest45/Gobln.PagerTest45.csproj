@@ -61,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\scr\Gobln.Pager\Gobln.Pager.csproj">
-      <Project>{4E56A05C-8C20-4CE1-931F-E8E4BA0D352A}</Project>
+      <Project>{4e56a05c-8c20-4ce1-931f-e8e4ba0d352a}</Project>
       <Name>Gobln.Pager</Name>
     </ProjectReference>
   </ItemGroup>

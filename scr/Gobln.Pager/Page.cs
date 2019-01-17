@@ -1,5 +1,4 @@
 ﻿using Gobln.Pager.Infrastructure;
-using Gobln.Pager.Properties;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -103,10 +102,10 @@ namespace Gobln.Pager
         public Page(IEnumerable<T> source, int pageIndex, int pageSize, int itemCount)
         {
             if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
 
             if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
 
             var definitions = new PageDefinition(pageIndex, pageSize, itemCount);
 
@@ -215,10 +214,10 @@ namespace Gobln.Pager
             var page = new Page<T>();
 
             if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
 
             if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
 
             var definitions = new PageDefinition(pageIndex, pageSize, itemCount);
 

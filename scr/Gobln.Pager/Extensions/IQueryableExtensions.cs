@@ -1,5 +1,4 @@
 ﻿using Gobln.Pager.Infrastructure;
-using Gobln.Pager.Properties;
 using System;
 using System.Linq;
 
@@ -40,10 +39,10 @@ namespace Gobln.Pager
         public static Page<T> ToPage<T>(this IQueryable<T> source, int pageIndex, int pageSize)
         {
             if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
 
             if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
 
             var pd = new PageDefinition(pageIndex, pageSize, source.Count());
 
@@ -62,10 +61,10 @@ namespace Gobln.Pager
         public static Page<T> ToPage<T>(this IQueryable<T> source, IPagerFilter pagerFilter)
         {
             if (pagerFilter.PageIndex < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", "Can not be less then zero or zero.");
 
             if (pagerFilter.PageSize < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", "Can not be less then zero or zero.");
 
             var pd = new PageDefinition(pagerFilter.PageIndex, pagerFilter.PageSize, source.Count());
 
@@ -87,10 +86,10 @@ namespace Gobln.Pager
         public static Page<T> ToPage<T>(this IQueryable<T> source, int pageIndex, int pageSize, int itemCount, bool prePaged = false)
         {
             if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
 
             if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
 
             var pd = new PageDefinition(pageIndex, pageSize, itemCount);
 
@@ -111,10 +110,10 @@ namespace Gobln.Pager
         public static Page<T> ToPage<T>(this IQueryable<T> source, IPagerFilter pagerFilter, int itemCount, bool prePaged = false)
         {
             if (pagerFilter.PageIndex < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", "Can not be less then zero or zero.");
 
             if (pagerFilter.PageSize < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", "Can not be less then zero or zero.");
 
             var pd = new PageDefinition(pagerFilter.PageIndex, pagerFilter.PageSize, itemCount);
 
@@ -150,7 +149,7 @@ namespace Gobln.Pager
         public static PagedList<T> ToPagedList<T>(this IQueryable<T> source, int pageSize)
         {
             if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
             
             return PagedList<T>.FromEnumerable(source, pageSize);
         }
@@ -185,10 +184,10 @@ namespace Gobln.Pager
         public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source, int pageIndex, int pageSize)
         {
             if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
 
             if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
 
             var pd = new PageDefinition(pageIndex, pageSize, source.Count());
 
@@ -207,10 +206,10 @@ namespace Gobln.Pager
         public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source, IPagerFilter pagerFilter)
         {
             if (pagerFilter.PageIndex < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", "Can not be less then zero or zero.");
 
             if (pagerFilter.PageSize < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", "Can not be less then zero or zero.");
 
             var pd = new PageDefinition(pagerFilter.PageIndex, pagerFilter.PageSize, source.Count());
             
@@ -232,10 +231,10 @@ namespace Gobln.Pager
         public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source, int pageIndex, int pageSize, int itemCount, bool prePaged = false)
         {
             if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
 
             if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
 
             var pd = new PageDefinition(pageIndex, pageSize, itemCount);
             
@@ -271,7 +270,7 @@ namespace Gobln.Pager
         public static async Task<PagedList<T>> ToPagedListAsync<T>(this IQueryable<T> source, int pageSize)
         {
             if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
 
             return await Task.Run(() => PagedList<T>.FromEnumerable(source, pageSize)).ConfigureAwait(false);
         }

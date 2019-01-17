@@ -1,22 +1,22 @@
 ﻿using Gobln.Pager;
-using Gobln.PagerTest45.Models;
+using Gobln.PagerTestCore10.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Gobln.PagerTest45
+namespace Gobln.PagerTestCore10
 {
     [TestClass]
-    public class PageListTest
+    public class PageTest
     {
         /// <summary>
-        /// Create PageList
+        /// Create a pager
         /// </summary>
         [TestMethod]
-        public void PageListTest1()
+        public void PageTest1()
         {
-            var testPageList = new PagedList<TestModel1>()
+            var testList = new List<TestModel1>()
             {
                 new TestModel1(){ Id = 1, Name = "Tester1", Date = new DateTime( 2016, 5,1 ) },
                 new TestModel1(){ Id = 2, Name = "Tester2", Date = new DateTime( 2016, 5,2 ) },
@@ -24,17 +24,19 @@ namespace Gobln.PagerTest45
                 new TestModel1(){ Id = 4, Name = "Tester4", Date = new DateTime( 2016, 5,4 ) },
                 new TestModel1(){ Id = 5, Name = "Tester5", Date = new DateTime( 2016, 5,5 ) },
             };
+
+            var page = testList.ToPage();
             
-            testPageList = testPageList;
+            page = page;
         }
 
         /// <summary>
-        /// Create PageList and add item
+        /// Create a pager
         /// </summary>
         [TestMethod]
-        public void PageListTest2()
+        public void PageTest2()
         {
-            var testPageList = new PagedList<TestModel1>()
+            var testList = new PagedList<TestModel1>()
             {
                 new TestModel1(){ Id = 1, Name = "Tester1", Date = new DateTime( 2015, 5,1 ) },
                 new TestModel1(){ Id = 2, Name = "Tester2", Date = new DateTime( 2015, 5,2 ) },
@@ -53,43 +55,66 @@ namespace Gobln.PagerTest45
                 new TestModel1(){ Id = 15, Name = "Tester15", Date = new DateTime( 2015, 5,5 ) },
             };
 
-            testPageList.Add(new TestModel1() { Id = 16, Name = "Tester16", Date = new DateTime(2015, 5, 5) });
+            testList.Add(new TestModel1() { Id = 16, Name = "Tester16", Date = new DateTime(2015, 5, 5) });
+
+            var page = testList.GetCurrentPage();
             
-            testPageList = testPageList;
+            page = page;
         }
 
         /// <summary>
-        /// Create PageList and adds range
+        /// Create a pager from an pre paged list
         /// </summary>
         [TestMethod]
-        public void PageListTest3()
+        public void PageTest3()
         {
-            var testPageList = new List<TestModel1>();
-
-            testPageList.AddRange(new List<TestModel1>
+            var testList = new List<TestModel1>()
             {
-                new TestModel1() { Id = 1, Name = "Tester1", Date = new DateTime(2015, 5, 1) },
-                new TestModel1() { Id = 2, Name = "Tester2", Date = new DateTime(2015, 5, 2) },
-                new TestModel1() { Id = 3, Name = "Tester3", Date = new DateTime(2015, 5, 3) },
-                new TestModel1() { Id = 4, Name = "Tester4", Date = new DateTime(2015, 5, 4) },
-                new TestModel1() { Id = 5, Name = "Tester5", Date = new DateTime(2015, 5, 5) },
-                new TestModel1() { Id = 6, Name = "Tester6", Date = new DateTime(2015, 5, 1) },
-                new TestModel1() { Id = 7, Name = "Tester7", Date = new DateTime(2015, 5, 2) },
-                new TestModel1() { Id = 8, Name = "Tester8", Date = new DateTime(2015, 5, 3) },
-                new TestModel1() { Id = 9, Name = "Tester9", Date = new DateTime(2015, 5, 4) },
-                new TestModel1() { Id = 10, Name = "Tester10", Date = new DateTime(2015, 5, 5) },
-            });
+                new TestModel1(){ Id = 1, Name = "Tester1", Date = new DateTime( 2015, 5,1 ) },
+                new TestModel1(){ Id = 2, Name = "Tester2", Date = new DateTime( 2015, 5,2 ) },
+                new TestModel1(){ Id = 3, Name = "Tester3", Date = new DateTime( 2015, 5,3 ) },
+                new TestModel1(){ Id = 4, Name = "Tester4", Date = new DateTime( 2015, 5,4 ) },
+                new TestModel1(){ Id = 5, Name = "Tester5", Date = new DateTime( 2015, 5,5 ) },
+                new TestModel1(){ Id = 6, Name = "Tester6", Date = new DateTime( 2015, 5,1 ) },
+                new TestModel1(){ Id = 7, Name = "Tester7", Date = new DateTime( 2015, 5,2 ) },
+                new TestModel1(){ Id = 8, Name = "Tester8", Date = new DateTime( 2015, 5,3 ) },
+                new TestModel1(){ Id = 9, Name = "Tester9", Date = new DateTime( 2015, 5,4 ) },
+                new TestModel1(){ Id = 10, Name = "Tester10", Date = new DateTime( 2015, 5,5 ) },
+            };
 
-            testPageList.Add(new TestModel1() { Id = 16, Name = "Tester16", Date = new DateTime(2015, 5, 5) });
+            var page = testList.ToPage(5, 10, 100, prePaged: true);
             
-            testPageList = testPageList;
+            page = page;
         }
 
         /// <summary>
-        /// Create PageList and convert to list or array
+        /// Test with empty
         /// </summary>
         [TestMethod]
-        public void PageListTest4()
+        public void PageTest4()
+        {
+            var testList = new List<TestModel1>()
+            {
+            };
+
+            var page = new Page<TestModel1>(testList);
+
+            testList = null;
+
+            page = new Page<TestModel1>(testList);
+
+            page = testList.ToPage(1, 10, 0);
+
+            page = testList.ToPage(1, 10, 0, prePaged: true);
+            
+            page = page;
+        }
+
+        /// <summary>
+        /// Make use of IPagerFilter
+        /// </summary>
+        [TestMethod]
+        public void PageTest5()
         {
             var testList = new List<TestModel1>()
             {
@@ -110,24 +135,24 @@ namespace Gobln.PagerTest45
                 new TestModel1(){ Id = 15, Name = "Tester15", Date = new DateTime( 2015, 5,5 ) },
             };
 
-            testList = testList.OrderBy(c => c.Date).ToList();
+            var filterModel = new FilterModel()
+            {
+                PageIndex = 5,
+                PageSize = 2
+            };
 
-            var testPageList = testList.ToPagedList();
-
-            testPageList = testPageList.OrderBy(c => c.Id).ToPagedList();
-
-            var testList2 = testPageList.ToList();
-
-            var testArray = testPageList.ToArray();
+            var page = testList.ToPage(filterModel);
+            
+            page = page;
         }
 
         /// <summary>
-        /// Create PageList and converts to Pager
+        /// Test Prepage
         /// </summary>
         [TestMethod]
-        public void PageListTest5()
+        public void PageTest6()
         {
-            var testPageList = new PagedList<TestModel1>()
+            var testList = new List<TestModel1>()
             {
                 new TestModel1(){ Id = 1, Name = "Tester1", Date = new DateTime( 2015, 5,1 ) },
                 new TestModel1(){ Id = 2, Name = "Tester2", Date = new DateTime( 2015, 5,2 ) },
@@ -146,34 +171,20 @@ namespace Gobln.PagerTest45
                 new TestModel1(){ Id = 15, Name = "Tester15", Date = new DateTime( 2015, 5,5 ) },
             };
 
-            //Create default pager
-            var pager = testPageList.GetCurrentPage();
+            var filterModel = new FilterModel()
+            {
+                PageIndex = 5,
+                PageSize = 2
+            };
 
-            //set page values
-            testPageList.CurrentPageIndex = 2;
-            testPageList.PageSize = 3;
+            var page = testList.ToPage(filterModel);
 
-            pager = testPageList.GetCurrentPage();
 
-            // get the 4 page
-            // this will set the CurrentPageIndex to 4
-            pager = testPageList.GetPage(4);
-
-            //Get the next pager
-            //This will set the CurrentPageIndex by 1
-            pager = testPageList.GetNextPage();
-
-            //Get the previous pager
-            //This will set the CurrentPageIndex by -1
-            pager = testPageList.GetPreviousPage();
-
-            //peak at the next pager
-            //This will NOT set the CurrentPageIndex by 1
-            pager = testPageList.PeakNextPage();
-
-            //peak the previous pager
-            //This will NOT set the CurrentPageIndex by -1
-            pager = testPageList.PeakPreviousPage();
+            var prePage = page
+                .Select(c => c.Name)
+                .ToPage(page.CurrentPageIndex, page.PageSize, page.TotalItemCount, prePaged: true);
+            
+            prePage = prePage;
         }
     }
 }

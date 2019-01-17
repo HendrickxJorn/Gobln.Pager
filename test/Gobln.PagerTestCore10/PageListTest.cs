@@ -1,11 +1,11 @@
 ﻿using Gobln.Pager;
-using Gobln.PagerTest45.Models;
+using Gobln.PagerTestCore10.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Gobln.PagerTest45
+namespace Gobln.PagerTestCore10
 {
     [TestClass]
     public class PageListTest

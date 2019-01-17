@@ -1,5 +1,4 @@
 ﻿using Gobln.Pager.Infrastructure;
-using Gobln.Pager.Properties;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -44,7 +43,7 @@ namespace Gobln.Pager
         public PagedList(int pageSize)
         {
             if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
 
             _currentPageIndex = 1;
             _pageSize = pageSize;
@@ -68,7 +67,7 @@ namespace Gobln.Pager
         public PagedList(IEnumerable<T> collection, int pageSize)
         {
             if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
 
             _list = new List<T>(collection);
             _pageSize = pageSize;
@@ -98,7 +97,7 @@ namespace Gobln.Pager
         public static PagedList<T> FromEnumerable(IEnumerable<T> collection, int pageSize)
         {
             if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", Resources.ExceptionZeroOrLess);
+                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
 
             var pagedList = new PagedList<T>() { _list = new List<T>(collection) };
             pagedList._pageSize = pageSize;
