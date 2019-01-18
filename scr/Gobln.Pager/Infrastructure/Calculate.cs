@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Gobln.Pager.Infrastructure
+namespace Gobln.Pager
 {
     internal static class Calculate
     {

@@ -1,4 +1,4 @@
-﻿namespace Gobln.Pager.Infrastructure
+﻿namespace Gobln.Pager
 {
     internal class PageDefinition
     {
@@ -21,6 +21,15 @@
             PageIndex = Calculate.ValidPageIndex(pageIndex, pageSize, itemCount);
             PageCount = Calculate.TotalPageCount(itemCount, PageSize);
             SkipIndex = Calculate.SkipIndex(pageIndex, pageSize);
+        }
+
+        public PageDefinition(IPagerFilter pagerFilter, int itemCount)
+        {
+            ItemCount = itemCount;
+            PageSize = Calculate.ValidPageSize(pagerFilter.PageSize);
+            PageIndex = Calculate.ValidPageIndex(pagerFilter.PageIndex, pagerFilter.PageSize, itemCount);
+            PageCount = Calculate.TotalPageCount(itemCount, PageSize);
+            SkipIndex = Calculate.SkipIndex(pagerFilter.PageIndex, pagerFilter.PageSize);
         }
 
         #endregion Init

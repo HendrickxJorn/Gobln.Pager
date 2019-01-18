@@ -39,7 +39,7 @@
     <AssemblyName>Gobln.Pager</AssemblyName>
     <RootNamespace>Gobln.Pager</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Company />
     <Description>A portable pager library written in C#, to allow you covert IEnumarble/IQueryable to an PageList or Page object.</Description>
   </PropertyGroup>

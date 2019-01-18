@@ -1,6 +1,4 @@
-﻿using Gobln.Pager.Infrastructure;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 #if !FEATURE_TYPE_NET40
@@ -19,18 +17,18 @@ namespace Gobln.Pager
         #region ToPage
 
         /// <summary>
-        /// Converts IEnumerable<typeparamref name="T"/> to a Page
+        /// Converts IEnumerable to a Page
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
         public static Page<T> ToPage<T>(this IEnumerable<T> source)
         {
-            return Page<T>.FromEnumerable(source, new PageDefinition(1, 10, source.Count()));
+            return Page<T>.FromEnumerable(source, new PageDefinition(1, source.Count(), source.Count()));
         }
 
         /// <summary>
-        /// Converts IEnumerable<typeparamref name="T"/> to a Page
+        /// Converts IEnumerable to a Page
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -39,11 +37,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static Page<T> ToPage<T>(this IEnumerable<T> source, int pageIndex, int pageSize)
         {
-            if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
-
-            if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
+            Validator.Validate(pageIndex, pageSize);
 
             var pd = new PageDefinition(pageIndex, pageSize, source.Count());
 
@@ -53,7 +47,7 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Converts IEnumerable<typeparamref name="T"/> to a Page
+        /// Converts IEnumerable to a Page
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -61,13 +55,9 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static Page<T> ToPage<T>(this IEnumerable<T> source, IPagerFilter pagerFilter)
         {
-            if (pagerFilter.PageIndex < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", "Can not be less then zero or zero.");
+            Validator.Validate(pagerFilter);
 
-            if (pagerFilter.PageSize < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", "Can not be less then zero or zero.");
-
-            var pd = new PageDefinition(pagerFilter.PageIndex, pagerFilter.PageSize, source.Count());
+            var pd = new PageDefinition(pagerFilter, source.Count());
 
             return pd.ItemCount < 1
                   ? Page<T>.FromEnumerable(source, pd)
@@ -75,22 +65,18 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Converts IEnumerable<typeparamref name="T"/> to a Page
+        /// Converts IEnumerable to a Page
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <param name="pageIndex">Index of page</param>
         /// <param name="pageSize">Size of page</param>
-        /// <param name="itemCount">Total item count of IEnumerable<typeparamref name="T"/></param>
-        /// <param name="prePaged">Is the IEnumerable<typeparamref name="T"/> already prepaged. If so the IEnumerable<typeparamref name="T"/> will not be paged anymore.</param>
+        /// <param name="itemCount">Total item count of IEnumerable</param>
+        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
         /// <returns></returns>
         public static Page<T> ToPage<T>(this IEnumerable<T> source, int pageIndex, int pageSize, int itemCount, bool prePaged = false)
         {
-            if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
-
-            if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
+            Validator.Validate(pageIndex, pageSize);
 
             var pd = new PageDefinition(pageIndex, pageSize, itemCount);
 
@@ -100,23 +86,19 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Converts IEnumerable<typeparamref name="T"/> to a Page
+        /// Converts IEnumerable to a Page
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
-        /// <param name="itemCount">Total item count of IEnumerable<typeparamref name="T"/></param>
-        /// <param name="prePaged">Is the IEnumerable<typeparamref name="T"/> already prepaged. If so the IEnumerable<typeparamref name="T"/> will not be paged anymore.</param>
+        /// <param name="itemCount">Total item count of IEnumerable</param>
+        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
         /// <returns></returns>
         public static Page<T> ToPage<T>(this IEnumerable<T> source, IPagerFilter pagerFilter, int itemCount, bool prePaged = false)
         {
-            if (pagerFilter.PageIndex < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", "Can not be less then zero or zero.");
+            Validator.Validate(pagerFilter);
 
-            if (pagerFilter.PageSize < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", "Can not be less then zero or zero.");
-
-            var pd = new PageDefinition(pagerFilter.PageIndex, pagerFilter.PageSize, itemCount);
+            var pd = new PageDefinition(pagerFilter, itemCount);
 
             return prePaged || pd.ItemCount < 1
                   ? Page<T>.FromEnumerable(source, pd)
@@ -128,7 +110,7 @@ namespace Gobln.Pager
         #region ToPagedList
 
         /// <summary>
-        /// Convert IEnumerable<typeparamref name="T"/> to a PagedList
+        /// Convert IEnumerable to a PagedList
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -139,7 +121,7 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Convert IEnumerable<typeparamref name="T"/> to a PagedList
+        /// Convert IEnumerable to a PagedList
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -147,9 +129,8 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static PagedList<T> ToPagedList<T>(this IEnumerable<T> source, int pageSize)
         {
-            if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
-            
+            Validator.ValidatePageSize(pageSize);
+
             return PagedList<T>.FromEnumerable(source, pageSize);
         }
 
@@ -162,19 +143,18 @@ namespace Gobln.Pager
         #region ToPage
 
         /// <summary>
-        /// Converts asynchronous IEnumerable<typeparamref name="T"/> to a Page
+        /// Converts asynchronous IEnumerable to a Page
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
         public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source)
         {
-            //return new Page<T>(source, new PageDefinition(1, 1, source.Count()));
-            return await Task.Run(() => Page<T>.FromEnumerable(source, new PageDefinition(1, 1, source.Count()))).ConfigureAwait(false);
+            return await Task.Run(() => Page<T>.FromEnumerable(source, new PageDefinition(1, source.Count(), source.Count()))).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Converts asynchronous IEnumerable<typeparamref name="T"/> to a Page
+        /// Converts asynchronous IEnumerable to a Page
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -183,11 +163,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, int pageIndex, int pageSize)
         {
-            if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
-
-            if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
+            Validator.Validate(pageIndex, pageSize);
 
             var pd = new PageDefinition(pageIndex, pageSize, source.Count());
 
@@ -197,7 +173,7 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Converts asynchronous IEnumerable<typeparamref name="T"/> to a Page
+        /// Converts asynchronous IEnumerable to a Page
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -205,13 +181,9 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, IPagerFilter pagerFilter)
         {
-            if (pagerFilter.PageIndex < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", "Can not be less then zero or zero.");
+            Validator.Validate(pagerFilter);
 
-            if (pagerFilter.PageSize < 1)
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", "Can not be less then zero or zero.");
-
-            var pd = new PageDefinition(pagerFilter.PageIndex, pagerFilter.PageSize, source.Count());
+            var pd = new PageDefinition(pagerFilter, source.Count());
 
             return pd.ItemCount < 1
                   ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
@@ -219,24 +191,40 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Converts asynchronous IEnumerable<typeparamref name="T"/> to a Page
+        /// Converts asynchronous IEnumerable to a Page
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <param name="pageIndex">Index of page</param>
         /// <param name="pageSize">Size of page</param>
-        /// <param name="itemCount">Total item count of IEnumerable<typeparamref name="T"/></param>
-        /// <param name="prePaged">Is the IEnumerable<typeparamref name="T"/> already prepaged. If so the IEnumerable<typeparamref name="T"/> will not be paged anymore.</param>
+        /// <param name="itemCount">Total item count of IEnumerable</param>
+        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
         /// <returns></returns>
         public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, int pageIndex, int pageSize, int itemCount, bool prePaged = false)
         {
-            if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
-
-            if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
+            Validator.Validate(pageIndex, pageSize);
 
             var pd = new PageDefinition(pageIndex, pageSize, itemCount);
+
+            return prePaged || pd.ItemCount < 1
+                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
+                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Converts asynchronous IEnumerable to a Page
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
+        /// <param name="itemCount">Total item count of IEnumerable</param>
+        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
+        /// <returns></returns>
+        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, IPagerFilter pagerFilter, int itemCount, bool prePaged = false)
+        {
+            Validator.Validate(pagerFilter);
+
+            var pd = new PageDefinition(pagerFilter, itemCount);
 
             return prePaged || pd.ItemCount < 1
                   ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
@@ -248,7 +236,7 @@ namespace Gobln.Pager
         #region ToPagedList
 
         /// <summary>
-        /// Convert asynchronous IEnumerable<typeparamref name="T"/> to a PagedList
+        /// Convert asynchronous IEnumerable to a PagedList
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -260,7 +248,7 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Convert asynchronous IEnumerable<typeparamref name="T"/> to a PagedList
+        /// Convert asynchronous IEnumerable to a PagedList
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -268,8 +256,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static async Task<PagedList<T>> ToPagedListAsync<T>(this IEnumerable<T> source, int pageSize)
         {
-            if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
+            Validator.ValidatePageSize(pageSize);
 
             //return new PagedList<T>(source, pageSize);
             return await Task.Run(() => PagedList<T>.FromEnumerable(source, pageSize)).ConfigureAwait(false);
