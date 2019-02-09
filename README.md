@@ -1,7 +1,7 @@
 # Gobln.Pager
 
-Gobln.Pager is a .Net portable pager library written in C#, to allow you covert IEnumarble/IQueryable to an PageList or Page object.
-And usable in any type of project.
+Gobln.Pager is a .Net easy to use pager library written in C#, to allow you covert IEnumarble/IQueryable to an PageList or Page object.
+And can be usable in any type of project.
 
 If you would like to use Gobln.Pager in Mvc, check the following link [Gobln.Pager.Mvc](https://nuget.org/packages/Gobln.Pager.Mvc).
 
@@ -18,8 +18,7 @@ If you would like to use Gobln.Pager in Mvc, check the following link [Gobln.Pag
 
 Install Gobln.Pager, trough [Nuget](https://nuget.org/) or other means.
 Use the extension .ToPage() on your IEnumarble/IQueryable and you will get the 10 first items from you IEnumarble/IQueryable.
-To change the size and the page you'll like to get, add these values to the .Pager.
-And the result will change.
+To Change the page size or the selected page you onlu need to change the first two value of ToPager({page index}, {page size})
 
 ### Examples
 

@@ -243,7 +243,6 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static async Task<PagedList<T>> ToPagedListAsync<T>(this IEnumerable<T> source)
         {
-            //return new PagedList<T>(source);
             return await Task.Run(() => PagedList<T>.FromEnumerable(source)).ConfigureAwait(false);
         }
 
@@ -258,7 +257,6 @@ namespace Gobln.Pager
         {
             Validator.ValidatePageSize(pageSize);
 
-            //return new PagedList<T>(source, pageSize);
             return await Task.Run(() => PagedList<T>.FromEnumerable(source, pageSize)).ConfigureAwait(false);
         }
 

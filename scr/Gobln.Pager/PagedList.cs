@@ -41,8 +41,7 @@ namespace Gobln.Pager
         /// <param name="pageSize">The number of elements displayed per page</param>
         public PagedList(int pageSize)
         {
-            if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
+            Validator.ValidatePageSize(pageSize);
 
             _currentPageIndex = 1;
             _pageSize = pageSize;
@@ -65,8 +64,7 @@ namespace Gobln.Pager
         /// <param name="pageSize">The size that will be displayed on the page.</param>
         public PagedList(IEnumerable<T> collection, int pageSize)
         {
-            if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
+            Validator.ValidatePageSize(pageSize);
 
             _list = new List<T>(collection);
             _pageSize = pageSize;
@@ -95,8 +93,7 @@ namespace Gobln.Pager
         /// <param name="pageSize">The number of elements displayed per page</param>
         public static PagedList<T> FromEnumerable(IEnumerable<T> collection, int pageSize)
         {
-            if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
+            Validator.ValidatePageSize(pageSize);
 
             var pagedList = new PagedList<T>() { _list = new List<T>(collection) };
             pagedList._pageSize = pageSize;
@@ -259,6 +256,7 @@ namespace Gobln.Pager
 
         /// <summary>
         /// The current page index
+        /// This value can not be lower then 1
         /// </summary>
         public int CurrentPageIndex
         {
@@ -268,7 +266,7 @@ namespace Gobln.Pager
             }
             set
             {
-                if (value < 0)
+                if (value < 1)
                     value = 1;
                 else if (value > PageCount)
                     value = PageCount;
@@ -279,6 +277,7 @@ namespace Gobln.Pager
 
         /// <summary>
         /// The amount of items per page
+        /// This value can not be lower then 1
         /// </summary>
         public int PageSize
         {
@@ -288,10 +287,8 @@ namespace Gobln.Pager
             }
             set
             {
-                if (value < 0)
+                if (value < 1)
                     value = 1;
-                else if (value == 0)
-                    value = int.MaxValue;
 
                 _pageSize = value;
                 RecalculatePageCount();
@@ -360,10 +357,9 @@ namespace Gobln.Pager
         /// <returns><see cref="Page{T}"/></returns>
         public Page<T> PeakNextPage()
         {
-            if (HasNextPage)
-                return _list.ToPage(CurrentPageIndex + 1, PageSize);
-            else
-                return GetCurrentPage();
+            return HasNextPage
+                ? _list.ToPage(CurrentPageIndex + 1, PageSize)
+                : GetCurrentPage();
         }
 
         /// <summary>
@@ -372,10 +368,9 @@ namespace Gobln.Pager
         /// <returns></returns>
         public Page<T> PeakPreviousPage()
         {
-            if (HasPreviousPage)
-                return _list.ToPage(CurrentPageIndex - 1, PageSize);
-            else
-                return GetCurrentPage();
+            return HasPreviousPage
+                ? _list.ToPage(CurrentPageIndex - 1, PageSize)
+                : GetCurrentPage();
         }
 
         /// <summary>

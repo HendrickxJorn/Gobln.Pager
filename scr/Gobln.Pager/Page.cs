@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -100,26 +99,17 @@ namespace Gobln.Pager
         /// <param name="itemCount">Total item count in the original list</param>
         public Page(IEnumerable<T> source, int pageIndex, int pageSize, int itemCount)
         {
-            if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
-
-            if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
+            Validator.Validate(pageIndex, pageSize);
 
             var definitions = new PageDefinition(pageIndex, pageSize, itemCount);
 
-            if (source != null && itemCount > 0)
+            if (source != null && definitions.ItemCount > 0)
             {
                 var arrSource = source.ToArray();
 
-                if (arrSource.Any())
-                {
-                    _list = new List<T>(arrSource);
-                }
-                else
-                {
-                    _list = new List<T>();
-                }
+                _list = arrSource.Any()
+                    ? new List<T>(arrSource)
+                    : new List<T>();
             }
             else
             {
@@ -143,14 +133,9 @@ namespace Gobln.Pager
             {
                 var arrSource = source.ToArray();
 
-                if (arrSource.Any())
-                {
-                    _list = new List<T>(arrSource);
-                }
-                else
-                {
-                    _list = new List<T>();
-                }
+                _list = arrSource.Any()
+                    ? new List<T>(arrSource)
+                    : new List<T>();
             }
             else
             {
@@ -210,40 +195,9 @@ namespace Gobln.Pager
         /// <param name="itemCount">Total item count in the original list</param>
         public static Page<T> FromEnumerable(IEnumerable<T> source, int pageIndex, int pageSize, int itemCount)
         {
-            var page = new Page<T>();
+            Validator.Validate(pageIndex, pageSize);
 
-            if (pageIndex < 1)
-                throw new ArgumentOutOfRangeException("pageIndex", "Can not be less then zero or zero.");
-
-            if (pageSize < 1)
-                throw new ArgumentOutOfRangeException("pageSize", "Can not be less then zero or zero.");
-
-            var definitions = new PageDefinition(pageIndex, pageSize, itemCount);
-
-            if (source != null && itemCount > 0)
-            {
-                var arrSource = source.ToArray();
-
-                if (arrSource.Any())
-                {
-                    page._list = new List<T>(arrSource);
-                }
-                else
-                {
-                    page._list = new List<T>();
-                }
-            }
-            else
-            {
-                page._list = new List<T>();
-            }
-
-            page.CurrentPageIndex = definitions.PageIndex;
-            page.TotalPageCount = definitions.PageCount;
-            page.PageSize = definitions.PageSize;
-            page.TotalItemCount = definitions.ItemCount;
-
-            return page;
+            return FromEnumerable(source, new PageDefinition(pageIndex, pageSize, itemCount));
         }
 
         /// <summary>
@@ -259,14 +213,9 @@ namespace Gobln.Pager
             {
                 var arrSource = source.ToArray();
 
-                if (arrSource.Any())
-                {
-                    page._list = new List<T>(arrSource);
-                }
-                else
-                {
-                    page._list = new List<T>();
-                }
+                page._list = arrSource.Any()
+                    ? new List<T>(arrSource)
+                    : new List<T>();
             }
             else
             {

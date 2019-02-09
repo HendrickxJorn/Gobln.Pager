@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncTest.cs" />
+    <Compile Include="HelperList.cs" />
     <Compile Include="Models\FilterModel.cs" />
     <Compile Include="Models\TestModel1.cs" />
     <Compile Include="PageListTest.cs" />

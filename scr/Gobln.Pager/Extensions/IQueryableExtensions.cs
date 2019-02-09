@@ -185,7 +185,7 @@ namespace Gobln.Pager
             Validator.Validate(pagerFilter);
 
             var pd = new PageDefinition(pagerFilter, source.Count());
-            
+
             return pd.ItemCount < 1
                   ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
                   : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);

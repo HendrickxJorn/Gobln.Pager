@@ -3,7 +3,7 @@
     /// <summary>
     /// PagerFilter
     /// </summary>
-    public class PagerFilter: IPagerFilter
+    public class PagerFilter : IPagerFilter
     {
         /// <summary>
         /// The index of the page
