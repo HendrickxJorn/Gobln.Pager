@@ -1,6 +1,7 @@
 ﻿using Gobln.Pager;
 using Gobln.PagerTestCore10.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Gobln.PagerTestCore10
@@ -18,9 +19,13 @@ namespace Gobln.PagerTestCore10
 
             task.Wait();
 
-            var result = task.Result;
+            var resultPage = task.Result;
 
-            result = result;
+            var resultList = resultPage.ToList();
+
+            var expected = HelperList.List1Amount15;
+
+            CollectionAssert.AreEqual(expected, resultList, new TestModel1Comparer());
         }
 
         /// <summary>
@@ -33,9 +38,13 @@ namespace Gobln.PagerTestCore10
 
             task.Wait();
 
-            var result = task.Result;
+            var resultPage = task.Result;
 
-            result = result;
+            var resultList = resultPage.ToList();
+
+            var expected = HelperList.List1Amount15.Take(3).ToList();
+
+            CollectionAssert.AreEqual(expected, resultList, new TestModel1Comparer());
         }
 
         /// <summary>
@@ -54,9 +63,13 @@ namespace Gobln.PagerTestCore10
 
             task.Wait();
 
-            page = task.Result;
+            var resultPage = task.Result;
 
-            page = page;
+            var resultList = resultPage.ToList();
+
+            var expected = HelperList.List1Amount15.Take(3).ToList();
+
+            CollectionAssert.AreEqual(expected, resultList, new TestModel1Comparer());
         }
     }
 }

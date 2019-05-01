@@ -14,4 +14,14 @@ namespace Gobln.PagerTestCore10.Models
 
         public DateTime Date { get; set; }
     }
+
+    public class TestModel1Comparer : Comparer<TestModel1>
+    {
+        public override int Compare(TestModel1 x, TestModel1 y)
+        {
+            return x.Id.CompareTo(y.Id)
+                & x.Name.CompareTo(y.Name)
+                & x.Date.CompareTo(y.Date);
+        }
+    }
 }

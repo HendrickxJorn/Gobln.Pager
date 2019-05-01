@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gobln.Pager", "scr\Gobln.Pager\Gobln.Pager.csproj", "{4E56A05C-8C20-4CE1-931F-E8E4BA0D352A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gobln.PagerTest45", "test\Gobln.PagerTest45\Gobln.PagerTest45.csproj", "{0965B5D6-3EAB-4CD6-A660-53AC85A1A4C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gobln.PagerTestCore10", "Test\Gobln.PagerTestCore10\Gobln.PagerTestCore10.csproj", "{CE6F61F3-513C-4B6D-8FCA-F3C5A3572E26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gobln.PagerTestCore10", "Test\Gobln.PagerTestCore10\Gobln.PagerTestCore10.csproj", "{CE6F61F3-513C-4B6D-8FCA-F3C5A3572E26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
