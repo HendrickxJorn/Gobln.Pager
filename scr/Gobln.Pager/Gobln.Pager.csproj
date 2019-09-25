@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net40;net45;netcoreapp1.0;netcoreapp2.0;netstandard1.6;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net40;net45;netcoreapp1.0;netcoreapp2.0;netcoreapp3.0;netstandard1.6;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(TargetFramework)'=='net40'">
@@ -18,6 +18,10 @@
   
   <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp2.0'">
     <DefineConstants>FEATURE_TYPE_CORE20</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
+    <DefineConstants>FEATURE_TYPE_CORE30</DefineConstants>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.6'">
@@ -38,12 +42,11 @@
     <AssemblyName>Gobln.Pager</AssemblyName>
     <RootNamespace>Gobln.Pager</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.4</Version>
+    <Version>1.1.0</Version>
     <Description>A portable pager library written in C#, to allow you covert IEnumarble/IQueryable to an PageList or Page object.</Description>
     <RepositoryUrl>https://github.com/HendrickxJorn/Gobln.Pager</RepositoryUrl>
 	<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
 	<ApplicationIcon></ApplicationIcon>
-	<Win32Resource />
 	<PackageIconUrl>https://github.com/HendrickxJorn/Gobln.Pager/blob/master/images/Gobln%20Pager.ico?raw=true</PackageIconUrl>
   </PropertyGroup>
   
@@ -61,6 +64,10 @@
   
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp2.0|AnyCPU'">
     <DocumentationFile>bin\Debug\netcoreapp2.0\Gobln.Pager.xml</DocumentationFile>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.0|AnyCPU'">
+    <DocumentationFile>bin\Debug\netcoreapp3.0\Gobln.Pager.xml</DocumentationFile>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.6|AnyCPU'">
@@ -91,6 +98,12 @@
   
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp2.0|AnyCPU'">
     <DocumentationFile>bin\Release\netcoreapp2.0\Gobln.Pager.xml</DocumentationFile>
+	<DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp3.0|AnyCPU'">
+    <DocumentationFile>bin\Release\netcoreapp3.0\Gobln.Pager.xml</DocumentationFile>
 	<DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
