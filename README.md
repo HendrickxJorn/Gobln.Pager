@@ -10,6 +10,7 @@ If you would like to use Gobln.Pager in Mvc, check the following link [Gobln.Pag
 * .Net 4.0 and higher
 * .Net Core 1.0 and higher
 * .Net Core 2.0 and higher
+* .Net Core 3.0 and higher
 * .Net Standard 1.6 and higher
 
 ## Page
