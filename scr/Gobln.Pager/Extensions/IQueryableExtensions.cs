@@ -23,6 +23,11 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static Page<T> ToPage<T>(this IQueryable<T> source)
         {
+            if (source.Count() == 0)
+            {
+                return new Page<T>();
+            }
+
             return Page<T>.FromEnumerable(source, new PageDefinition(1, source.Count(), source.Count()));
         }
 

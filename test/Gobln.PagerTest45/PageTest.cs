@@ -70,7 +70,7 @@ namespace Gobln.PagerTest45
 
             CollectionAssert.AreEqual(expected, resultList, new TestModel1Comparer());
 
-
+            //----------------
 
             testList = null;
 
@@ -82,7 +82,7 @@ namespace Gobln.PagerTest45
 
             CollectionAssert.AreEqual(expected, resultList, new TestModel1Comparer());
 
-
+            //----------------
 
             resultPage = testList.ToPage(1, 10, 0);
 
@@ -92,7 +92,7 @@ namespace Gobln.PagerTest45
 
             CollectionAssert.AreEqual(expected, resultList, new TestModel1Comparer());
 
-
+            //----------------
 
             resultPage = testList.ToPage(1, 10, 0, prePaged: true);
 
@@ -147,6 +147,21 @@ namespace Gobln.PagerTest45
             var expected = HelperList.List1Amount15.Select(c => c.Name).Skip(8).Take(2).ToList();
 
             CollectionAssert.AreEqual(expected, resultList);
+        }
+
+        /// <summary>
+        /// Create a pager from a empty List
+        /// </summary>
+        [TestMethod]
+        public void PageTest7()
+        {
+            var resultPage = HelperList.List1Amount15.Where(c => 1 == 0).ToPage();
+
+            var resultList = resultPage.ToList();
+
+            var expected = HelperList.List1Amount15.Where(c => 1 == 0).ToList();
+
+            CollectionAssert.AreEqual(expected, resultList, new TestModel1Comparer());
         }
     }
 }
