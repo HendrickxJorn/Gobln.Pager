@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace Gobln.Pager
 {
@@ -6,55 +7,49 @@ namespace Gobln.Pager
     /// Interface IPagedList<typeparamref name="T"/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IPagedList<T> : IPagedList, IList<T> //, ICollection<T>, IList, ICollection, IEnumerable<T>, IEnumerable
+    public interface IPagedList<T> : IPagedList, IList<T>
     {
         /// <summary>
-        /// Retrieves the currently active Page
+        /// Retrieves the currently active <see cref="Page{T}"/>
         /// </summary>
         /// <returns><see cref="Page{T}"/></returns>
-        Page<T> GetCurrentPage();
+        Page<T> GetPage();
 
         /// <summary>
-        /// Retrieves the Page at the given index
+        /// Retrieves the <see cref="Page{T}"/> at the given index
         /// </summary>
         /// <param name="pageIndex">Index of the requested Page</param>
         /// <returns><see cref="Page{T}"/></returns>
         Page<T> GetPage(int pageIndex);
 
         /// <summary>
-        /// Loads the next Page if possible and returns it.
+        /// Go to the next <see cref="Page"/>. Can not go beyond the last <see cref="Page"/>.
         /// </summary>
-        /// <returns></returns>
-        Page<T> GetNextPage();
+        /// <returns><see cref="PagedList{T}"/></returns>
+        PagedList<T> NextPage();
 
         /// <summary>
-        /// Loads the previous Page if possible and returns it.
+        /// Go to the previous <see cref="Page"/>. Can not go beyond the fist <see cref="Page"/>.
         /// </summary>
-        /// <returns></returns>
-        Page<T> GetPreviousPage();
+        /// <returns><see cref="PagedList{T}"/></returns>
+        PagedList<T> PreviousPage();
 
         /// <summary>
-        /// Returns the next Page if possible without loading it (if the active page is the last Page, it will return the active Page).
+        /// Get all the Pages
         /// </summary>
-        /// <returns></returns>
-        Page<T> PeakNextPage();
-
-        /// <summary>
-        /// Returns the previous Page if possible without loading it (if the active page is the first Page, it will return the active Page).
-        /// </summary>
-        /// <returns></returns>
-        Page<T> PeakPreviousPage();
+        /// <returns><see cref="IEnumerable"/> of <see cref="Page{T}"/></returns>
+        IEnumerable<Page<T>> GetPages();
 
         /// <summary>
         /// Copies the elements of the PagedList to a new List.
         /// </summary>
-        /// <returns>An List containing copies of the elements of the PagedList.</returns>
+        /// <returns>An <see cref="List{T}"/> containing copies of the elements of the <see cref="PagedList{T}"/></returns>
         List<T> ToList();
 
         /// <summary>
         /// Copies the elements of the PagedList to a new array.
         /// </summary>
-        /// <returns>An array containing copies of the elements of the PagedList.</returns>
+        /// <returns>An array containing copies of the elements of the <see cref="PagedList{T}"/></returns>
         T[] ToArray();
     }
 
@@ -66,7 +61,7 @@ namespace Gobln.Pager
         /// <summary>
         /// The current page index
         /// </summary>
-        int CurrentPageIndex { get; set; }
+        int PageIndex { get; set; }
 
         /// <summary>
         /// The amount of items per page

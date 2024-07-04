@@ -1,44 +1,37 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace Gobln.Pager
 {
     /// <summary>
-    /// Represents a strongly typed pagedlist of objects that can be accessed by index.
+    /// Represents a strongly typed <see cref="PagedList{T}"/>
     /// </summary>
     /// <typeparam name="T">The type of elements in the list.</typeparam>
-    [Serializable]
-#if FEATURE_TYPE_NET40
-    public class PagedList<T> : IPagedList<T>
-#else
     public class PagedList<T> : IPagedList<T>, IReadOnlyList<T>
-#endif
     {
         #region Members
 
-        private List<T> _list = new List<T>();
+        private readonly List<T> _list = [];
         private int _currentPageIndex;
         private int _pageSize;
-        private const int _defaultPageSize = 10;
 
         #endregion Members
 
-        #region Init
+        #region Initialize
 
         /// <summary>
-        /// Initializes a new empty instance of the Gobln.Pager.PagedList class with default initial page size.
+        /// Initializes a new instance of the <see cref="PagedList{T}"/> class that is empty and has a page size of 10.
         /// </summary>
         public PagedList()
-            : this(_defaultPageSize)
+            :this(10)
         {
         }
 
         /// <summary>
-        /// Initializes a new empty instance of the Gobln.Pager.PagedList class with given initial page size.
+        /// Initializes a new instance of the <see cref="PagedList{T}"/> class that is empty and has a page size of <see href="pageSize"/>.
         /// </summary>
-        /// <param name="pageSize">The number of elements displayed per page</param>
+        /// <param name="pageSize">The number of elements per page</param>
         public PagedList(int pageSize)
         {
             Validator.ValidatePageSize(pageSize);
@@ -48,79 +41,46 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Initializes a new instance of the Gobln.Pager.PagedList class from the given list with the default page size.
+        /// Initializes a new instance of the <see cref="PagedList{T}"/> class that contains elements copied from the specified source and has a page size of 10.
+        /// And where the pageSize can be defined.
         /// </summary>
-        /// <param name="collection">The source list to paginate</param>
-        public PagedList(IEnumerable<T> collection)
-            : this(collection, _defaultPageSize)
+        /// <param name="source">The source whose elements are copied to the new <see cref="PagedList{T}"/></param>
+        public PagedList(IEnumerable<T> source)
+            : this(source, 10)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the Gobln.Pager.PagedList class that contains elements copied from the specified collection and has sufficient capacity to accommodate the number of elements copied.
+        /// Initializes a new instance of the <see cref="PagedList{T}"/> class that contains elements copied from the specified source and has a page size of <see href="pageSize"/>.
         /// And where the pageSize can be defined.
         /// </summary>
-        /// <param name="collection">The collection whose elements are copied to the new pageList.</param>
-        /// <param name="pageSize">The size that will be displayed on the page.</param>
-        public PagedList(IEnumerable<T> collection, int pageSize)
+        /// <param name="source">The source whose elements are copied to the new <see cref="PagedList{T}"/></param>
+        /// <param name="pageSize">The number of elements per page</param>
+        public PagedList(IEnumerable<T> source, int pageSize)
+            :this(pageSize)
         {
-            Validator.ValidatePageSize(pageSize);
-
-            _list = new List<T>(collection);
-            _pageSize = pageSize;
-            _currentPageIndex = 1;
+            _list = new List<T>(source);
 
             RecalculatePageCount();
         }
 
-        #endregion Init
-
-        #region Factory
-
-        /// <summary>
-        /// Initializes a new instance of the Gobln.Pager.PagedList class from the given list with the default page size.
-        /// </summary>
-        /// <param name="collection">The source list to paginate</param>
-        public static PagedList<T> FromEnumerable(IEnumerable<T> collection)
-        {
-            return FromEnumerable(collection, _defaultPageSize);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the Gobln.Pager.PagedList class from the given list with the given page size.
-        /// </summary>
-        /// <param name="collection">The source list to paginate</param>
-        /// <param name="pageSize">The number of elements displayed per page</param>
-        public static PagedList<T> FromEnumerable(IEnumerable<T> collection, int pageSize)
-        {
-            Validator.ValidatePageSize(pageSize);
-
-            var pagedList = new PagedList<T>() { _list = new List<T>(collection) };
-            pagedList._pageSize = pageSize;
-            pagedList._currentPageIndex = 1;
-
-            pagedList.RecalculatePageCount();
-
-            return pagedList;
-        }
-
-        #endregion Factory
+        #endregion Initialize
 
         #region Implementation of IEnumerable
 
         /// <summary>
-        /// Returns an enumerator that iterates through the Gobln.Pager.PagedList.
+        /// Returns an enumerator that iterates through the <see cref="PagedList{T}"/>.
         /// </summary>
-        /// <returns>A Gobln.Pager.PagedList.Enumerator for the Gobln.Pager.PagedList.</returns>
+        /// <returns>A Enumerator for the <see cref="PagedList{T}"/></returns>
         public IEnumerator<T> GetEnumerator()
         {
             return _list.GetEnumerator();
         }
 
         /// <summary>
-        /// Returns an enumerator that iterates through the Gobln.Pager.PagedList.
+        /// Returns an enumerator that iterates through the <see cref="PagedList{T}"/>.
         /// </summary>
-        /// <returns>A Gobln.Pager.PagedList.Enumerator for the Gobln.Pager.PagedList.</returns>
+        /// <returns>A Enumerator for the <see cref="PagedList{T}"/></returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
@@ -131,9 +91,9 @@ namespace Gobln.Pager
         #region Implementation of ICollection<T>
 
         /// <summary>
-        /// Adds an object to the end of the Gobln.Pager.PagedList.
+        /// Adds an object to the end of the <see cref="PagedList{T}"/>
         /// </summary>
-        /// <param name="item">The object to be added to the end of the Gobln.Pager.PagedList. The value can be null for reference types.</param>
+        /// <param name="item">The object to be added to the end of the <see cref="PagedList{T}"/>. The value can be null for reference types</param>
         public void Add(T item)
         {
             _list.Add(item);
@@ -141,7 +101,7 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Removes all elements from the Gobln.Pager.PagedList.
+        /// Removes all elements from the <see cref="PagedList{T}"/>
         /// </summary>
         public void Clear()
         {
@@ -150,33 +110,33 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Determines whether an element is in the Gobln.Pager.PagedList.
+        /// Determines whether an element is in the <see cref="PagedList{T}"/>
         /// </summary>
-        /// <param name="item">The object to locate in the Gobln.Pager.PagedList. The value can be null for reference types.</param>
-        /// <returns>true if item is found in the Gobln.Pager.PagedList; otherwise, false.</returns>
+        /// <param name="item">The object to locate in the <see cref="PagedList{T}"/>. The value can be null for reference types</param>
+        /// <returns>true if item is found in the <see cref="PagedList{T}"/>; otherwise, false</returns>
         public bool Contains(T item)
         {
             return _list.Contains(item);
         }
 
         /// <summary>
-        /// Copies the entire Gobln.Pager.PagedList to a compatible one-dimensional array, starting at the specified index of the target array.
+        /// Copies the entire <see cref="PagedList{T}"/> to a compatible one-dimensional array, starting at the specified index of the target array
         /// </summary>
-        /// <param name="array">The one-dimensional System.Array that is the destination of the elements copied from Gobln.Pager.PagedList. The System.Array must have zero-based indexing.</param>
-        /// <param name="arrayIndex">The zero-based index in array at which copying begins.</param>
-        /// <exception cref="System.ArgumentNullException">array is null.</exception>
-        /// <exception cref="System.ArgumentOutOfRangeException">arrayIndex is less than 0.</exception>
-        /// <exception cref="System.ArgumentException">The number of elements in the source Gobln.Pager.PagedList is greater than the available space from arrayIndex to the end of the destination array.</exception>
+        /// <param name="array">The one-dimensional System.Array that is the destination of the elements copied from <see cref="PagedList{T}"/>. The System.Array must have zero-based indexing</param>
+        /// <param name="arrayIndex">The zero-based index in array at which copying begins</param>
+        /// <exception cref="System.ArgumentNullException">array is null</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">arrayIndex is less than 0</exception>
+        /// <exception cref="System.ArgumentException">The number of elements in the source <see cref="PagedList{T}"/> is greater than the available space from arrayIndex to the end of the destination array</exception>
         public void CopyTo(T[] array, int arrayIndex)
         {
             _list.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
-        /// Removes the first occurrence of a specific object from the Gobln.Pager.PagedList.
+        /// Removes the first occurrence of a specific object from the <see cref="PagedList{T}"/>.
         /// </summary>
-        /// <param name="item">The object to remove from the Gobln.Pager.PagedList. The value can be null for reference types.</param>
-        /// <returns>true if item is successfully removed; otherwise, false. This method also returns false if item was not found in the Gobln.Pager.PagedList.</returns>
+        /// <param name="item">The object to remove from the <see cref="PagedList{T}"/>. The value can be null for reference types</param>
+        /// <returns>true if item is successfully removed; otherwise, false. This method also returns false if item was not found in the <see cref="PagedList{T}"/></returns>
         public bool Remove(T item)
         {
             var result = _list.Remove(item);
@@ -185,19 +145,15 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Gets the number of elements actually contained in the Gobln.Pager.PagedList.
+        /// Gets the number of elements actually contained in the <see cref="PagedList{T}"/>.
         /// </summary>
-        /// <returns>The number of elements actually contained in the Gobln.Pager.PagedList.</returns>
+        /// <returns>The number of elements actually contained in the <see cref="PagedList{T}"/></returns>
         public int Count => _list.Count;
 
-#if FEATURE_TYPE_NET40
-        int ICollection<T>.Count => Count;
-#else
         int IReadOnlyCollection<T>.Count => Count;
-#endif
 
         /// <summary>
-        /// Is the Gobln.Pager.PagedList readonly
+        /// Is the <see cref="PagedList{T}"/> readonly
         /// </summary>
         public bool IsReadOnly => false;
 
@@ -206,21 +162,21 @@ namespace Gobln.Pager
         #region Implementation of IList<T>
 
         /// <summary>
-        /// Searches for the specified object and returns the zero-based index of the first occurrence within the entire Gobln.Pager.PagedList.
+        /// Searches for the specified object and returns the zero-based index of the first occurrence within the entire <see cref="PagedList{T}"/>.
         /// </summary>
-        /// <param name="item">The object to locate in the Gobln.Pager.PagedList. The value can be null for reference types.</param>
-        /// <returns>The zero-based index of the first occurrence of item within the entire Gobln.Pager.PagedList, if found; otherwise, –1.</returns>
+        /// <param name="item">The object to locate in the <see cref="PagedList{T}"/>. The value can be null for reference types</param>
+        /// <returns>The zero-based index of the first occurrence of item within the entire <see cref="PagedList{T}"/>, if found; otherwise, –1</returns>
         public int IndexOf(T item)
         {
             return _list.IndexOf(item);
         }
 
         /// <summary>
-        ///  Inserts an element into the Gobln.Pager.PagedList at the specified index.
+        ///  Inserts an element into the <see cref="PagedList{T}"/> at the specified index.
         /// </summary>
-        /// <param name="index">The zero-based index at which item should be inserted.</param>
-        /// <param name="item">The object to insert. The value can be null for reference types.</param>
-        /// <exception cref="System.ArgumentOutOfRangeException">index is less than 0.-or-index is greater than Gobln.Pager.PagedList.Count.</exception>
+        /// <param name="index">The zero-based index at which item should be inserted</param>
+        /// <param name="item">The object to insert. The value can be null for reference types</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">index is less than 0 or the index is greater than amount of items in the <see cref="PagedList{T}"/></exception>
         public void Insert(int index, T item)
         {
             _list.Insert(index, item);
@@ -228,10 +184,10 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Removes the element at the specified index of the Gobln.Pager.PagedList.
+        /// Removes the element at the specified index of the <see cref="PagedList{T}"/>.
         /// </summary>
-        /// <param name="index">The zero-based index of the element to remove.</param>
-        /// <exception cref="System.ArgumentOutOfRangeException">index is less than 0.-or-index is equal to or greater than Gobln.Pager.PagedList.Count.</exception>
+        /// <param name="index">The zero-based index of the element to remove</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">index is less than 0.-or-index is equal to or greater than Gobln.Pager.PagedList.Count</exception>
         public void RemoveAt(int index)
         {
             _list.RemoveAt(index);
@@ -241,13 +197,19 @@ namespace Gobln.Pager
         /// <summary>
         /// Gets or sets the element at the specified index.
         /// </summary>
-        /// <param name="index">The zero-based index of the element to get or set.</param>
-        /// <returns>The element at the specified index.</returns>
-        /// <exception cref="System.ArgumentOutOfRangeException">index is less than 0.-or-index is equal to or greater than Gobln.Pager.PagedList.Count.</exception>
+        /// <param name="index">The zero-based index of the element to get or set</param>
+        /// <returns>The element at the specified index</returns>
+        /// <exception cref="System.ArgumentOutOfRangeException">index is less than 0.-or-index is equal to or greater than Gobln.Pager.PagedList.Count</exception>
         public T this[int index]
         {
-            get { return _list[index]; }
-            set { _list[index] = value; }
+            get
+            {
+                return _list[index];
+            }
+            set
+            {
+                _list[index] = value;
+            }
         }
 
         #endregion Implementation of IList<T>
@@ -255,10 +217,10 @@ namespace Gobln.Pager
         #region Implementation of IPagedList
 
         /// <summary>
-        /// The current page index
-        /// This value can not be lower then 1
+        /// The page index
+        /// This value can not be lower then 1 or greater then the <see cref="PageCount" />
         /// </summary>
-        public int CurrentPageIndex
+        public int PageIndex
         {
             get
             {
@@ -267,9 +229,13 @@ namespace Gobln.Pager
             set
             {
                 if (value < 1)
+                {
                     value = 1;
-                else if (value > PageCount)
+                }
+                else if (PageCount < value)
+                {
                     value = PageCount;
+                }
 
                 _currentPageIndex = value;
             }
@@ -287,10 +253,7 @@ namespace Gobln.Pager
             }
             set
             {
-                if (value < 1)
-                    value = 1;
-
-                _pageSize = value;
+                _pageSize = value < 1 ? 1 : value;
                 RecalculatePageCount();
             }
         }
@@ -315,68 +278,54 @@ namespace Gobln.Pager
         #region Implementation of IPagedList<T>
 
         /// <summary>
-        /// Retrieves the currently active <see cref="Page{T}"/>
-        /// </summary>
-        /// <returns><see cref="Page{T}"/></returns>
-        public Page<T> GetCurrentPage() => _list.ToPage(CurrentPageIndex, PageSize);
-
-        /// <summary>
-        /// Retrieves the <see cref="Page{T}"/> at the given index
+        /// Retrieves the <see cref="Page"/> at the given index
         /// </summary>
         /// <param name="pageIndex">Index of the requested page</param>
         /// <returns><see cref="Page{T}"/></returns>
-        public Page<T> GetPage(int pageIndex)
-        {
-            CurrentPageIndex = pageIndex;
-            return GetCurrentPage();
-        }
+        public Page<T> GetPage(int pageIndex) => _list.ToPage(pageIndex, PageSize);
 
         /// <summary>
-        /// Loads the next <see cref="Page{T}"/> if possible and returns it.
+        /// Retrieves the currently active <see cref="Page"/>
         /// </summary>
         /// <returns><see cref="Page{T}"/></returns>
-        public Page<T> GetNextPage()
+        public Page<T> GetPage() => GetPage(PageIndex);
+
+        /// <summary>
+        /// Go to the next <see cref="Page"/>. Can not go beyond the last <see cref="Page"/>.
+        /// </summary>
+        /// <returns><see cref="PagedList{T}"/></returns>
+        public PagedList<T> NextPage()
         {
-            CurrentPageIndex += 1;
-            return GetCurrentPage();
+            PageIndex += 1;
+            return this;
         }
 
         /// <summary>
-        /// Loads the previous Page if possible and returns it.
+        /// Go to the previous <see cref="Page"/>. Can not go beyond the fist <see cref="Page"/>.
         /// </summary>
-        /// <returns><see cref="Page{T}"/></returns>
-        public Page<T> GetPreviousPage()
+        /// <returns><see cref="PagedList{T}"/></returns>
+        public PagedList<T> PreviousPage()
         {
-            CurrentPageIndex -= 1;
-            return GetCurrentPage();
+            PageIndex -= 1;
+            return this;
         }
 
         /// <summary>
-        /// Returns the next Page if possible without loading it (if the active page is the last page, it will return the active page).
+        /// Get all the Pages
         /// </summary>
-        /// <returns><see cref="Page{T}"/></returns>
-        public Page<T> PeakNextPage()
+        /// <returns><see cref="IEnumerable"/> of <see cref="Page{T}"/></returns>
+        public IEnumerable<Page<T>> GetPages()
         {
-            return HasNextPage
-                ? _list.ToPage(CurrentPageIndex + 1, PageSize)
-                : GetCurrentPage();
-        }
-
-        /// <summary>
-        /// /// Returns the previous Page if possible without loading it (if the active page is the first page, it will return the active page).
-        /// </summary>
-        /// <returns></returns>
-        public Page<T> PeakPreviousPage()
-        {
-            return HasPreviousPage
-                ? _list.ToPage(CurrentPageIndex - 1, PageSize)
-                : GetCurrentPage();
+            for (int i = 1; i < PageCount; i++)
+            {
+                yield return this.GetPage(i);
+            }
         }
 
         /// <summary>
         /// Copies the elements of the <see cref="PagedList{T}"/> to a new List.
         /// </summary>
-        /// <returns>An List containing copies of the elements of the <see cref="PagedList{T}"/>.</returns>
+        /// <returns>An List containing copies of the elements of the <see cref="PagedList{T}"/></returns>
         public List<T> ToList()
         {
             return new List<T>(_list);
@@ -385,10 +334,10 @@ namespace Gobln.Pager
         /// <summary>
         /// Copies the elements of the <see cref="PagedList{T}"/> to a new array.
         /// </summary>
-        /// <returns>An array containing copies of the elements of the <see cref="PagedList{T}"/>.</returns>
+        /// <returns>An array containing copies of the elements of the <see cref="PagedList{T}"/></returns>
         public T[] ToArray()
         {
-            return _list.ToArray();
+            return [.. _list];
         }
 
         #endregion Implementation of IPagedList<T>
@@ -396,10 +345,10 @@ namespace Gobln.Pager
         #region Additional
 
         /// <summary>
-        ///  Adds the elements of the specified collection to the end of the Gobln.Pager.PagedList.
+        ///  Adds the elements of the specified collection to the end of the <see cref="PagedList{T}"/>.
         /// </summary>
-        /// <param name="collection">The collection whose elements should be added to the end of the Gobln.Pager.PagedList. The collection itself cannot be null, but it can contain elements that are null, if type T is a reference type.</param>
-        /// <exception cref="System.ArgumentNullException">collection is null.</exception>
+        /// <param name="collection">The collection whose elements should be added to the end of the <see cref="PagedList{T}"/>. The collection itself cannot be null, but it can contain elements that are null, if type T is a reference type</param>
+        /// <exception cref="System.ArgumentNullException">collection is null</exception>
         public void AddRange(IEnumerable<T> collection)
         {
             _list.AddRange(collection);
@@ -407,12 +356,12 @@ namespace Gobln.Pager
         }
 
         /// <summary>
-        /// Returns a read-only System.Collections.Generic.IList wrapper for the current collection.
+        /// Returns a read-only <see cref="IList"/> wrapper for the current collection.
         /// </summary>
-        /// <returns>A System.Collections.ObjectModel.ReadOnlyCollection that acts as a read-only wrapper around the current Gobln.Pager.PagedList.</returns>
+        /// <returns>A System.Collections.ObjectModel.ReadOnlyCollection that acts as a read-only wrapper around the current <see cref="PagedList{T}"/></returns>
         public ReadOnlyCollection<T> AsReadOnly()
         {
-            return _list.AsReadOnly();
+            return new List<T>(_list).AsReadOnly();
         }
 
         #endregion Additional
@@ -421,12 +370,30 @@ namespace Gobln.Pager
 
         private void RecalculatePageCount()
         {
-            PageCount = Calculate.CalculatePageCount(Count, PageSize);
+            PageCount = Count == 0 ? 1 : ((Count - 1) / PageSize) + 1;
 
             //By reassigning the CurrentPageIndex to itself, we force the validation again so the CurrentPageIndex remains in scope.
-            CurrentPageIndex = CurrentPageIndex;
+            PageIndex = PageIndex;
         }
 
         #endregion Private
+    }
+
+    /// <summary>
+    /// Represents a strongly typed <see cref="PagedList"/>
+    /// </summary>
+    public static class PagedList
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PagedList{T}"/> class from the given list with the given page size.
+        /// </summary>
+        /// <param name="source">The elements of <typeparamref name="T"/></param>
+        /// <param name="pageSize">The number of elements displayed per page</param>
+        public static PagedList<T> FromEnumerable<T>(IEnumerable<T> source, int pageSize = 10)
+        {
+            Validator.ValidatePageSize(pageSize);
+
+            return new PagedList<T>(source, pageSize);
+        }
     }
 }

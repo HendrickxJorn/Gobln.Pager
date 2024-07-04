@@ -1,11 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
-#if !FEATURE_TYPE_NET40
-
+using System.Threading;
 using System.Threading.Tasks;
-
-#endif
 
 namespace Gobln.Pager
 {
@@ -14,26 +10,28 @@ namespace Gobln.Pager
     /// </summary>
     public static class IEnumerableExtensions
     {
+        private static Page<T> PrivateToPage<T>(IEnumerable<T> source, int pageIndex, int pageSize, int totalItemCount, bool prePaged = false)
+        {
+            var pd = new PageDefinition(pageIndex, pageSize, totalItemCount);
+
+            return new Page<T>(prePaged || pd.TotalItemCount < 1 ? source : source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+        }
+
         #region ToPage
 
         /// <summary>
-        /// Converts IEnumerable to a Page
+        /// Converts IEnumerable to an <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
         public static Page<T> ToPage<T>(this IEnumerable<T> source)
         {
-            if (source.Count() == 0)
-            {
-                return new Page<T>();
-            }
-
-            return Page<T>.FromEnumerable(source, new PageDefinition(1, source.Count(), source.Count()));
+            return PrivateToPage(source, 1, source.Count(), source.Count());
         }
 
         /// <summary>
-        /// Converts IEnumerable to a Page
+        /// Converts IEnumerable to an <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -44,70 +42,85 @@ namespace Gobln.Pager
         {
             Validator.Validate(pageIndex, pageSize);
 
-            var pd = new PageDefinition(pageIndex, pageSize, source.Count());
-
-            return pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+            return PrivateToPage(source, pageIndex, pageSize, source.Count());
         }
 
         /// <summary>
-        /// Converts IEnumerable to a Page
+        /// Converts IEnumerable to an <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
+        /// <param name="pagerFilter"><see cref="IPageFilter"/></param>
         /// <returns></returns>
-        public static Page<T> ToPage<T>(this IEnumerable<T> source, IPagerFilter pagerFilter)
+        public static Page<T> ToPage<T>(this IEnumerable<T> source, IPageFilter pagerFilter)
         {
             Validator.Validate(pagerFilter);
 
-            var pd = new PageDefinition(pagerFilter, source.Count());
-
-            return pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, source.Count());
         }
 
         /// <summary>
-        /// Converts IEnumerable to a Page
+        /// Converts asynchronous a pre-paged IEnumerable to an <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <param name="pageIndex">Index of page</param>
         /// <param name="pageSize">Size of page</param>
-        /// <param name="itemCount">Total item count of IEnumerable</param>
-        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
+        /// <param name="totalItemCount">Total item count of IEnumerable</param>
         /// <returns></returns>
-        public static Page<T> ToPage<T>(this IEnumerable<T> source, int pageIndex, int pageSize, int itemCount, bool prePaged = false)
+        public static Page<T> ToPage<T>(this IEnumerable<T> source, int pageIndex, int pageSize, int totalItemCount)
         {
             Validator.Validate(pageIndex, pageSize);
 
-            var pd = new PageDefinition(pageIndex, pageSize, itemCount);
-
-            return prePaged || pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+            return PrivateToPage(source, pageIndex, pageSize, totalItemCount, true);
         }
 
         /// <summary>
-        /// Converts IEnumerable to a Page
+        /// Converts asynchronous a pre-paged IEnumerable to an <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
-        /// <param name="itemCount">Total item count of IEnumerable</param>
-        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
+        /// <param name="pagerFilter"><see cref="IPageFilter"/></param>
+        /// <param name="totalItemCount">Total item count of IEnumerable</param>
         /// <returns></returns>
-        public static Page<T> ToPage<T>(this IEnumerable<T> source, IPagerFilter pagerFilter, int itemCount, bool prePaged = false)
+        public static Page<T> ToPage<T>(this IEnumerable<T> source, IPageFilter pagerFilter, int totalItemCount)
         {
             Validator.Validate(pagerFilter);
 
-            var pd = new PageDefinition(pagerFilter, itemCount);
+            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, true);
+        }
 
-            return prePaged || pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+        /// <summary>
+        /// Converts IEnumerable to an <see cref="Page"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="pageIndex">Index of page</param>
+        /// <param name="pageSize">Size of page</param>
+        /// <param name="totalItemCount">Total item count of IEnumerable</param>
+        /// <param name="prePaged">Is the IEnumerable already pre-paged. If so the IEnumerable will not be paged anymore.</param>
+        /// <returns></returns>
+        public static Page<T> ToPage<T>(this IEnumerable<T> source, int pageIndex, int pageSize, int totalItemCount, bool prePaged)
+        {
+            Validator.Validate(pageIndex, pageSize);
+
+            return PrivateToPage(source, pageIndex, pageSize, totalItemCount, prePaged);
+        }
+
+        /// <summary>
+        /// Converts IEnumerable to an <see cref="Page"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="pagerFilter"><see cref="IPageFilter"/></param>
+        /// <param name="totalItemCount">Total item count of IEnumerable</param>
+        /// <param name="prePaged">Is the IEnumerable already pre-paged. If so the IEnumerable will not be paged anymore.</param>
+        /// <returns></returns>
+        public static Page<T> ToPage<T>(this IEnumerable<T> source, IPageFilter pagerFilter, int totalItemCount, bool prePaged)
+        {
+            Validator.Validate(pagerFilter);
+
+            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, prePaged);
         }
 
         #endregion ToPage
@@ -115,18 +128,18 @@ namespace Gobln.Pager
         #region ToPagedList
 
         /// <summary>
-        /// Convert IEnumerable to a PagedList
+        /// Convert IEnumerable to an <see cref="PagedList{T}"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
         public static PagedList<T> ToPagedList<T>(this IEnumerable<T> source)
         {
-            return PagedList<T>.FromEnumerable(source);
+            return PagedList.FromEnumerable(source);
         }
 
         /// <summary>
-        /// Convert IEnumerable to a PagedList
+        /// Convert IEnumerable to an <see cref="PagedList{T}"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
@@ -136,104 +149,131 @@ namespace Gobln.Pager
         {
             Validator.ValidatePageSize(pageSize);
 
-            return PagedList<T>.FromEnumerable(source, pageSize);
+            return PagedList.FromEnumerable(source, pageSize);
         }
 
         #endregion ToPagedList
-
-#if !FEATURE_TYPE_NET40
 
         #region Async
 
         #region ToPage
 
         /// <summary>
-        /// Converts asynchronous IEnumerable to a Page
+        /// Converts asynchronous IEnumerable to an <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source)
+        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, CancellationToken cancellationToken = default)
         {
-            return await Task.Run(() => Page<T>.FromEnumerable(source, new PageDefinition(1, source.Count(), source.Count()))).ConfigureAwait(false);
+            return await Task.Run(() => PrivateToPage(source, 1, source.Count(), source.Count()), cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Converts asynchronous IEnumerable to a Page
+        /// Converts asynchronous IEnumerable to an <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <param name="pageIndex">Index of page</param>
         /// <param name="pageSize">Size of page</param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, int pageIndex, int pageSize)
+        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, int pageIndex, int pageSize, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pageIndex, pageSize);
 
-            var pd = new PageDefinition(pageIndex, pageSize, source.Count());
-
-            return pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
+            return await Task.Run(() => PrivateToPage(source, pageIndex, pageSize, source.Count()), cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Converts asynchronous IEnumerable to a Page
+        /// Converts asynchronous IEnumerable to an <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
+        /// <param name="pagerFilter"><see cref="IPageFilter"/></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, IPagerFilter pagerFilter)
+        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, IPageFilter pagerFilter, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pagerFilter);
 
-            var pd = new PageDefinition(pagerFilter, source.Count());
-
-            return pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
+            return await Task.Run(() => PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, source.Count()), cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Converts asynchronous IEnumerable to a Page
+        /// Converts asynchronous a pre-paged IEnumerable to an <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
         /// <param name="pageIndex">Index of page</param>
         /// <param name="pageSize">Size of page</param>
-        /// <param name="itemCount">Total item count of IEnumerable</param>
-        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
+        /// <param name="totalItemCount">Total item count of IEnumerable</param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, int pageIndex, int pageSize, int itemCount, bool prePaged = false)
+        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, int pageIndex, int pageSize, int totalItemCount, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pageIndex, pageSize);
 
-            var pd = new PageDefinition(pageIndex, pageSize, itemCount);
-
-            return prePaged || pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
+            return await Task.Run(() => PrivateToPage(source, pageIndex, pageSize, totalItemCount, true), cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Converts asynchronous IEnumerable to a Page
+        /// Converts asynchronous a pre-paged IEnumerable to an <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
-        /// <param name="itemCount">Total item count of IEnumerable</param>
-        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
+        /// <param name="pagerFilter"><see cref="IPageFilter"/></param>
+        /// <param name="totalItemCount">Total item count of IEnumerable</param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, IPagerFilter pagerFilter, int itemCount, bool prePaged = false)
+        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, IPageFilter pagerFilter, int totalItemCount, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pagerFilter);
 
-            var pd = new PageDefinition(pagerFilter, itemCount);
+            return await Task.Run(() => PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, true))
+                .ConfigureAwait(false);
+        }
 
-            return prePaged || pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
+        /// <summary>
+        /// Converts asynchronous IEnumerable to an <see cref="Page"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="pageIndex">Index of page</param>
+        /// <param name="pageSize">Size of page</param>
+        /// <param name="totalItemCount">Total item count of IEnumerable</param>
+        /// <param name="prePaged">Is the IEnumerable already pre-paged. If so the IEnumerable will not be paged anymore.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, int pageIndex, int pageSize, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default)
+        {
+            Validator.Validate(pageIndex, pageSize);
+
+            return await Task.Run(() => PrivateToPage(source, pageIndex, pageSize, totalItemCount, prePaged), cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Converts asynchronous IEnumerable to an <see cref="Page"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="pagerFilter"><see cref="IPageFilter"/></param>
+        /// <param name="totalItemCount">Total item count of IEnumerable</param>
+        /// <param name="prePaged">Is the IEnumerable already pre-paged. If so the IEnumerable will not be paged anymore.</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, IPageFilter pagerFilter, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default)
+        {
+            Validator.Validate(pagerFilter);
+
+            return await Task.Run(() => PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, prePaged))
+                .ConfigureAwait(false);
         }
 
         #endregion ToPage
@@ -241,34 +281,34 @@ namespace Gobln.Pager
         #region ToPagedList
 
         /// <summary>
-        /// Convert asynchronous IEnumerable to a PagedList
+        /// Convert asynchronous IEnumerable to an <see cref="PagedList{T}"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="source"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<PagedList<T>> ToPagedListAsync<T>(this IEnumerable<T> source)
+        public static async Task<PagedList<T>> ToPagedListAsync<T>(this IEnumerable<T> source, CancellationToken cancellationToken = default)
         {
-            return await Task.Run(() => PagedList<T>.FromEnumerable(source)).ConfigureAwait(false);
+            return await Task.Run(() => PagedList.FromEnumerable(source), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Convert asynchronous IEnumerable to a PagedList
+        /// Convert asynchronous IEnumerable to an <see cref="PagedList{T}"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
+        /// <param name="source">The elements of <typeparamref name="T"/></param>
         /// <param name="pageSize"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<PagedList<T>> ToPagedListAsync<T>(this IEnumerable<T> source, int pageSize)
+        public static async Task<PagedList<T>> ToPagedListAsync<T>(this IEnumerable<T> source, int pageSize, CancellationToken cancellationToken = default)
         {
             Validator.ValidatePageSize(pageSize);
 
-            return await Task.Run(() => PagedList<T>.FromEnumerable(source, pageSize)).ConfigureAwait(false);
+            return await Task.Run(() => PagedList.FromEnumerable(source, pageSize), cancellationToken).ConfigureAwait(false);
         }
 
         #endregion ToPagedList
 
         #endregion Async
-
-#endif
     }
 }

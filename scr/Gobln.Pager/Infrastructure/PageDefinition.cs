@@ -1,37 +1,32 @@
-﻿namespace Gobln.Pager
+﻿using System;
+
+namespace Gobln.Pager
 {
-    internal class PageDefinition
+    internal class PageDefinition(int pageIndex, int pageSize, int totalItemCount)
     {
-        #region Properties
+        public int PageSize => pageSize <= 0 ? int.MaxValue : pageSize;
 
-        public int PageSize { get; private set; }
-        public int PageIndex { get; private set; }
-        public int PageCount { get; private set; }
-        public int SkipIndex { get; private set; }
-        public int ItemCount { get; private set; }
-
-        #endregion Properties
-
-        #region Init
-
-        public PageDefinition(int pageIndex, int pageSize, int itemCount)
+        public int PageIndex
         {
-            ItemCount = itemCount;
-            PageSize = Calculate.ValidPageSize(pageSize);
-            PageIndex = Calculate.ValidPageIndex(pageIndex, pageSize, itemCount);
-            PageCount = Calculate.TotalPageCount(itemCount, PageSize);
-            SkipIndex = Calculate.SkipIndex(pageIndex, pageSize);
+            get
+            {
+                {
+                    if (pageIndex < 1)
+                    {
+                        pageIndex = 1;
+                    }
+
+                    return pageIndex > PageCount && PageCount > 0
+                        ? PageCount
+                        : pageIndex;
+                }
+            }
         }
 
-        public PageDefinition(IPagerFilter pagerFilter, int itemCount)
-        {
-            ItemCount = itemCount;
-            PageSize = Calculate.ValidPageSize(pagerFilter.PageSize);
-            PageIndex = Calculate.ValidPageIndex(pagerFilter.PageIndex, pagerFilter.PageSize, itemCount);
-            PageCount = Calculate.TotalPageCount(itemCount, PageSize);
-            SkipIndex = Calculate.SkipIndex(pagerFilter.PageIndex, pagerFilter.PageSize);
-        }
+        public int PageCount => (int)Math.Ceiling(totalItemCount / (decimal)pageSize);
 
-        #endregion Init
+        public int SkipIndex => (pageIndex - 1) * pageSize;
+
+        public int TotalItemCount => totalItemCount;
     }
 }

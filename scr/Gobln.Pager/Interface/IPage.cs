@@ -3,7 +3,7 @@
 namespace Gobln.Pager
 {
     /// <summary>
-    /// Interface Page<typeparamref name="T"/>
+    /// Interface <see cref="Page{T}"/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface IPage<out T> : IPage, IEnumerable<T> 
@@ -11,14 +11,14 @@ namespace Gobln.Pager
     }
 
     /// <summary>
-    /// Interface Page
+    /// Interface <see cref="Page"/>
     /// </summary>
     public interface IPage
     {
         /// <summary>
-        /// The index of the current page in the original list
+        /// The index of the current page in the original collection
         /// </summary>
-        int CurrentPageIndex { get; }
+        int PageIndex { get; }
 
         /// <summary>
         /// The size of the page
@@ -26,17 +26,17 @@ namespace Gobln.Pager
         int PageSize { get; }
 
         /// <summary>
-        /// Total amount of items in the original list
+        /// Total amount of items in the original collection
         /// </summary>
         int TotalItemCount { get; }
 
         /// <summary>
-        /// Total amount of pages in the original list
+        /// Total amount of pages in the original collection
         /// </summary>
         int TotalPageCount { get; }
 
         /// <summary>
-        /// Is paging available (more than one page in the original list)
+        /// Is paging available (has more than one page in the original collection)
         /// </summary>
         bool HasPaging { get; }
 

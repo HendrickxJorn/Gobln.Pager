@@ -7,11 +7,9 @@ If you would like to use Gobln.Pager in Mvc, check the following link [Gobln.Pag
 
 ## Frameworks
 
-* .Net 4.0 and higher
-* .Net Core 1.0 and higher
-* .Net Core 2.0 and higher
-* .Net Core 3.0 and higher
-* .Net Standard 1.6 and higher
+* .Net 4.5 and higher
+* .Net Standard 2.0 and higher
+* .Net 6.0 and higher
 
 ## Page
 
@@ -116,6 +114,25 @@ For more examples, check the test project
 The project is on [Nuget](https://www.nuget.org/packages/Gobln.Pager/). Install via the NuGet Package Manager.
 
 PM > Install-Package Gobln.Pager
+
+## Breaking changes in version 2
+
+### Page
+
+- When using the parameter TotalItemCount with the creation of a Page, this will use the given collection as its was Pre-Paged. To regain the functionality of version 1, the prepaged parameter must be set to false.
+
+### PagedList
+
+- CurrentPageIndex rename to PageIndex
+- GetCurrentPage() rename to GetPage()
+- Next() rename to NextPage()
+- Previous rename to PreviousPage()
+- Remove SetPageIndex()
+- Remove GetNextPage()
+- Remove GetPreviousPage()
+- Remove PeakNextPage()
+- Remove PeakPreviousPage()
+
 
 ## License
 
