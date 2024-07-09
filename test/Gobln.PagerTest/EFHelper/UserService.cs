@@ -56,5 +56,20 @@ namespace Gobln.PagerTest.EFHelper
 
             return await query.ToPageAsync(pageFilter, cancellationToken);
         }
+
+
+        public PagedList<User> GetPagedListUsers()
+        {
+            var query = _context.Users;
+
+            return query.ToPagedList();
+        }
+
+        public async Task<PagedList<User>> GetPagedListUsersAsync(CancellationToken cancellationToken)
+        {
+            var query = _context.Users;
+
+            return await query.ToPagedListAsync(cancellationToken);
+        }
     }
 }

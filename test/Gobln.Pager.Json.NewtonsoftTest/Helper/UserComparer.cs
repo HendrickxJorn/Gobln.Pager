@@ -1,13 +1,13 @@
-﻿using Gobln.Pager.Json.MicrosoftTest.Model;
+﻿using Gobln.Pager.Json.NewtonsoftTest.Model;
 using System.Reflection;
 
-namespace Gobln.Pager.Json.MicrosoftTest.Helper
+namespace Gobln.Pager.Json.NewtonsoftTest.Helper
 {
-    internal class TestUserComparer : IEqualityComparer<TestUser>
+    internal class UserComparer : IEqualityComparer<User>
     {
-        public bool Equals(TestUser expected, TestUser actual)
+        public bool Equals(User expected, User actual)
         {
-            var props = typeof(TestUser).GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
+            var props = typeof(User).GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
             foreach (var prop in props)
             {
                 var expectedValue = prop.GetValue(expected, null);
@@ -23,7 +23,7 @@ namespace Gobln.Pager.Json.MicrosoftTest.Helper
             return true;
         }
 
-        public int GetHashCode(TestUser parameterValue)
+        public int GetHashCode(User parameterValue)
         {
             return Tuple.Create(parameterValue).GetHashCode();
         }

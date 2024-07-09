@@ -119,6 +119,7 @@ PM > Install-Package Gobln.Pager
 
 ### Page
 
+- PageIndex is now default 1, not 0
 - When using the parameter TotalItemCount with the creation of a Page, this will use the given collection as its was Pre-Paged. To regain the functionality of version 1, the prepaged parameter must be set to false.
 
 ### PagedList
@@ -132,7 +133,6 @@ PM > Install-Package Gobln.Pager
 - Remove GetPreviousPage()
 - Remove PeakNextPage()
 - Remove PeakPreviousPage()
-
 
 ## License
 

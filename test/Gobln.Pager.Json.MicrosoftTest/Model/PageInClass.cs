@@ -2,7 +2,7 @@
 {
     internal class PageInClass
     {
-        public Page<TestUser> User { get; set; }
+        public Page<User> User { get; set; }
 
         public int SomeNumber { get; set; } = 5;
     }

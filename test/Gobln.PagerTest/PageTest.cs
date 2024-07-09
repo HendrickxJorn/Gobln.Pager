@@ -66,7 +66,7 @@ namespace Gobln.PagerTest
             // And will then give back an empty Page
             var result = data.ToPage(5, 15);
 
-            var expected = new List<Model.User>();
+            var expected = new List<User>();
 
             Assert.Equal(1, result.PageIndex);
             Assert.Equal(expected, result, new UserComparer());
@@ -139,7 +139,7 @@ namespace Gobln.PagerTest
         [Fact]
         public void Create_Empty_Page()
         {
-            var result = new List<Model.User>().ToPage();
+            var result = new List<User>().ToPage();
 
             var expected = new List<User>().ToArray();
 
@@ -156,9 +156,10 @@ namespace Gobln.PagerTest
             var data = UserData.UserList;
 
             // Create a Page for 15 items on page 5, with an total of 0 items
+            // Will return default
             var result = data.ToPage(5, 15, 0);
 
-            var expected = new List<Model.User>();
+            var expected = new List<User>();
 
             Assert.Equal(1, result.PageIndex);
             Assert.Equal(expected, result, new UserComparer());
@@ -196,13 +197,10 @@ namespace Gobln.PagerTest
             Assert.Equal(expected, result, new UserComparer());
         }
 
-
-
-
-
         [Fact]
         public void Create_Page_From_EF01()
         {
+            /// mock EF
             var data = UserData.UserList
                 .AsQueryable();
 
@@ -215,11 +213,11 @@ namespace Gobln.PagerTest
             var mockContext = new Mock<UserContext>();
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);
 
+            /// Call Service with mock EF
             var service = new UserService(mockContext.Object);
             var result = service.GetPageUsers(new PageFilter(2, 5));
 
-           
-            var expected = data;
+            var expected = data.Skip(5).Take(5).ToList();
 
             Assert.Equal(2, result.PageIndex);
             Assert.Equal(expected, result, new UserComparer());

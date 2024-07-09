@@ -1,7 +1,10 @@
 ﻿using Gobln.Pager;
 using Gobln.PagerTest.Data;
+using Gobln.PagerTest.EFHelper;
 using Gobln.PagerTest.Helper;
 using Gobln.PagerTest.Model;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using Xunit;
 
 namespace Gobln.PagerTest
@@ -145,6 +148,32 @@ namespace Gobln.PagerTest
 
             var expected = new List<User>();
 
+            Assert.Equal(expected, result, new UserComparer());
+        }
+
+        [Fact]
+        public async Task Create_Page_From_EF01()
+        {
+            /// mock EF
+            var data = UserData.UserList
+                .AsQueryable();
+
+            var mockSet = new Mock<DbSet<User>>();
+            mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(data.Provider);
+            mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(data.Expression);
+            mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(data.ElementType);
+            mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(() => data.GetEnumerator());
+
+            var mockContext = new Mock<UserContext>();
+            mockContext.Setup(c => c.Users).Returns(mockSet.Object);
+
+            /// Call Service with mock EF
+            var service = new UserService(mockContext.Object);
+            var result = await service.GetPageUsersAsync(new PageFilter(2, 5), default);
+
+            var expected = data.Skip(5).Take(5).ToList();
+
+            Assert.Equal(2, result.PageIndex);
             Assert.Equal(expected, result, new UserComparer());
         }
     }

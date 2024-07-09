@@ -1,10 +1,10 @@
-﻿using Gobln.Pager.Json.MicrosoftTest.Model;
+﻿using Gobln.Pager.Json.NewtonsoftTest.Model;
 
-namespace Gobln.Pager.Json.MicrosoftTest.Data
+namespace Gobln.Pager.Json.NewtonsoftTest.Data
 {
-    internal class TestUserData
+    internal class UserData
     {
-        public static IEnumerable<TestUser> TestUserList => [
+        public static IEnumerable<User> TestUserList => [
                     new() { Id = 1, Name = "Tester1",   SurName= "Test", Date = new DateTime(2023, 5, 1) },
                     new() { Id = 2, Name = "Tester2",   SurName= "Test", Date = new DateTime(2023, 5, 2) },
                     new() { Id = 3, Name = "Tester3",   SurName= "Test", Date = new DateTime(2023, 5, 3) },

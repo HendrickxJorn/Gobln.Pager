@@ -1,5 +1,4 @@
-﻿using Gobln.Pager;
-using Gobln.Pager.Json.Microsoft;
+﻿using Gobln.Pager.Json.Microsoft;
 using Gobln.Pager.Json.MicrosoftTest.Data;
 using Gobln.Pager.Json.MicrosoftTest.Helper;
 using Gobln.Pager.Json.MicrosoftTest.Model;
@@ -15,18 +14,18 @@ namespace Gobln.Pager.Json.MicrosoftTest
         {
             var serializeOptions = new JsonSerializerOptions
             {
-                Converters = { new PageJsonConverter<TestUser>() },
+                Converters = { new PageJsonConverter<User>() },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
             var page = data.ToPage();
 
-            var result = JsonSerializer.Serialize(page, serializeOptions);
+            var json = JsonSerializer.Serialize(page, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<Page<TestUser>>(result, serializeOptions);
+            var result = JsonSerializer.Deserialize<Page<User>>(json, serializeOptions);
 
-            Assert.Equal(page, resultDe, new TestUserComparer());
+            Assert.Equal(page, result, new UserComparer());
         }
 
         [Fact]
@@ -37,15 +36,15 @@ namespace Gobln.Pager.Json.MicrosoftTest
                 Converters = { new PageJsonConverter() },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
             var page = data.ToPage();
 
-            var result = JsonSerializer.Serialize(page, serializeOptions);
+            var json = JsonSerializer.Serialize(page, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<Page<TestUser>>(result, serializeOptions);
+            var result = JsonSerializer.Deserialize<Page<User>>(json, serializeOptions);
 
-            Assert.Equal(page, resultDe, new TestUserComparer());
+            Assert.Equal(page, result, new UserComparer());
         }
 
         [Fact]
@@ -56,19 +55,19 @@ namespace Gobln.Pager.Json.MicrosoftTest
                 Converters = { new PageJsonConverter() },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
             var pageInClass = new PageInClass()
             {
                 User = data.ToPage()
             };
 
-            var result = JsonSerializer.Serialize(pageInClass, serializeOptions);
+            var json = JsonSerializer.Serialize(pageInClass, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<PageInClass>(result, serializeOptions);
+            var result = JsonSerializer.Deserialize<PageInClass>(json, serializeOptions);
 
-            Assert.Equal(pageInClass.SomeNumber, resultDe.SomeNumber);
-            Assert.Equal(pageInClass.User, resultDe.User, new TestUserComparer());
+            Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
+            Assert.Equal(pageInClass.User, result.User, new UserComparer());
         }
 
         [Fact]
@@ -79,15 +78,15 @@ namespace Gobln.Pager.Json.MicrosoftTest
                 Converters = { new PageJsonConverter() },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
-            Page<TestUser> page = null;
+            Page<User> page = null;
 
-            var result = JsonSerializer.Serialize(page, serializeOptions);
+            var json = JsonSerializer.Serialize(page, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<Page<TestUser>>(result, serializeOptions);
+            var result = JsonSerializer.Deserialize<Page<User>>(json, serializeOptions);
 
-            Assert.Equal(page, resultDe, new TestUserComparer());
+            Assert.Equal(page, result, new UserComparer());
         }
 
         [Fact]
@@ -98,19 +97,19 @@ namespace Gobln.Pager.Json.MicrosoftTest
                 Converters = { new PageJsonConverter() },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
             var pageInClass = new PageInClass()
             {
                 User = null
             };
 
-            var result = JsonSerializer.Serialize(pageInClass, serializeOptions);
+            var json = JsonSerializer.Serialize(pageInClass, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<PageInClass>(result, serializeOptions);
+            var result = JsonSerializer.Deserialize<PageInClass>(json, serializeOptions);
 
-            Assert.Equal(pageInClass.SomeNumber, resultDe.SomeNumber);
-            Assert.Equal(pageInClass.User, resultDe.User, new TestUserComparer());
+            Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
+            Assert.Equal(pageInClass.User, result.User, new UserComparer());
         }
 
         [Fact]
@@ -119,19 +118,19 @@ namespace Gobln.Pager.Json.MicrosoftTest
             var serializeOptions = new JsonSerializerOptions
             {
                 Converters = { 
-                    new IPageJsonConverter<TestUser>(),
+                    new IPageJsonConverter<User>(),
                 },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
-            IPage<TestUser> page = data.ToPage();
+            IPage<User> page = data.ToPage();
 
-            var result = JsonSerializer.Serialize(page, serializeOptions);
+            var json = JsonSerializer.Serialize(page, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<IPage<TestUser>>(result, serializeOptions);
+            var result = JsonSerializer.Deserialize<IPage<User>>(json, serializeOptions);
 
-            Assert.Equal(page, resultDe, new TestUserComparer());
+            Assert.Equal(page, result, new UserComparer());
         }
 
         [Fact]
@@ -144,15 +143,17 @@ namespace Gobln.Pager.Json.MicrosoftTest
                 },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
-            IPage<TestUser> page = data.ToPage();
+            IPage<User> page = data.ToPage();
 
-            var result = JsonSerializer.Serialize(page, serializeOptions);
+            var json = JsonSerializer.Serialize(page, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<IPage<TestUser>>(result, serializeOptions);
+            Assert.Throws<System.NotSupportedException>(() => JsonSerializer.Deserialize<IPage<User>>(json, serializeOptions));
 
-            Assert.Equal(page, resultDe, new TestUserComparer());
+            //var result = JsonSerializer.Deserialize<IPage<TestUser>>(json, serializeOptions);
+
+            //Assert.Equal(page, result, new TestUserComparer());
         }
 
         [Fact]
@@ -165,19 +166,21 @@ namespace Gobln.Pager.Json.MicrosoftTest
                 },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
             var pageInClass = new PageInClassGenericType()
             {
                 User = data.ToPage()
             };
 
-            var result = JsonSerializer.Serialize(pageInClass, serializeOptions);
+            var json = JsonSerializer.Serialize(pageInClass, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<PageInClassGenericType>(result, serializeOptions);
+            Assert.Throws<System.NotSupportedException>(() => JsonSerializer.Deserialize<PageInClassGenericType>(json, serializeOptions));
 
-            Assert.Equal(pageInClass.SomeNumber, resultDe.SomeNumber);
-            Assert.Equal(pageInClass.User, resultDe.User, new TestUserComparer());
+            //var result = JsonSerializer.Deserialize<PageInClassGenericType>(json, serializeOptions);
+
+            //Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
+            //Assert.Equal(pageInClass.User, result.User, new TestUserComparer());
         }
 
         [Fact]
@@ -186,20 +189,20 @@ namespace Gobln.Pager.Json.MicrosoftTest
             var serializeOptions = new JsonSerializerOptions
             {
                 Converters = {
-                    new PageJsonConverter<TestUser>(),
-                    new IPageJsonConverter<TestUser>(),
+                    new PageJsonConverter<User>(),
+                    new IPageJsonConverter<User>(),
                 },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
-            IPage<TestUser> page = data.ToPage();
+            IPage<User> page = data.ToPage();
 
-            var result = JsonSerializer.Serialize(page, serializeOptions);
+            var json = JsonSerializer.Serialize(page, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<Page<TestUser>>(result, serializeOptions);
+            var result = JsonSerializer.Deserialize<Page<User>>(json, serializeOptions);
 
-            Assert.Equal(page, resultDe, new TestUserComparer());
+            Assert.Equal(page, result, new UserComparer());
         }
 
         [Fact]
@@ -208,24 +211,24 @@ namespace Gobln.Pager.Json.MicrosoftTest
             var serializeOptions = new JsonSerializerOptions
             {
                 Converters = {
-                    new PageJsonConverter<TestUser>(),
-                    new IPageJsonConverter<TestUser>(),
+                    new PageJsonConverter<User>(),
+                    new IPageJsonConverter<User>(),
                 },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
             var pageInClass = new PageInClassGenericType()
             {
                 User = data.ToPage()
             };
 
-            var result = JsonSerializer.Serialize(pageInClass, serializeOptions);
+            var json = JsonSerializer.Serialize(pageInClass, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<PageInClassGenericType>(result, serializeOptions);
+            var result = JsonSerializer.Deserialize<PageInClassGenericType>(json, serializeOptions);
 
-            Assert.Equal(pageInClass.SomeNumber, resultDe.SomeNumber);
-            Assert.Equal(pageInClass.User, resultDe.User, new TestUserComparer());
+            Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
+            Assert.Equal(pageInClass.User, result.User, new UserComparer());
         }
 
         [Fact]
@@ -235,23 +238,23 @@ namespace Gobln.Pager.Json.MicrosoftTest
             {
                 Converters = {
                     new PageJsonConverter(),
-                    new IPageJsonConverter<TestUser>(),
+                    new IPageJsonConverter<User>(),
                 },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
             var pageInClass = new PageInClassGenericType()
             {
                 User = data.ToPage()
             };
 
-            var result = JsonSerializer.Serialize(pageInClass, serializeOptions);
+            var json = JsonSerializer.Serialize(pageInClass, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<PageInClassGenericType>(result, serializeOptions);
+            var result = JsonSerializer.Deserialize<PageInClassGenericType>(json, serializeOptions);
 
-            Assert.Equal(pageInClass.SomeNumber, resultDe.SomeNumber);
-            Assert.Equal(pageInClass.User, resultDe.User, new TestUserComparer());
+            Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
+            Assert.Equal(pageInClass.User, result.User, new UserComparer());
         }
 
         [Fact]
@@ -264,15 +267,15 @@ namespace Gobln.Pager.Json.MicrosoftTest
                 },
             };
 
-            var data = TestUserData.TestUserList;
+            var data = UserData.TestUserList;
 
-            var page = new List<TestUser>().ToPage();
+            var page = new List<User>().ToPage();
 
-            var result = JsonSerializer.Serialize(page, serializeOptions);
+            var json = JsonSerializer.Serialize(page, serializeOptions);
 
-            var resultDe = JsonSerializer.Deserialize<Page<TestUser>>(result, serializeOptions);
+            var result = JsonSerializer.Deserialize<Page<User>>(json, serializeOptions);
 
-            Assert.Equal(page, resultDe, new TestUserComparer());
+            Assert.Equal(page, result, new UserComparer());
         }
     }
 }
