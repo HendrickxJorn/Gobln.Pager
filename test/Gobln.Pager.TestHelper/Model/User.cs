@@ -1,6 +1,6 @@
-﻿namespace Gobln.Pager.Json.NewtonsoftTest.Model
+﻿namespace Gobln.Pager.TestHelper.Model
 {
-    internal class User
+    public class User
     {
         public int Id { get; set; }
 

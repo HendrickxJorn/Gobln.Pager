@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\scr\Gobln.Pager.Json.Microsoft\Gobln.Pager.Json.Microsoft.csproj" />
     <ProjectReference Include="..\..\scr\Gobln.Pager\Gobln.Pager.csproj" />
+    <ProjectReference Include="..\Gobln.Pager.TestHelper\Gobln.Pager.TestHelper.csproj" />
   </ItemGroup>
 
 </Project>

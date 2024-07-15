@@ -1,5 +1,5 @@
 ﻿using Gobln.Pager;
-using Gobln.PagerTest.Model;
+using Gobln.Pager.TestHelper.Model;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 
 
-namespace Gobln.PagerTest.EFHelper
+namespace Gobln.Pager.TestHelper.EFHelper
 {
     public class UserService
     {

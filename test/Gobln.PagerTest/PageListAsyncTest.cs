@@ -1,8 +1,7 @@
-﻿using Gobln.Pager;
-using Gobln.PagerTest.Data;
-using Gobln.PagerTest.EFHelper;
-using Gobln.PagerTest.Helper;
-using Gobln.PagerTest.Model;
+﻿using Gobln.Pager.TestHelper.Comparer;
+using Gobln.Pager.TestHelper.Data;
+using Gobln.Pager.TestHelper.EFHelper;
+using Gobln.Pager.TestHelper.Model;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -11,6 +10,9 @@ namespace Gobln.PagerTest
 {
     public class PageListAsyncTest
     {
+        /// <summary>
+        /// Create pagedList form EF
+        /// </summary>
         [Fact]
         public async Task Create_PagedList_From_EF01()
         {

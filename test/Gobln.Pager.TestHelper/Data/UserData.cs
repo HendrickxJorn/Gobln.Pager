@@ -1,8 +1,8 @@
-﻿using Gobln.PagerTest.Model;
+﻿using Gobln.Pager.TestHelper.Model;
 
-namespace Gobln.PagerTest.Data
+namespace Gobln.Pager.TestHelper.Data
 {
-    internal class UserData
+    public class UserData
     {
         public static IEnumerable<User> UserList => [
                     new() { Id = 1,  Name = "Tester1",  SurName= "Test", Date = new DateTime(2023, 5,  1) },

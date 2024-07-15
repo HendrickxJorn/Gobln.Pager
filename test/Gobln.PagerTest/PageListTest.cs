@@ -1,8 +1,8 @@
 ﻿using Gobln.Pager;
-using Gobln.PagerTest.Data;
-using Gobln.PagerTest.EFHelper;
-using Gobln.PagerTest.Helper;
-using Gobln.PagerTest.Model;
+using Gobln.Pager.TestHelper.Comparer;
+using Gobln.Pager.TestHelper.Data;
+using Gobln.Pager.TestHelper.EFHelper;
+using Gobln.Pager.TestHelper.Model;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -175,7 +175,6 @@ namespace Gobln.PagerTest
             Assert.Equal(expected, result, new UserComparer());
         }
 
-
         /// <summary>
         /// Get Pages
         /// </summary>
@@ -195,12 +194,15 @@ namespace Gobln.PagerTest
                 data.ToPage(3,10),
             };
 
-            for (int i = 0; i < 2; i++) 
+            for (int i = 0; i < 2; i++)
             {
                 Assert.Equal(expected[i], result[i], new UserComparer());
             }
         }
 
+        /// <summary>
+        /// Create pagedList form EF
+        /// </summary>
         [Fact]
         public void Create_PagedList_From_EF01()
         {

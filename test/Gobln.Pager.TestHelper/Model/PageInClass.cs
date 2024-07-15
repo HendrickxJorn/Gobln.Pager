@@ -1,6 +1,6 @@
-﻿namespace Gobln.Pager.Json.MicrosoftTest.Model
+﻿namespace Gobln.Pager.TestHelper.Model
 {
-    internal class PageInClass
+    public class PageInClass
     {
         public Page<User> User { get; set; }
 

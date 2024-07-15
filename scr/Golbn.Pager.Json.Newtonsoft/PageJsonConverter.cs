@@ -70,10 +70,63 @@ namespace Golbn.Pager.Json.Newtonsoft
 
             var tempPage = jsonObj.ToObject<TempPage<T>>();
 
-            return new Page<T>(tempPage.PageItems, tempPage.PageIndex, tempPage.PageSize, tempPage.TotalItemCount);
+            return tempPage.PageItems?.Length == 0
+               ? new Page<T>()
+               : new Page<T>(tempPage.PageItems, tempPage.PageIndex, tempPage.PageSize, tempPage.TotalItemCount);
         }
 
         public override void WriteJson(JsonWriter writer, Page<T>? value, JsonSerializer serializer)
+        {
+            TempPage<T> tempPage;
+
+            if (value == null)
+            {
+                tempPage = new TempPage<T>
+                {
+                    PageIndex = 1,
+                    PageSize = int.MaxValue,
+                    TotalItemCount = 1,
+                    PageItems = null
+                };
+            }
+            else
+            {
+                tempPage = new TempPage<T>
+                {
+                    PageIndex = value.PageIndex,
+                    PageSize = value.PageSize,
+                    TotalItemCount = value.TotalItemCount,
+                    PageItems = [.. value]
+                };
+            }
+
+            writer.WriteRawValue(JsonConvert.SerializeObject(tempPage));
+        }
+    }
+
+    /// <summary>
+    /// Converts an <see cref="IPage{T}"/> to or from JSON
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class IPageJsonConverter<T> : JsonConverter<IPage<T>>
+    {
+        public override IPage<T>? ReadJson(JsonReader reader, Type objectType, IPage<T>? existingValue, bool hasExistingValue, JsonSerializer serializer)
+        {
+            if (reader.TokenType == JsonToken.Null)
+            {
+                return null;
+            }
+
+            var jsonObj = JToken.ReadFrom(reader);
+
+            var tempPage = jsonObj.ToObject<TempPage<T>>();
+
+            return tempPage.PageItems?.Length == 0
+               ? new Page<T>()
+               : new Page<T>(tempPage.PageItems, tempPage.PageIndex, tempPage.PageSize, tempPage.TotalItemCount);
+        }
+
+        public override void WriteJson(JsonWriter writer, IPage<T>? value, JsonSerializer serializer)
         {
             TempPage<T> tempPage;
 

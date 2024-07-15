@@ -1,7 +1,7 @@
-﻿using Gobln.PagerTest.Model;
+﻿using Gobln.Pager.TestHelper.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace Gobln.PagerTest.EFHelper
+namespace Gobln.Pager.TestHelper.EFHelper
 {
     public class UserContext : DbContext
     {

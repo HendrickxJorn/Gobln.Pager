@@ -1,19 +1,14 @@
 ﻿using Gobln.Pager;
-using Gobln.PagerTest.Data;
-using Gobln.PagerTest.EFHelper;
-using Gobln.PagerTest.Helper;
-using Gobln.PagerTest.Model;
+using Gobln.Pager.TestHelper.Comparer;
+using Gobln.Pager.TestHelper.Data;
+using Gobln.Pager.TestHelper.EFHelper;
+using Gobln.Pager.TestHelper.Model;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using System.Reflection.Metadata;
 using Xunit;
 
 namespace Gobln.PagerTest
 {
-    //https://learn.microsoft.com/en-us/visualstudio/test/how-to-create-a-data-driven-unit-test?view=vs-2022
-    //https://andrewlock.net/creating-parameterised-tests-in-xunit-with-inlinedata-classdata-and-memberdata/
-    //https://www.telerik.com/blogs/how-to-simplify-your-csharp-unit-testing-mocking-framework
-
     public class PageTest
     {
         /// <summary>
@@ -197,6 +192,9 @@ namespace Gobln.PagerTest
             Assert.Equal(expected, result, new UserComparer());
         }
 
+        /// <summary>
+        /// Create page form EF
+        /// </summary>
         [Fact]
         public void Create_Page_From_EF01()
         {

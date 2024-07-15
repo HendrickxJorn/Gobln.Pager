@@ -1,18 +1,16 @@
-﻿using Gobln.PagerTest.Model;
-using System.Reflection;
+﻿using System.Reflection;
 
-namespace Gobln.PagerTest.Helper
+namespace Gobln.Pager.TestHelper.Comparer
 {
-    internal class UserComparer : IEqualityComparer<User>
+    public class CustomComparer<T> : IEqualityComparer<T>
     {
-        public bool Equals(User expected, User actual)
+        public bool Equals(T expected, T actual)
         {
-            var props = typeof(User).GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
+            var props = typeof(T).GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance);
             foreach (var prop in props)
             {
                 var expectedValue = prop.GetValue(expected, null);
                 var actualValue = prop.GetValue(actual, null);
-
                 if (!expectedValue.Equals(actualValue))
                 {
                     //throw new EqualException($"A value of \"{expectedValue}\" for property \"{prop.Name}\"", $"A value of \"{actualValue}\" for property \"{prop.Name}\"");
@@ -23,7 +21,7 @@ namespace Gobln.PagerTest.Helper
             return true;
         }
 
-        public int GetHashCode(User parameterValue)
+        public int GetHashCode(T parameterValue)
         {
             return Tuple.Create(parameterValue).GetHashCode();
         }

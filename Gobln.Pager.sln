@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gobln.Pager.Json.MicrosoftT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gobln.Pager.Json.NewtonsoftTest", "test\Gobln.Pager.Json.NewtonsoftTest\Gobln.Pager.Json.NewtonsoftTest.csproj", "{6ABE9E59-3DA1-4394-8FC8-4F8F789B29A6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gobln.Pager.TestHelper", "test\Gobln.Pager.TestHelper\Gobln.Pager.TestHelper.csproj", "{B7448277-61C8-4601-B1F1-7E1AC5ADEB17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{6ABE9E59-3DA1-4394-8FC8-4F8F789B29A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6ABE9E59-3DA1-4394-8FC8-4F8F789B29A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6ABE9E59-3DA1-4394-8FC8-4F8F789B29A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7448277-61C8-4601-B1F1-7E1AC5ADEB17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7448277-61C8-4601-B1F1-7E1AC5ADEB17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7448277-61C8-4601-B1F1-7E1AC5ADEB17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7448277-61C8-4601-B1F1-7E1AC5ADEB17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,6 +66,7 @@ Global
 		{33C98B76-AE01-4DEF-A295-93271130A3C4} = {0CDC3B21-EFFF-4C6A-9B2C-24211B35F37A}
 		{842B7162-3429-45FB-BB37-339529828B32} = {635DB9FF-D417-49EA-B940-E48B28F05F53}
 		{6ABE9E59-3DA1-4394-8FC8-4F8F789B29A6} = {635DB9FF-D417-49EA-B940-E48B28F05F53}
+		{B7448277-61C8-4601-B1F1-7E1AC5ADEB17} = {635DB9FF-D417-49EA-B940-E48B28F05F53}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6830DFD8-CE1D-4753-A5E2-5504B74F635F}
