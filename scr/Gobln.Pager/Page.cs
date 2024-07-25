@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Gobln.Pager
@@ -10,11 +12,13 @@ namespace Gobln.Pager
     /// Represents a strongly typed <see cref="Page"/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Serializable]
+    [DebuggerDisplay("Count = {Count}")]
     public class Page<T> : IPage<T>, IEnumerable
     {
         #region Members
 
-        private readonly T[] _items = [];
+        internal T[] _items = [];
 
         #endregion Members
 
@@ -63,13 +67,13 @@ namespace Gobln.Pager
 
         /// <summary>
         /// Converts a collection of <typeparamref name="T"/> to a single <see cref="Page"/>
-        /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
+        /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
         /// </summary>
-        public Page(IEnumerable<T> source)
+        public Page(IEnumerable<T> collection)
         {
-            if (source != null && source.Any())
+            if (collection != null && collection.Any())
             {
-                _items = source.ToArray();
+                _items = collection.ToArray();
 
                 PageSize = _items.Length;
                 TotalItemCount = _items.Length;
@@ -79,19 +83,19 @@ namespace Gobln.Pager
         /// <summary>
         /// Converts a pre-paged collection to a specific <see cref="Page"/>
         /// </summary>
-        /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
+        /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
         /// <param name="pageIndex">The currently selected page in the original collection</param>
         /// <param name="pageSize">Size of an individual page</param>
         /// <param name="totalItemCount">Total item count in the original collection</param>
-        public Page(IEnumerable<T> source, int pageIndex, int pageSize, int totalItemCount)
+        public Page(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)
         {
             Validator.Validate(pageIndex, pageSize);
 
             var definitions = new PageDefinition(pageIndex, pageSize, totalItemCount);
 
-            if (source != null && definitions.TotalItemCount > 0 && source.Any())
+            if (collection != null && definitions.TotalItemCount > 0 && collection.Any())
             {
-                _items = source.ToArray();
+                _items = collection.ToArray();
 
                 PageIndex = definitions.PageIndex;
                 TotalPageCount = definitions.PageCount;
@@ -103,13 +107,13 @@ namespace Gobln.Pager
         /// <summary>
         /// Converts a collection to a specific <see cref="Page"/>
         /// </summary>
-        /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
+        /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
         /// <param name="pageDefinitions">The definition of the current page and its position in the original collection</param>
-        internal Page(IEnumerable<T> source, PageDefinition pageDefinitions)
+        internal Page(IEnumerable<T> collection, PageDefinition pageDefinitions)
         {
-            if (source != null && pageDefinitions.TotalItemCount > 0 && source.Any())
+            if (collection != null && pageDefinitions.TotalItemCount > 0 && collection.Any())
             {
-                _items = source.ToArray();
+                _items = collection.ToArray();
 
                 PageIndex = pageDefinitions.PageIndex;
                 TotalPageCount = pageDefinitions.PageCount;
@@ -165,35 +169,35 @@ namespace Gobln.Pager
         /// Converts collection of <typeparamref name="T"/> to an single <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
+        /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
         /// <param name="pageIndex">The currently selected page in the original collection</param>
         /// <param name="pageSize">Size of an individual page</param>
         /// <returns></returns>
-        public static Page<T> FromEnumerable<T>(IEnumerable<T> source, int pageIndex, int pageSize)
+        public static Page<T> FromEnumerable<T>(IEnumerable<T> collection, int pageIndex, int pageSize)
         {
             Validator.Validate(pageIndex, pageSize);
 
-            return source == null
+            return collection == null
                 ? new Page<T>()
-                : new Page<T>(source, new PageDefinition(pageIndex, pageSize, source.Count()));
+                : new Page<T>(collection, new PageDefinition(pageIndex, pageSize, collection.Count()));
         }
 
         /// <summary>
         /// Converts a pre-paged collection of <typeparamref name="T"/> to an single <see cref="Page"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
+        /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
         /// <param name="pageIndex">The currently selected page in the original collection</param>
         /// <param name="pageSize">Size of an individual page</param>
         /// <param name="totalItemCount">Total item count in the original collection</param>
         /// <returns></returns>
-        public static Page<T> FromEnumerable<T>(IEnumerable<T> source, int pageIndex, int pageSize, int totalItemCount)
+        public static Page<T> FromEnumerable<T>(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)
         {
             Validator.Validate(pageIndex, pageSize);
 
-            return source == null
+            return collection == null
                 ? new Page<T>()
-                : new Page<T>(source, new PageDefinition(pageIndex, pageSize, totalItemCount));
+                : new Page<T>(collection, new PageDefinition(pageIndex, pageSize, totalItemCount));
         }
     }
 }

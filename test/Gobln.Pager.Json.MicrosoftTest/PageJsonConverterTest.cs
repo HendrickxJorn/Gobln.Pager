@@ -108,12 +108,10 @@ namespace Gobln.Pager.Json.MicrosoftTest
 
             var json = JsonSerializer.Serialize(pageInClass, serializeOptions);
 
-            Assert.Throws<System.NotSupportedException>(() => JsonSerializer.Deserialize<PageInClassGenericType>(json, serializeOptions));
+            var result = JsonSerializer.Deserialize<PageInClassGenericType>(json, serializeOptions);
 
-            //var result = JsonSerializer.Deserialize<PageInClassGenericType>(json, serializeOptions);
-
-            //Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
-            //Assert.Equal(pageInClass.User, result.User, new TestUserComparer());
+            Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
+            Assert.Equal(pageInClass.User, result.User, new UserComparer());
         }
 
         /// <summary>
@@ -276,11 +274,9 @@ namespace Gobln.Pager.Json.MicrosoftTest
 
             var json = JsonSerializer.Serialize(page, serializeOptions);
 
-            Assert.Throws<NotSupportedException>(() => JsonSerializer.Deserialize<IPage<User>>(json, serializeOptions));
+            var result = JsonSerializer.Deserialize<IPage<User>>(json, serializeOptions);
 
-            //var result = JsonSerializer.Deserialize<IPage<TestUser>>(json, serializeOptions);
-
-            //Assert.Equal(page, result, new TestUserComparer());
+            Assert.Equal(page, result, new UserComparer());
         }
 
         /// <summary>

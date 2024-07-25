@@ -274,11 +274,9 @@ namespace Gobln.Pager.Json.NewtonsoftTest
 
             var json = JsonConvert.SerializeObject(page, serializeOptions);
 
-            Assert.Throws<Newtonsoft.Json.JsonSerializationException>(() => JsonConvert.DeserializeObject<IPage<User>>(json, serializeOptions));
+            var result = JsonConvert.DeserializeObject<IPage<User>>(json, serializeOptions);
 
-            //var result = JsonConvert.DeserializeObject<IPage<User>>(json, serializeOptions);
-
-            //Assert.Equal(page, result, new UserComparer());
+            Assert.Equal(page, result, new UserComparer());
         }
 
         /// <summary>

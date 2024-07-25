@@ -165,7 +165,7 @@ namespace Gobln.PagerTest
             mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(data.Provider);
             mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(data.Expression);
             mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(data.ElementType);
-            mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(() => data.GetEnumerator());
+            mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator);
 
             var mockContext = new Mock<UserContext>();
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);

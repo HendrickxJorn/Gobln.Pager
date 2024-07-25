@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace Gobln.Pager
 {
@@ -8,13 +10,15 @@ namespace Gobln.Pager
     /// Represents a strongly typed <see cref="PagedList{T}"/>
     /// </summary>
     /// <typeparam name="T">The type of elements in the list.</typeparam>
+    [Serializable]
+    [DebuggerDisplay("Count = {Count}")]
     public class PagedList<T> : IPagedList<T>, IReadOnlyList<T>
     {
         #region Members
 
-        private readonly List<T> _list = [];
-        private int _currentPageIndex;
-        private int _pageSize;
+        internal List<T> _list;
+        internal int _currentPageIndex;
+        internal int _pageSize;
 
         #endregion Members
 
@@ -38,15 +42,16 @@ namespace Gobln.Pager
 
             _currentPageIndex = 1;
             _pageSize = pageSize;
+            _list = [];
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PagedList{T}"/> class that contains elements copied from the specified source and has a page size of 10.
         /// And where the pageSize can be defined.
         /// </summary>
-        /// <param name="source">The source whose elements are copied to the new <see cref="PagedList{T}"/></param>
-        public PagedList(IEnumerable<T> source)
-            : this(source, 10)
+        /// <param name="collection">The source whose elements are copied to the new <see cref="PagedList{T}"/></param>
+        public PagedList(IEnumerable<T> collection)
+            : this(collection, 10)
         {
         }
 
@@ -54,12 +59,12 @@ namespace Gobln.Pager
         /// Initializes a new instance of the <see cref="PagedList{T}"/> class that contains elements copied from the specified source and has a page size of <see href="pageSize"/>.
         /// And where the pageSize can be defined.
         /// </summary>
-        /// <param name="source">The source whose elements are copied to the new <see cref="PagedList{T}"/></param>
+        /// <param name="collection">The source whose elements are copied to the new <see cref="PagedList{T}"/></param>
         /// <param name="pageSize">The number of elements per page</param>
-        public PagedList(IEnumerable<T> source, int pageSize)
+        public PagedList(IEnumerable<T> collection, int pageSize)
             :this(pageSize)
         {
-            _list = new List<T>(source);
+            _list = new List<T>(collection);
 
             RecalculatePageCount();
         }
@@ -322,24 +327,6 @@ namespace Gobln.Pager
             }
         }
 
-        /// <summary>
-        /// Copies the elements of the <see cref="PagedList{T}"/> to a new List.
-        /// </summary>
-        /// <returns>An List containing copies of the elements of the <see cref="PagedList{T}"/></returns>
-        public List<T> ToList()
-        {
-            return new List<T>(_list);
-        }
-
-        /// <summary>
-        /// Copies the elements of the <see cref="PagedList{T}"/> to a new array.
-        /// </summary>
-        /// <returns>An array containing copies of the elements of the <see cref="PagedList{T}"/></returns>
-        public T[] ToArray()
-        {
-            return [.. _list];
-        }
-
         #endregion Implementation of IPagedList<T>
 
         #region Additional
@@ -368,7 +355,7 @@ namespace Gobln.Pager
 
         #region Private
 
-        private void RecalculatePageCount()
+        internal void RecalculatePageCount()
         {
             PageCount = Count == 0 ? 1 : ((Count - 1) / PageSize) + 1;
 
@@ -387,13 +374,13 @@ namespace Gobln.Pager
         /// <summary>
         /// Initializes a new instance of the <see cref="PagedList{T}"/> class from the given list with the given page size.
         /// </summary>
-        /// <param name="source">The elements of <typeparamref name="T"/></param>
+        /// <param name="collection">The elements of <typeparamref name="T"/></param>
         /// <param name="pageSize">The number of elements displayed per page</param>
-        public static PagedList<T> FromEnumerable<T>(IEnumerable<T> source, int pageSize = 10)
+        public static PagedList<T> FromEnumerable<T>(IEnumerable<T> collection, int pageSize = 10)
         {
             Validator.ValidatePageSize(pageSize);
 
-            return new PagedList<T>(source, pageSize);
+            return new PagedList<T>(collection, pageSize);
         }
     }
 }

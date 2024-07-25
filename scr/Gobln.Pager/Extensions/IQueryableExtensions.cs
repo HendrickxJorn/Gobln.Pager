@@ -9,11 +9,11 @@ namespace Gobln.Pager
     /// </summary>
     public static class IQueryableExtensions
     {
-        private static Page<T> PrivateToPage<T>(IQueryable<T> source, int pageIndex, int pageSize, int totalItemCount, bool prePaged = false)
+        internal static Page<T> PrivateToPage<T>(IQueryable<T> collection, int pageIndex, int pageSize, int totalItemCount, bool prePaged = false)
         {
             var pd = new PageDefinition(pageIndex, pageSize, totalItemCount);
 
-            return new Page<T>(prePaged || pd.TotalItemCount < 1 ? source : source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+            return new Page<T>(prePaged || pd.TotalItemCount < 1 ? collection : collection.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
         }
 
         #region ToPage

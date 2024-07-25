@@ -39,18 +39,6 @@ namespace Gobln.Pager
         /// </summary>
         /// <returns><see cref="IEnumerable"/> of <see cref="Page{T}"/></returns>
         IEnumerable<Page<T>> GetPages();
-
-        /// <summary>
-        /// Copies the elements of the PagedList to a new List.
-        /// </summary>
-        /// <returns>An <see cref="List{T}"/> containing copies of the elements of the <see cref="PagedList{T}"/></returns>
-        List<T> ToList();
-
-        /// <summary>
-        /// Copies the elements of the PagedList to a new array.
-        /// </summary>
-        /// <returns>An array containing copies of the elements of the <see cref="PagedList{T}"/></returns>
-        T[] ToArray();
     }
 
     /// <summary>

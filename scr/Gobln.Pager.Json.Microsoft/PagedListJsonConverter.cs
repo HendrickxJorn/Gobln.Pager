@@ -1,0 +1,127 @@
+﻿using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace Gobln.Pager.Json.Microsoft
+{
+    /// <summary>
+    /// Converts an <see cref="PagedList"/> to or from JSON
+    /// </summary>
+    public class PagedListJsonConverter : JsonConverterFactory
+    {
+        public override bool CanConvert(Type typeToConvert) => typeToConvert.IsGenericType
+                && (typeToConvert.GetGenericTypeDefinition() == typeof(PagedList<>)
+                    || typeToConvert.GetGenericTypeDefinition() == typeof(IPagedList<>));
+
+        public override JsonConverter CreateConverter(
+            Type typeToConvert,
+            JsonSerializerOptions options)
+        {
+            Type elementType = typeToConvert.GetGenericArguments()[0];
+
+            JsonConverter converter = (JsonConverter)Activator.CreateInstance(
+                typeof(IPagedListJsonConverter<>)
+                    .MakeGenericType(elementType),
+                BindingFlags.Instance | BindingFlags.Public,
+                binder: null,
+                args: null,
+                culture: null)!;
+
+            return converter;
+        }
+    }
+
+    /// <summary>
+    /// Converts an <see cref="PagedList{T}"/> to or from JSON
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class PagedListJsonConverter<T> : JsonConverter<PagedList<T>>
+    {
+        public override PagedList<T> Read(
+            ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType != JsonTokenType.StartArray)
+            {
+                throw new JsonException();
+            }
+
+            reader.Read();
+
+            PagedList<T> elements;
+
+            if (reader.TokenType == JsonTokenType.EndArray)
+            {
+                elements = [];
+            }
+            else
+            {
+                var temp = JsonSerializer.Deserialize<IEnumerable<T>>(ref reader, options)!;
+
+                elements = temp.Count() == 0
+                    ? new PagedList<T>()
+                    : new PagedList<T>(temp);
+            }
+
+            reader.Read();
+
+            return elements;
+        }
+
+        public override void Write(
+            Utf8JsonWriter writer, PagedList<T> value, JsonSerializerOptions options)
+        {
+            writer.WriteStartArray();
+
+            JsonSerializer.Serialize(writer, value.ToArray(), options);
+
+            writer.WriteEndArray();
+        }
+    }
+
+    /// <summary>
+    /// Converts an <see cref="IPagedList{T}"/> to or from JSON
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public class IPagedListJsonConverter<T> : JsonConverter<IPagedList<T>>
+    {
+        public override IPagedList<T> Read(
+            ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType != JsonTokenType.StartArray)
+            {
+                throw new JsonException();
+            }
+
+            reader.Read();
+
+            PagedList<T> elements;
+
+            if (reader.TokenType == JsonTokenType.EndArray)
+            {
+                elements = [];
+            }
+            else
+            {
+                var temp = JsonSerializer.Deserialize<IEnumerable<T>>(ref reader, options)!;
+
+                elements = temp.Count() == 0
+                    ? new PagedList<T>()
+                    : new PagedList<T>(temp);
+            }
+
+            reader.Read();
+
+            return elements;
+        }
+
+        public override void Write(
+            Utf8JsonWriter writer, IPagedList<T> value, JsonSerializerOptions options)
+        {
+            writer.WriteStartArray();
+
+            JsonSerializer.Serialize(writer, value.ToArray(), options);
+
+            writer.WriteEndArray();
+        }
+    }
+}

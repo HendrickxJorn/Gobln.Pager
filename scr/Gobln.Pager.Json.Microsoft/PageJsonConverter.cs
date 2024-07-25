@@ -21,9 +21,9 @@ namespace Gobln.Pager.Json.Microsoft
     /// </summary>
     public class PageJsonConverter : JsonConverterFactory
     {
-        public override bool CanConvert(Type typeToConvert)
-            => typeToConvert.IsGenericType
-            && typeToConvert.GetGenericTypeDefinition() == typeof(Page<>);
+        public override bool CanConvert(Type typeToConvert)  => typeToConvert.IsGenericType
+                        && (typeToConvert.GetGenericTypeDefinition() == typeof(Page<>)
+                            || typeToConvert.GetGenericTypeDefinition() == typeof(IPage<>));
 
         public override JsonConverter CreateConverter(
             Type typeToConvert,
@@ -32,7 +32,7 @@ namespace Gobln.Pager.Json.Microsoft
             Type elementType = typeToConvert.GetGenericArguments()[0];
 
             JsonConverter converter = (JsonConverter)Activator.CreateInstance(
-                typeof(IPageJsonConverter<>)
+                typeof(PageJsonConverter<>)
                     .MakeGenericType(elementType),
                 BindingFlags.Instance | BindingFlags.Public,
                 binder: null,

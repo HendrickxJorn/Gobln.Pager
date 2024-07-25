@@ -102,10 +102,10 @@ namespace Gobln.PagerTest
         }
 
         /// <summary>
-        /// Use orderby
+        /// Use Lambda OrderBy()
         /// </summary>
         [Fact]
-        public void Create_PagedList_OrderBy01()
+        public void Create_PagedList_Lambda_OrderBy01()
         {
             var data = UserData.UserList;
 
@@ -120,6 +120,27 @@ namespace Gobln.PagerTest
                 .ToArray();
 
             Assert.Equal(expected, result, new UserComparer());
+        }
+
+        /// <summary>
+        /// Use Lambda Select()
+        /// </summary>
+        [Fact]
+        public void Create_PagedList_Lambda_Select01()
+        {
+            var data = UserData.UserList;
+
+            var pagedList = new PagedList<User>(data);
+
+            var result = pagedList
+                .Select(x => x.Id)
+                .ToPagedList();
+
+            var expected = data
+                .Select(x => x.Id)
+                .ToArray();
+
+            Assert.Equal(expected, result);
         }
 
         /// <summary>
@@ -214,7 +235,7 @@ namespace Gobln.PagerTest
             mockSet.As<IQueryable<User>>().Setup(m => m.Provider).Returns(data.Provider);
             mockSet.As<IQueryable<User>>().Setup(m => m.Expression).Returns(data.Expression);
             mockSet.As<IQueryable<User>>().Setup(m => m.ElementType).Returns(data.ElementType);
-            mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(() => data.GetEnumerator());
+            mockSet.As<IQueryable<User>>().Setup(m => m.GetEnumerator()).Returns(data.GetEnumerator);
 
             var mockContext = new Mock<UserContext>();
             mockContext.Setup(c => c.Users).Returns(mockSet.Object);

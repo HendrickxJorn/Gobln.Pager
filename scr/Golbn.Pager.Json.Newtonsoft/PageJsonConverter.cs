@@ -20,7 +20,8 @@ namespace Golbn.Pager.Json.Newtonsoft
     public class PageJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType) => objectType.IsGenericType
-                && objectType.GetGenericTypeDefinition() == typeof(Page<>);
+                    && (objectType.GetGenericTypeDefinition() == typeof(Page<>) 
+                        || objectType.GetGenericTypeDefinition() == typeof(IPage<>));
 
         public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
