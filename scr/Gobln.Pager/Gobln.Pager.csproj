@@ -3,12 +3,12 @@
   <PropertyGroup>
     <TargetFrameworks>net461;net48;net6;net8;netstandard2.0;netstandard2.1</TargetFrameworks>
     <LangVersion>12</LangVersion>
-    <PackageId>Gobln.Pager</PackageId>
+    <PackageId>$(AssemblyName)</PackageId>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <PackageTags>Page, Pager, Paging, Pagination, Core</PackageTags>
     <PackageProjectUrl>https://github.com/HendrickxJorn/Gobln.Pager</PackageProjectUrl>
     <Authors>Jorn Hendrickx</Authors>
-    <Product>Gobln.Pager</Product>
+    <Product>$(AssemblyName)</Product>
     <AssemblyName>Gobln.Pager</AssemblyName>
     <RootNamespace>Gobln.Pager</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

@@ -32,57 +32,10 @@ namespace Gobln.Pager.Json.Microsoft
     }
 
     /// <summary>
-    /// Converts an <see cref="PagedList{T}"/> to or from JSON
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class PagedListJsonConverter<T> : JsonConverter<PagedList<T>>
-    {
-        public override PagedList<T> Read(
-            ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-        {
-            if (reader.TokenType != JsonTokenType.StartArray)
-            {
-                throw new JsonException();
-            }
-
-            reader.Read();
-
-            PagedList<T> elements;
-
-            if (reader.TokenType == JsonTokenType.EndArray)
-            {
-                elements = [];
-            }
-            else
-            {
-                var temp = JsonSerializer.Deserialize<IEnumerable<T>>(ref reader, options)!;
-
-                elements = temp.Count() == 0
-                    ? new PagedList<T>()
-                    : new PagedList<T>(temp);
-            }
-
-            reader.Read();
-
-            return elements;
-        }
-
-        public override void Write(
-            Utf8JsonWriter writer, PagedList<T> value, JsonSerializerOptions options)
-        {
-            writer.WriteStartArray();
-
-            JsonSerializer.Serialize(writer, value.ToArray(), options);
-
-            writer.WriteEndArray();
-        }
-    }
-
-    /// <summary>
     /// Converts an <see cref="IPagedList{T}"/> to or from JSON
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class IPagedListJsonConverter<T> : JsonConverter<IPagedList<T>>
+    internal class IPagedListJsonConverter<T> : JsonConverter<IPagedList<T>>
     {
         public override IPagedList<T> Read(
             ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -92,22 +45,11 @@ namespace Gobln.Pager.Json.Microsoft
                 throw new JsonException();
             }
 
-            reader.Read();
+            var temp = JsonSerializer.Deserialize<IEnumerable<T>>(ref reader, options)!;
 
-            PagedList<T> elements;
-
-            if (reader.TokenType == JsonTokenType.EndArray)
-            {
-                elements = [];
-            }
-            else
-            {
-                var temp = JsonSerializer.Deserialize<IEnumerable<T>>(ref reader, options)!;
-
-                elements = temp.Count() == 0
-                    ? new PagedList<T>()
-                    : new PagedList<T>(temp);
-            }
+            var elements = temp.Count() == 0
+                 ? new PagedList<T>()
+                 : new PagedList<T>(temp);
 
             reader.Read();
 
