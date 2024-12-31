@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
-    <PackageReference Include="xunit" Version="2.9.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\scr\Gobln.Pager.Json.Newtonsoft\Gobln.Pager.Json.Newtonsoft.csproj" />
     <ProjectReference Include="..\..\scr\Gobln.Pager\Gobln.Pager.csproj" />
-    <ProjectReference Include="..\..\scr\Golbn.Pager.Json.Newtonsoft\Golbn.Pager.Json.Newtonsoft.csproj" />
     <ProjectReference Include="..\Gobln.Pager.TestHelper\Gobln.Pager.TestHelper.csproj" />
   </ItemGroup>
 

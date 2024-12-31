@@ -1,26 +1,17 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Gobln.Pager;
+﻿using Gobln.Pager;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
 
-namespace Golbn.Pager.Json.Newtonsoft
+namespace Gobln.Pager.Json.Newtonsoft
 {
-    //https://www.newtonsoft.com/json/help/html/CustomJsonConverter.htm
-
-    //https://www.newtonsoft.com/json/help/html/CustomJsonConverterGeneric.htm
-
     /// <summary>
     /// Converts an <see cref="Page"/> to or from JSON
     /// </summary>
     public class PageJsonConverter : JsonConverter
     {
         public override bool CanConvert(Type objectType) => objectType.IsGenericType
-                    && (objectType.GetGenericTypeDefinition() == typeof(Page<>) 
+                    && (objectType.GetGenericTypeDefinition() == typeof(Page<>)
                         || objectType.GetGenericTypeDefinition() == typeof(IPage<>));
 
         public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
@@ -40,17 +31,20 @@ namespace Golbn.Pager.Json.Newtonsoft
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            Type elementType = value.GetType().GetGenericArguments()[0];
+            if (value is not null)
+            {
+                Type elementType = value.GetType().GetGenericArguments()[0];
 
-            JsonConverter converter = (JsonConverter)Activator.CreateInstance(
-                typeof(IPageJsonConverter<>)
-                    .MakeGenericType([elementType]),
-                BindingFlags.Instance | BindingFlags.Public,
-                binder: null,
-                args: null,
-                culture: null)!;
+                JsonConverter converter = (JsonConverter)Activator.CreateInstance(
+                    typeof(IPageJsonConverter<>)
+                        .MakeGenericType([elementType]),
+                    BindingFlags.Instance | BindingFlags.Public,
+                    binder: null,
+                    args: null,
+                    culture: null)!;
 
-            converter.WriteJson(writer, value, serializer);
+                converter.WriteJson(writer, value, serializer);
+            }
         }
     }
 
@@ -71,7 +65,7 @@ namespace Golbn.Pager.Json.Newtonsoft
 
             var tempPage = jsonObj.ToObject<TempPage<T>>();
 
-            return tempPage.PageItems?.Length == 0
+            return tempPage is null || tempPage.PageItems?.Length == 0
                ? new Page<T>()
                : new Page<T>(tempPage.PageItems, tempPage.PageIndex, tempPage.PageSize, tempPage.TotalItemCount);
         }

@@ -15,13 +15,49 @@ namespace Gobln.PagerTest
         /// Create a Page from a List
         /// </summary>
         [Fact]
-        public void Create_Page_From_IEnumerable()
+        public void Create_Page_From_IEnumerable_01()
         {
             var data = UserData.UserList;
 
             // Create an default page
-            // Will put everything one 1 page
+            // Will put everything on 1 page
             var result = data.ToPage();
+
+            var expected = data;
+
+            Assert.Equal(1, result.PageIndex);
+            Assert.Equal(expected, result, new UserComparer());
+        }
+
+        /// <summary>
+        /// Create a Page from a List
+        /// </summary>
+        [Fact]
+        public void Create_Page_From_IEnumerable_02()
+        {
+            var data = UserData.UserList;
+
+            // Create an default page
+            // Will put everything on 1 page
+            var result = new Page<User>(data);
+
+            var expected = data;
+
+            Assert.Equal(1, result.PageIndex);
+            Assert.Equal(expected, result, new UserComparer());
+        }
+
+        /// <summary>
+        /// Create a Page from a List
+        /// </summary>
+        [Fact]
+        public void Create_Page_From_IEnumerable_03()
+        {
+            var data = UserData.UserList;
+
+            // Create an default page
+            // Will put everything on 1 page
+            var result = Page.FromEnumerable(data);
 
             var expected = data;
 
@@ -33,7 +69,7 @@ namespace Gobln.PagerTest
         /// Create a Page from a PagedList
         /// </summary>
         [Fact]
-        public void Create_Page_From_PagedList()
+        public void Create_Page_From_PagedList_01()
         {
             var data = UserData.UserList.ToPagedList();
 
@@ -51,7 +87,7 @@ namespace Gobln.PagerTest
         /// Create a Page from a PagedList, but overreach
         /// </summary>
         [Fact]
-        public void Create_Page_From_IEnumerable_Overreach()
+        public void Create_Page_From_IEnumerable_Overreach_01()
         {
             var data = UserData.UserList;
 
@@ -71,7 +107,7 @@ namespace Gobln.PagerTest
         /// Create a Page from an pre-paged list
         /// </summary>
         [Fact]
-        public void Create_Page_From_Prepaged_IEnumerable()
+        public void Create_Page_From_Prepaged_IEnumerable_01()
         {
             var data = UserData.UserList;
 
@@ -88,7 +124,7 @@ namespace Gobln.PagerTest
         /// Make use of PageFilter
         /// </summary>
         [Fact]
-        public void Create_Page_With_PageFilter()
+        public void Create_Page_With_PageFilter_01()
         {
             var data = UserData.UserList;
 
@@ -108,7 +144,7 @@ namespace Gobln.PagerTest
         /// Make use of PageFilter
         /// </summary>
         [Fact]
-        public void Create_Page_With_PageFilter_PrePaged()
+        public void Create_Page_With_PageFilter_PrePaged_01()
         {
             var data = UserData.UserList;
 
@@ -132,7 +168,7 @@ namespace Gobln.PagerTest
         /// Create a Page from a empty List
         /// </summary>
         [Fact]
-        public void Create_Empty_Page()
+        public void Create_Empty_Page_01()
         {
             var result = new List<User>().ToPage();
 
@@ -146,17 +182,41 @@ namespace Gobln.PagerTest
         /// Create a Page from an pre-paged list
         /// </summary>
         [Fact]
-        public void Create_Page_With_Prepaged_Zero()
+        public void Create_Page_With_Prepaged_Zero_01()
         {
             var data = UserData.UserList;
 
             // Create a Page for 15 items on page 5, with an total of 0 items
-            // Will return default
+            // will return empty Page
             var result = data.ToPage(5, 15, 0);
 
             var expected = new List<User>();
 
             Assert.Equal(1, result.PageIndex);
+            Assert.Equal(0, result.PageSize);
+            Assert.Equal(1, result.TotalPageCount);
+            Assert.Equal(0, result.TotalItemCount);
+            Assert.Equal(expected, result, new UserComparer());
+        }
+
+        /// <summary>
+        /// Create a Page from an pre-paged list
+        /// </summary>
+        [Fact]
+        public void Create_Page_With_Prepaged_Zero_02()
+        {
+            var data = UserData.UserList;
+
+            // Create a Page for 15 items on page 5, with an total of 0 items
+            // will return empty Page
+            var result = new Page<User>(data, 5, 15, 0);
+
+            var expected = new List<User>();
+
+            Assert.Equal(1, result.PageIndex);
+            Assert.Equal(0, result.PageSize);
+            Assert.Equal(1, result.TotalPageCount);
+            Assert.Equal(0, result.TotalItemCount);
             Assert.Equal(expected, result, new UserComparer());
         }
 
@@ -164,7 +224,7 @@ namespace Gobln.PagerTest
         /// Use the FromEnumerable
         /// </summary>
         [Fact]
-        public void Create_Page_With_FromEnumerable()
+        public void Create_Page_With_FromEnumerable_01()
         {
             var data = UserData.UserList;
 
@@ -180,7 +240,7 @@ namespace Gobln.PagerTest
         /// Use the FromEnumerable with PrePaged data
         /// </summary>
         [Fact]
-        public void Create_Page_With_FromEnumerablePrepaged()
+        public void Create_Page_With_FromEnumerablePrepaged_01()
         {
             var data = UserData.UserList;
 

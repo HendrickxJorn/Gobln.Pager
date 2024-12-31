@@ -1,14 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Gobln.Pager;
+﻿using Gobln.Pager;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
 
-namespace Golbn.Pager.Json.Newtonsoft
+namespace Gobln.Pager.Json.Newtonsoft
 {
     /// <summary>
     /// Converts an <see cref="PagedList"/> to or from JSON
@@ -36,17 +31,20 @@ namespace Golbn.Pager.Json.Newtonsoft
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            Type elementType = value.GetType().GetGenericArguments()[0];
+            if (value is not null)
+            {
+                Type elementType = value.GetType().GetGenericArguments()[0];
 
-            JsonConverter converter = (JsonConverter)Activator.CreateInstance(
-                typeof(IPagedListJsonConverter<>)
-                    .MakeGenericType([elementType]),
-                BindingFlags.Instance | BindingFlags.Public,
-                binder: null,
-                args: null,
-                culture: null)!;
+                JsonConverter converter = (JsonConverter)Activator.CreateInstance(
+                    typeof(IPagedListJsonConverter<>)
+                        .MakeGenericType([elementType]),
+                    BindingFlags.Instance | BindingFlags.Public,
+                    binder: null,
+                    args: null,
+                    culture: null)!;
 
-            converter.WriteJson(writer, value, serializer);
+                converter.WriteJson(writer, value, serializer);
+            }
         }
     }
 
@@ -67,7 +65,7 @@ namespace Golbn.Pager.Json.Newtonsoft
 
             var tempPage = jsonObj.ToObject<IEnumerable<T>>();
 
-            return tempPage.Count() == 0
+            return tempPage is null || tempPage.Count() == 0
                ? new PagedList<T>()
                : new PagedList<T>(tempPage);
         }

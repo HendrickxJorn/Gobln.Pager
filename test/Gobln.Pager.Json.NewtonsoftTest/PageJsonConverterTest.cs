@@ -1,5 +1,5 @@
 ﻿using Gobln.Pager;
-using Golbn.Pager.Json.Newtonsoft;
+using Gobln.Pager.Json.Newtonsoft;
 using Gobln.Pager.TestHelper.Data;
 using Gobln.Pager.TestHelper.Comparer;
 using Gobln.Pager.TestHelper.Model;

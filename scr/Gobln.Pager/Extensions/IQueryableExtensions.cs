@@ -69,7 +69,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static Page<T> ToPage<T>(this IQueryable<T> source, int pageIndex, int pageSize, int totalItemCount)
         {
-            Validator.Validate(pageIndex, pageSize);
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
 
             return PrivateToPage(source, pageIndex, pageSize, totalItemCount, true);
         }
@@ -84,7 +84,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static Page<T> ToPage<T>(this IQueryable<T> source, IPageFilter pagerFilter, int totalItemCount)
         {
-            Validator.Validate(pagerFilter);
+            Validator.Validate(pagerFilter, totalItemCount);
 
             return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, true);
         }
@@ -101,7 +101,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static Page<T> ToPage<T>(this IQueryable<T> source, int pageIndex, int pageSize, int totalItemCount, bool prePaged)
         {
-            Validator.Validate(pageIndex, pageSize);
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
 
             return PrivateToPage(source, pageIndex, pageSize, totalItemCount, prePaged);
         }
@@ -117,7 +117,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static Page<T> ToPage<T>(this IQueryable<T> source, IPageFilter pagerFilter, int totalItemCount, bool prePaged)
         {
-            Validator.Validate(pagerFilter);
+            Validator.Validate(pagerFilter, totalItemCount);
 
             return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, prePaged);
         }
@@ -217,7 +217,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source, int pageIndex, int pageSize, int totalItemCount, CancellationToken cancellationToken = default)
         {
-            Validator.Validate(pageIndex, pageSize);
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
 
             return await Task.Run(() => PrivateToPage(source, pageIndex, pageSize, totalItemCount, true), cancellationToken)
                 .ConfigureAwait(false);
@@ -234,7 +234,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source, IPageFilter pagerFilter, int totalItemCount, CancellationToken cancellationToken = default)
         {
-            Validator.Validate(pagerFilter);
+            Validator.Validate(pagerFilter, totalItemCount);
 
             return await Task.Run(() => PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, true), cancellationToken)
                 .ConfigureAwait(false);
@@ -253,7 +253,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source, int pageIndex, int pageSize, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default)
         {
-            Validator.Validate(pageIndex, pageSize);
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
 
             return await Task.Run(() => PrivateToPage(source, pageIndex, pageSize, totalItemCount, prePaged), cancellationToken)
                 .ConfigureAwait(false);
@@ -271,7 +271,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source, IPageFilter pagerFilter, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default)
         {
-            Validator.Validate(pagerFilter);
+            Validator.Validate(pagerFilter, totalItemCount);
 
             return await Task.Run(() => PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, prePaged), cancellationToken)
                 .ConfigureAwait(false);

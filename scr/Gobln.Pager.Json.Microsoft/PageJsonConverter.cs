@@ -9,7 +9,7 @@ namespace Gobln.Pager.Json.Microsoft
     /// </summary>
     public class PageJsonConverter : JsonConverterFactory
     {
-        public override bool CanConvert(Type typeToConvert)  => typeToConvert.IsGenericType
+        public override bool CanConvert(Type typeToConvert) => typeToConvert.IsGenericType
                         && (typeToConvert.GetGenericTypeDefinition() == typeof(Page<>)
                             || typeToConvert.GetGenericTypeDefinition() == typeof(IPage<>));
 
@@ -49,7 +49,7 @@ namespace Gobln.Pager.Json.Microsoft
 
             var temp = JsonSerializer.Deserialize<TempPage<T>>(ref reader, options)!;
 
-            var elements = temp.PageItems?.Length == 0 
+            var elements = temp.PageItems?.Length == 0
                 ? new Page<T>()
                 : new Page<T>(temp.PageItems, temp.PageIndex, temp.PageSize, temp.TotalItemCount);
 

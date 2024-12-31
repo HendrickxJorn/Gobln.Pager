@@ -1,0 +1,14 @@
+﻿https://stackoverflow.com/questions/73223946/can-you-make-abstract-components-in-blazor
+https://learn.microsoft.com/en-us/aspnet/core/blazor/components/dynamiccomponent?view=aspnetcore-8.0
+https://www.daveabrock.com/2021/04/08/blazor-dynamic-component/
+https://gavilan.blog/2021/04/29/blazor-4-dynamiccomponent-examples-asp-net-core-6/
+https://stackoverflow.com/questions/77917799/blazor-dynamic-component-bind
+https://github.com/conficient/BlazorDynamicList
+
+
+interface:
+Maken van een interface class hierna zien om dit aan te roepen via de interface
+Use DynamicComponents to show????
+	Dan meegeven als paramter
+https://stackoverflow.com/questions/60718087/list-of-blazor-components-that-implement-an-interface
+https://mikaelkoskinen.net/post/razor-components-implement-interface

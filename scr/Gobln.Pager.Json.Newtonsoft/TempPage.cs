@@ -1,4 +1,4 @@
-﻿namespace Golbn.Pager.Json.Newtonsoft
+﻿namespace Gobln.Pager.Json.Newtonsoft
 {
     internal class TempPage<T>
     {

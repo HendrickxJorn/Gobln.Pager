@@ -6,14 +6,15 @@ using System.Linq;
 
 namespace Gobln.Pager
 {
-    //https://stackoverflow.com/questions/5877808/what-is-serializable-and-when-should-i-use-it
+    // todo https://stackoverflow.com/questions/5877808/what-is-serializable-and-when-should-i-use-it
+    // todo add possible exeptions to the comments
+    // bug when TotalItemCount is 0 or new Page<>( null array )
 
     /// <summary>
     /// Represents a strongly typed <see cref="Page"/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Serializable]
-    [DebuggerDisplay("Count = {Count}")]
     public class Page<T> : IPage<T>, IEnumerable
     {
         #region Members
@@ -71,13 +72,9 @@ namespace Gobln.Pager
         /// </summary>
         public Page(IEnumerable<T> collection)
         {
-            if (collection != null && collection.Any())
-            {
-                _items = collection.ToArray();
+            var pageDefinitions = new PageDefinition(1, collection.Count(), collection.Count());
 
-                PageSize = _items.Length;
-                TotalItemCount = _items.Length;
-            }
+            FillPageData(collection, pageDefinitions);
         }
 
         /// <summary>
@@ -87,21 +84,14 @@ namespace Gobln.Pager
         /// <param name="pageIndex">The currently selected page in the original collection</param>
         /// <param name="pageSize">Size of an individual page</param>
         /// <param name="totalItemCount">Total item count in the original collection</param>
+        /// <exception cref="ArgumentOutOfRangeException">Can not be less then zero or zero</exception>
         public Page(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)
         {
-            Validator.Validate(pageIndex, pageSize);
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
 
-            var definitions = new PageDefinition(pageIndex, pageSize, totalItemCount);
+            var pageDefinitions = new PageDefinition(pageIndex, pageSize, totalItemCount);
 
-            if (collection != null && definitions.TotalItemCount > 0 && collection.Any())
-            {
-                _items = collection.ToArray();
-
-                PageIndex = definitions.PageIndex;
-                TotalPageCount = definitions.PageCount;
-                PageSize = definitions.PageSize;
-                TotalItemCount = definitions.TotalItemCount;
-            }
+            FillPageData(collection, pageDefinitions);
         }
 
         /// <summary>
@@ -109,7 +99,15 @@ namespace Gobln.Pager
         /// </summary>
         /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
         /// <param name="pageDefinitions">The definition of the current page and its position in the original collection</param>
+        /// <exception cref="ArgumentOutOfRangeException">Can not be less then zero or zero</exception>
         internal Page(IEnumerable<T> collection, PageDefinition pageDefinitions)
+        {
+            FillPageData(collection, pageDefinitions);
+        }
+
+        #endregion Initialize
+
+        private void FillPageData(IEnumerable<T> collection, PageDefinition pageDefinitions)
         {
             if (collection != null && pageDefinitions.TotalItemCount > 0 && collection.Any())
             {
@@ -121,8 +119,6 @@ namespace Gobln.Pager
                 TotalItemCount = pageDefinitions.TotalItemCount;
             }
         }
-
-        #endregion Initialize
 
         #region Implementation of IEnumerable
 
@@ -158,6 +154,7 @@ namespace Gobln.Pager
         /// <typeparam name="T"></typeparam>
         /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
         /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException">Can not be less then zero or zero</exception>
         public static Page<T> FromEnumerable<T>(IEnumerable<T> source)
         {
             return source == null
@@ -172,6 +169,7 @@ namespace Gobln.Pager
         /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
         /// <param name="pageIndex">The currently selected page in the original collection</param>
         /// <param name="pageSize">Size of an individual page</param>
+        /// <exception cref="ArgumentOutOfRangeException">Can not be less then zero or zero</exception>
         /// <returns></returns>
         public static Page<T> FromEnumerable<T>(IEnumerable<T> collection, int pageIndex, int pageSize)
         {
@@ -193,7 +191,7 @@ namespace Gobln.Pager
         /// <returns></returns>
         public static Page<T> FromEnumerable<T>(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)
         {
-            Validator.Validate(pageIndex, pageSize);
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
 
             return collection == null
                 ? new Page<T>()
