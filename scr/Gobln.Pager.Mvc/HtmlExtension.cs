@@ -1,6 +1,4 @@
-﻿using Gobln.Pager.Mvc.Contracts;
-
-#if NETFRAMEWORK
+﻿#if NETFRAMEWORK
 
 using System.Web.Mvc;
 

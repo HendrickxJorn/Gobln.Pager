@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Html;
 
 #endif
 
-namespace Gobln.Pager.Mvc.Contracts
+namespace Gobln.Pager.Mvc
 {
     public interface IPagerFactory
     {

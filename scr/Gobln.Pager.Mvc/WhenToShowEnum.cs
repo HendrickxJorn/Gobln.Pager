@@ -1,6 +1,9 @@
 ﻿namespace Gobln.Pager.Mvc
 {
-    public enum ShowPageLink
+    /// <summary>
+    /// Enum for when to show content
+    /// </summary>
+    public enum WhenToShowEnum
     {
         Never = 0,
         IfNecessary = 1,

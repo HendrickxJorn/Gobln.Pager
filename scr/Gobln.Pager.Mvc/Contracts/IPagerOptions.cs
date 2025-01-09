@@ -1,20 +1,46 @@
-﻿namespace Gobln.Pager.Mvc.Contracts
+﻿namespace Gobln.Pager.Mvc
 {
     public interface IPagerOptions
     {
-        bool AlwaysShowPager { get; set; }
+        /// <summary>
+        /// Show the pager
+        /// </summary>
+        WhenToShowEnum ShowPager { get; set; }
+
+        /// <summary>
+        /// Show the first button link
+        /// </summary>
+        WhenToShowEnum ShowFirstButtonLink { get; set; }
+
+        /// <summary>
+        /// Show the previous button link
+        /// </summary>
+        WhenToShowEnum ShowPreviousButtonLink { get; set; }
+
+        /// <summary>
+        /// Show the pager button links
+        /// </summary>
+        WhenToShowEnum ShowPagerButtonLinks { get; set; }
+
+        /// <summary>
+        /// Show the next button link
+        /// </summary>
+        WhenToShowEnum ShowNextButtonLink { get; set; }
+
+        /// <summary>
+        /// Show the last button link
+        /// </summary>
+        WhenToShowEnum ShowLastButtonLink { get; set; }
 
         /// <summary>
         /// Nav Tag Attributes
         /// </summary>
-        object NavTagHtmlAttributes { get; set; }
+        object? NavTagHtmlAttributes { get; set; }
 
         /// <summary>
         /// Ul Tag Attributes
         /// </summary>
-        object UlTagHtmlAttributes { get; set; }
-
-        PageLinkItem[] ShowItemOrder { get; set; }
+        object? UlTagHtmlAttributes { get; set; }
 
         string FirstPageLinkLabel { get; set; }
 
@@ -49,17 +75,6 @@
         /// </summary>
         string? HRefUrl { get; set; }
 
-
-        ShowPageLink ShowFirstButtonLink { get; set; }
-
-        ShowPageLink ShowPreviousButtonLink { get; set; }
-
-        ShowPageLink ShowPagerButtonLinks { get; set; }
-
-        ShowPageLink ShowNextButtonLink { get; set; }
-
-        ShowPageLink ShowLastButtonLink { get; set; }
-
         /// <summary>
         /// The number of sibling pages to show on each side of the current page.
         /// </summary>
@@ -70,6 +85,14 @@
         /// </summary>
         int BoundaryCount { get; set; }
 
+        /// <summary>
+        /// Show ellipsis
+        /// </summary>
         bool ShowEllipsis { get; set; }
+
+        /// <summary>
+        /// Show the range of items instead of the page index
+        /// </summary>
+        bool ShowIndexAsRange { get; set; }
     }
 }

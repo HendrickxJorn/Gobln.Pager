@@ -1,6 +1,4 @@
-﻿using Gobln.Pager.Mvc.Contracts;
-
-namespace Gobln.Pager.Mvc
+﻿namespace Gobln.Pager.Mvc
 {
     public static class Settings
     {

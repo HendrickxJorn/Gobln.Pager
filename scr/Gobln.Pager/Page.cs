@@ -5,9 +5,8 @@ using System.Linq;
 
 namespace Gobln.Pager
 {
-    // todo https://stackoverflow.com/questions/5877808/what-is-serializable-and-when-should-i-use-it
-    // todo add possible exeptions to the comments
-    // bug when TotalItemCount is 0 or new Page<>( null array )
+    // todo: https://stackoverflow.com/questions/5877808/what-is-serializable-and-when-should-i-use-it
+    // todo: bug when TotalItemCount is 0 or new Page<>( null array )
 
     /// <summary>
     /// Represents a strongly typed <see cref="Page"/>

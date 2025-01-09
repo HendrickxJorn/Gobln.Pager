@@ -1,5 +1,4 @@
 ﻿using Gobln.Pager.Mvc;
-using Gobln.Pager.Mvc.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;

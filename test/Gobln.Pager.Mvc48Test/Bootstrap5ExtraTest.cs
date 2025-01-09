@@ -6,10 +6,6 @@ namespace Gobln.Pager.Mvc48Test
 {
     public class Bootstrap5ExtraTest
     {
-        //https://mui.com/material-ui/react-pagination/
-        // todo get extra's form here
-        //          -> siblingCount={1} boundaryCount={1}
-
         private readonly HelperHtml _helperHtml;
         private readonly IPage _page1;
         private readonly IPage _page3;
@@ -49,15 +45,14 @@ namespace Gobln.Pager.Mvc48Test
             var result = mockHtmlHelper.Pager(_page3, new PagerOptions()
             {
                 NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
-                ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
                 AllowDisabledPageLinkTab = true,
 
                 HRefUrl = "#",
 
                 //new 
-                ShowFirstButtonLink = ShowPageLink.Never,
-                ShowLastButtonLink = ShowPageLink.Never,
+                ShowFirstButtonLink = WhenToShowEnum.Never,
+                ShowLastButtonLink = WhenToShowEnum.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
@@ -113,17 +108,16 @@ namespace Gobln.Pager.Mvc48Test
             var result = mockHtmlHelper.Pager(_page1, new PagerOptions()
             {
                 NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
-                ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
                 AllowDisabledPageLinkTab = true,
 
-                AlwaysShowPager = true,
+                ShowPager = WhenToShowEnum.Always,
 
                 HRefUrl = "#",
 
                 //new 
-                ShowFirstButtonLink = ShowPageLink.Never,
-                ShowLastButtonLink = ShowPageLink.Never,
+                ShowFirstButtonLink = WhenToShowEnum.Never,
+                ShowLastButtonLink = WhenToShowEnum.Never,
                 SiblingCount = 0,
                 BoundaryCount = 0,
             });
@@ -161,17 +155,14 @@ namespace Gobln.Pager.Mvc48Test
             var result = mockHtmlHelper.Pager(_page3, new PagerOptions()
             {
                 NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
-                ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
                 AllowDisabledPageLinkTab = true,
-
-                AlwaysShowPager = true,
 
                 HRefUrl = null,
 
                 //new 
-                ShowFirstButtonLink = ShowPageLink.Never,
-                ShowLastButtonLink = ShowPageLink.Never,
+                ShowFirstButtonLink = WhenToShowEnum.Never,
+                ShowLastButtonLink = WhenToShowEnum.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
@@ -213,17 +204,14 @@ namespace Gobln.Pager.Mvc48Test
             var result = mockHtmlHelper.Pager(_page5, new PagerOptions()
             {
                 NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
-                ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
                 AllowDisabledPageLinkTab = true,
-
-                AlwaysShowPager = true,
 
                 HRefUrl = null,
 
                 //new 
-                ShowFirstButtonLink = ShowPageLink.Never,
-                ShowLastButtonLink = ShowPageLink.Never,
+                ShowFirstButtonLink = WhenToShowEnum.Never,
+                ShowLastButtonLink = WhenToShowEnum.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
@@ -259,17 +247,14 @@ namespace Gobln.Pager.Mvc48Test
             var result = mockHtmlHelper.Pager(_page3, new PagerOptions()
             {
                 NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
-                ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
                 AllowDisabledPageLinkTab = true,
-
-                AlwaysShowPager = true,
 
                 HRefUrl = "http://pagerList.com/",
 
                 //new 
-                ShowFirstButtonLink = ShowPageLink.Never,
-                ShowLastButtonLink = ShowPageLink.Never,
+                ShowFirstButtonLink = WhenToShowEnum.Never,
+                ShowLastButtonLink = WhenToShowEnum.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
@@ -311,17 +296,14 @@ namespace Gobln.Pager.Mvc48Test
             var result = mockHtmlHelper.Pager(_page5, new PagerOptions()
             {
                 NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
-                ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
                 AllowDisabledPageLinkTab = true,
-
-                AlwaysShowPager = true,
 
                 HRefUrl = "http://pagerList.com/search",
 
                 //new 
-                ShowFirstButtonLink = ShowPageLink.Never,
-                ShowLastButtonLink = ShowPageLink.Never,
+                ShowFirstButtonLink = WhenToShowEnum.Never,
+                ShowLastButtonLink = WhenToShowEnum.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
