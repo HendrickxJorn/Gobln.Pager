@@ -28,7 +28,7 @@ namespace Gobln.Pager
         /// Initializes a new instance of the <see cref="PagedList{T}"/> class that is empty and has a page size of 10.
         /// </summary>
         public PagedList()
-            :this(10)
+            : this(10)
         {
         }
 
@@ -62,7 +62,7 @@ namespace Gobln.Pager
         /// <param name="collection">The source whose elements are copied to the new <see cref="PagedList{T}"/></param>
         /// <param name="pageSize">The number of elements per page</param>
         public PagedList(IEnumerable<T> collection, int pageSize)
-            :this(pageSize)
+            : this(pageSize)
         {
             _list = new List<T>(collection);
 

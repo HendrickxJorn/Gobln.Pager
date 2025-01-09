@@ -49,9 +49,6 @@ namespace Gobln.Pager.Mvc48Test
                 NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
                 ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AllowDisabledPageLink = false,
                 AllowDisabledPageLinkTab = false,
 
@@ -99,9 +96,6 @@ namespace Gobln.Pager.Mvc48Test
 
                 AllowDisabledPageLinkTab = false,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 HRefUrl = "#",
             });
 
@@ -140,9 +134,6 @@ namespace Gobln.Pager.Mvc48Test
                 NavTagHtmlAttributes = new { aria_label = "Page navigation" },
                 UlTagHtmlAttributes = new { @class = "pagination-lg" },
                 ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
-
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
 
                 AllowDisabledPageLink = false,
                 AllowDisabledPageLinkTab = false,
@@ -187,9 +178,6 @@ namespace Gobln.Pager.Mvc48Test
                 NavTagHtmlAttributes = new { aria_label = "Page navigation" },
                 UlTagHtmlAttributes = new { @class = "pagination-sm" },
                 ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
-
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
 
                 AllowDisabledPageLink = false,
                 AllowDisabledPageLinkTab = false,

@@ -2,27 +2,21 @@
 using Gobln.Pager.Mvc.Contracts;
 using System.Collections.Generic;
 using System.Reflection;
-
+using System;
 
 #if NETFRAMEWORK
-
 using System.Web;
 using System.Web.Mvc;
-using static System.Net.Mime.MediaTypeNames;
-
 #else
-
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-
 #endif
 
 // TODO Rename????
 // TODO make functions virtual
 namespace Gobln.Pager.Mvc
 {
-    //public class PagerFactory(IPage _page, IPagerOptions _pagerOptions)
     public class PagerFactory(IPagerOptions _pagerOptions)
         : IPagerFactory
     {
@@ -30,9 +24,7 @@ namespace Gobln.Pager.Mvc
 
         public virtual void Validate()
         {
-
 #if NETFRAMEWORK
-
             if (_pagerOptions is null)
             {
                 throw new ArgumentNullException(nameof(_pagerOptions));
@@ -42,14 +34,10 @@ namespace Gobln.Pager.Mvc
             {
                 throw new ArgumentNullException(nameof(_pagerOptions.ShowItemOrder));
             }
-
 #else
-
             ArgumentNullException.ThrowIfNull(_pagerOptions);
             ArgumentNullException.ThrowIfNull(_pagerOptions.ShowItemOrder);
-
 #endif
-
         }
 
 #if NETFRAMEWORK
@@ -58,9 +46,7 @@ namespace Gobln.Pager.Mvc
         public virtual IHtmlContent Render(IPage page)
 #endif
         {
-            _page = page;
-
-            if (_page == null || (!_page.HasPaging && !_pagerOptions.AlwaysShowPager))
+            if (page == null || (!page.HasPaging && !_pagerOptions.AlwaysShowPager))
             {
 #if NETFRAMEWORK
                 return MvcHtmlString.Create(string.Empty);
@@ -69,6 +55,8 @@ namespace Gobln.Pager.Mvc
 #endif
             }
 
+            _page = page;
+
 #if NETFRAMEWORK
             return MvcHtmlString.Create(RenderPager().ToString(TagRenderMode.Normal));
 #else
@@ -76,98 +64,44 @@ namespace Gobln.Pager.Mvc
 #endif
         }
 
-        //todo put every thing in the tag creator, => ul containt everyting of ul and lower, nav => contain everything of nav and lower
-        //          Then methode Render() only need to call nav and return it.
         private TagBuilder RenderPager()
         {
-            var ul = UlTagCreator();
+            var ul = TagCreatorUl();
 
-            foreach (var item in _pagerOptions.ShowItemOrder)
+            if( _pagerOptions.ShowFirstButtonLink == ShowPageLink.Always
+                || (_pagerOptions.ShowFirstButtonLink == ShowPageLink.IfNecessary && _page.PageIndex > 1))
             {
-                switch (item)
+                ul.InnerHtmlAppend(CreateFirstTag());
+            }
+
+            if (_pagerOptions.ShowPreviousButtonLink == ShowPageLink.Always 
+                || (_pagerOptions.ShowPreviousButtonLink == ShowPageLink.IfNecessary && _page.PageIndex > 1))
+            {
+                ul.InnerHtmlAppend(CreatePreviousTag());
+            }
+
+            if (_pagerOptions.ShowPagerButtonLinks == ShowPageLink.Always
+                || _pagerOptions.ShowPagerButtonLinks == ShowPageLink.IfNecessary)
+            {
+                foreach (var pNumber in PageNumbersCreator())
                 {
-                    case PageLinkItem.FirstPageLink:
-                        //todo VisableItemsPerSide
-                        //if (_pagerOptions.FirstPageLinkAlwaysShow || _page.PageIndex - _pagerOptions.VisableItemsPerSide > 1)
-                        //{
-                        ul.InnerHtmlAppend(CreateFirstTag());
-                        //}
-                        break;
-
-                    case PageLinkItem.PreviousPageLink:
-                        if (_pagerOptions.PreviousPageLinkAlwaysShow || _page.PageIndex > 1)
-                        {
-                            ul.InnerHtmlAppend(CreatePreviousTag());
-                        }
-                        break;
-
-                            case PageLinkItem.EllipsisPreviousPageLink:
-                    //            if (_pagerOptions.AlwaysShowJumpPageItem || _page.CurrentPageIndex - _pagerOptions.VisableItemsPerSide > 2)
-                    //            {
-                    //                var previous = ((_page.CurrentPageIndex - _pagerOptions.VisableItemsPerSide) / 2) + 1;
-
-                    //                previous = previous < 1 ? 1 : previous;
-
-                    //                var il = GenerateIl(_page.CurrentPageIndex == previous);
-
-                    //                il.InnerHtmlAppendHtml(GenerateLinkTag(_pagerOptions.LabelJumpPageItem, previous, string.Empty, disableTabing: _page.CurrentPageIndex == previous));
-
-                    //                ul.InnerHtmlAppendHtml(il);
-                    //            }
-                                break;
-
-                    case PageLinkItem.PageLinks:
-                        foreach (var pNumber in PageNumbersCreator())
-                        {
-                            ul.InnerHtmlAppend(pNumber);
-                        }
-                        break;
-
-                    //        case ItemShow.PagesItemsRange:
-                    //            foreach (var pNumber in GeneratePageNumbers(true))
-                    //            {
-                    //                ul.InnerHtmlAppendHtml(pNumber);
-                    //            }
-                    //            break;
-
-                          case PageLinkItem.EllipsisNextPageLink:
-                    //            if (_pagerOptions.AlwaysShowJumpPageItem || _page.CurrentPageIndex + _pagerOptions.VisableItemsPerSide < _page.TotalPageCount - 1)
-                    //            {
-                    //                var next = _page.CurrentPageIndex + _pagerOptions.VisableItemsPerSide;
-
-                    //                next = ((_page.TotalPageCount - next) / 2) + next;
-
-                    //                next = next > _page.TotalPageCount ? _page.TotalPageCount : next;
-
-                    //                var il = GenerateIl(next == _page.CurrentPageIndex);
-
-                    //                il.InnerHtmlAppendHtml(GenerateLinkTag(_pagerOptions.LabelJumpPageItem, next, string.Empty, disableTabing: _page.CurrentPageIndex == next));
-
-                    //                ul.InnerHtmlAppendHtml(il);
-                    //            }
-                                break;
-
-                    case PageLinkItem.NextPageLink:
-                        if (_pagerOptions.NextPageLinkAlwaysShow || _page.PageIndex < _page.TotalPageCount)
-                        {
-                            ul.InnerHtmlAppend(CreateNextTag());
-                        }
-                        break;
-
-                    case PageLinkItem.LastPageLink:
-                        //todo VisableItemsPerSide
-                        //if (_pagerOptions.LastPageLinkAlwaysShow || _page.PageIndex + _pagerOptions.VisableItemsPerSide < _page.TotalPageCount)
-                        //{
-                        ul.InnerHtmlAppend(CreateLastTag());
-                        //}
-                        break;
-
-                    default:
-                        break;
+                    ul.InnerHtmlAppend(pNumber);
                 }
             }
 
-            var nav = NavTagCreator();
+            if (_pagerOptions.ShowPreviousButtonLink == ShowPageLink.Always
+                || (_pagerOptions.ShowPreviousButtonLink == ShowPageLink.IfNecessary && _page.PageIndex < _page.TotalPageCount))
+            {
+                ul.InnerHtmlAppend(CreateNextTag());
+            }
+
+            if (_pagerOptions.ShowLastButtonLink == ShowPageLink.Always
+                || (_pagerOptions.ShowLastButtonLink == ShowPageLink.IfNecessary && _page.PageIndex < _page.TotalPageCount))
+            {
+                ul.InnerHtmlAppend(CreateLastTag());
+            }
+
+            var nav = TagCreatorNav();
 
             nav.InnerHtmlAppend(ul);
 
@@ -180,14 +114,14 @@ namespace Gobln.Pager.Mvc
 
             var isActive = _page.PageIndex == index && _pagerOptions.DisplayActive;
 
-            var Li = LiTagCreator(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink);
+            var Li = TagCreatorLi(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink);
 
             Li.InnerHtmlAppend(
                 isActive
-                ? SpanTagCreator(_pagerOptions.FirstPageLinkLabel, index,
+                ? TagCreatorSpan(_pagerOptions.FirstPageLinkLabel, index,
                     icon: _pagerOptions.FirstPageLinkIconLabel,
                     disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
-                : LinkTagCreator(_pagerOptions.FirstPageLinkLabel, index,
+                : TagCreatorLink(_pagerOptions.FirstPageLinkLabel, index,
                     icon: _pagerOptions.FirstPageLinkIconLabel,
                     disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
             );
@@ -203,14 +137,14 @@ namespace Gobln.Pager.Mvc
 
             var isActive = _page.PageIndex == index && _pagerOptions.DisplayActive;
 
-            var Li = LiTagCreator(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink);
+            var Li = TagCreatorLi(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink);
 
             Li.InnerHtmlAppend(
                 isActive
-                ? SpanTagCreator(_pagerOptions.PreviousPageLinkLabel, index,
+                ? TagCreatorSpan(_pagerOptions.PreviousPageLinkLabel, index,
                     icon: _pagerOptions.PreviousPageLinkIconLabel,
                     disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
-                : LinkTagCreator(_pagerOptions.PreviousPageLinkLabel, index,
+                : TagCreatorLink(_pagerOptions.PreviousPageLinkLabel, index,
                     icon: _pagerOptions.PreviousPageLinkIconLabel,
                     disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
             );
@@ -226,14 +160,14 @@ namespace Gobln.Pager.Mvc
 
             var isActive = _page.PageIndex == index && _pagerOptions.DisplayActive;
 
-            var Li = LiTagCreator(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink);
+            var Li = TagCreatorLi(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink);
 
             Li.InnerHtmlAppend(
                 isActive
-                ? SpanTagCreator(_pagerOptions.NextPageLinkLabel, index,
+                ? TagCreatorSpan(_pagerOptions.NextPageLinkLabel, index,
                     icon: _pagerOptions.NextPageLinkIconLabel,
                     disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
-                : LinkTagCreator(_pagerOptions.NextPageLinkLabel, index,
+                : TagCreatorLink(_pagerOptions.NextPageLinkLabel, index,
                     icon: _pagerOptions.NextPageLinkIconLabel,
                     disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
             );
@@ -247,14 +181,14 @@ namespace Gobln.Pager.Mvc
 
             var isActive = _page.PageIndex == index && _pagerOptions.DisplayActive;
 
-            var Li = LiTagCreator(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink);
+            var Li = TagCreatorLi(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink);
 
             Li.InnerHtmlAppend(
                 isActive
-                ? SpanTagCreator(_pagerOptions.LastPageLinkLabel, index,
+                ? TagCreatorSpan(_pagerOptions.LastPageLinkLabel, index,
                     icon: _pagerOptions.LastPageLinkIconLabel,
                     disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
-                : LinkTagCreator(_pagerOptions.LastPageLinkLabel, index,
+                : TagCreatorLink(_pagerOptions.LastPageLinkLabel, index,
                     icon: _pagerOptions.LastPageLinkIconLabel,
                     disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
             );
@@ -270,7 +204,7 @@ namespace Gobln.Pager.Mvc
 
         #region Generate
 
-        private TagBuilder PrivateTagBuilder(string name, object? attibutes = null)
+        private TagBuilder PrivateTagCreator(string name, object? attibutes = null, string[]? classes = null)
         {
             var tagBuilder = new TagBuilder(name);
 
@@ -279,28 +213,29 @@ namespace Gobln.Pager.Mvc
                 tagBuilder.MergeAttributes(HtmlHelper.AnonymousObjectToHtmlAttributes(attibutes));
             }
 
+            if(classes is not null)
+            {
+                tagBuilder.AddCssClass(string.Join(" ", classes.Where(c => !string.IsNullOrWhiteSpace(c))));
+            }
+
             return tagBuilder;
         }
 
-        public virtual TagBuilder NavTagCreator()
+        public virtual TagBuilder TagCreatorNav()
         {
-            return PrivateTagBuilder("nav", _pagerOptions.NavTagHtmlAttributes);
+            return PrivateTagCreator("nav", _pagerOptions.NavTagHtmlAttributes);
         }
 
-        public virtual TagBuilder UlTagCreator()
+        public virtual TagBuilder TagCreatorUl()
         {
-            var tagBuilder = PrivateTagBuilder("ul", _pagerOptions.UlTagHtmlAttributes);
-
-            tagBuilder.AddCssClass("pagination");
-
-            return tagBuilder;
+            return PrivateTagCreator("ul", _pagerOptions.UlTagHtmlAttributes, ["pagination"]);
         }
 
         //todo isActive omdraaien van bedoeling
         //todo change isDisabled and isActive to dictionary<>  ?????
-        public virtual TagBuilder LiTagCreator(bool isDisabled, bool isActive = false, Dictionary<string, string?>? attributes = null)
+        public virtual TagBuilder TagCreatorLi(bool isDisabled = false, bool isActive = false, Dictionary<string, string?>? attributes = null)
         {
-            var tagBuilder = PrivateTagBuilder("li");
+            var tagBuilder = PrivateTagCreator("li");
 
             if (attributes is not null && attributes.Count > 0)
             {
@@ -319,17 +254,21 @@ namespace Gobln.Pager.Mvc
 
             tagBuilder.AddCssClass("page-item");
 
+
             return tagBuilder;
         }
 
-        public virtual TagBuilder LinkTagCreator(string label, int pageIndex, string? icon = null, bool disableTabing = false)
+        public virtual TagBuilder TagCreatorLink(string label, int pageIndex, string? icon = null, bool disableTabing = false)
         {
-            var tagBuilder = PrivateTagBuilder("a");
+            var tagBuilder = PrivateTagCreator("a");
 
             tagBuilder.AddCssClass("page-link");
 
-            //todo make optional
-            //tagBuilder.Attributes.Add($"data-{_pagerOptions.DataIndexName}", pageIndex.ToString());
+            //todo: make optional
+            if (_pagerOptions.DataIndexName is not null && !(pageIndex > _page.TotalPageCount || pageIndex < 1))
+            {
+                tagBuilder.Attributes.Add($"data-{_pagerOptions.DataIndexName}", pageIndex.ToString());
+            }
 
             if (disableTabing)
             {
@@ -350,20 +289,20 @@ namespace Gobln.Pager.Mvc
 
             tagBuilder.Attributes.Add("href", url);
 
-            if (string.IsNullOrWhiteSpace(icon))
+            if (icon is null || string.IsNullOrWhiteSpace(icon))
             {
                 tagBuilder.InnerHtmlAppend(label);
             }
             else
             {
-                tagBuilder.InnerHtmlAppend(SpanIconTagCreator(icon));
+                tagBuilder.InnerHtmlAppend(TagCreatorSpanIcon(icon));
                 tagBuilder.MergeAttribute("aria-label", label);
             }
 
             return tagBuilder;
         }
 
-        public virtual TagBuilder SpanTagCreator(string label, int pageIndex, string? icon = null, bool isDisabled = false, bool disableTabing = false)
+        public virtual TagBuilder TagCreatorSpan(string label, int pageIndex, string? icon = null, bool disableTabing = false)
         {
             var tagBuilder = new TagBuilder("span");
 
@@ -374,39 +313,20 @@ namespace Gobln.Pager.Mvc
                 tagBuilder.Attributes.Add("tabindex", "-1");
             }
 
-            if (string.IsNullOrWhiteSpace(icon))
+            if (icon is null || string.IsNullOrWhiteSpace(icon))
             {
                 tagBuilder.InnerHtmlAppend(label);
             }
             else
             {
-                tagBuilder.InnerHtmlAppend(SpanIconTagCreator(icon));
+                tagBuilder.InnerHtmlAppend(TagCreatorSpanIcon(icon));
                 tagBuilder.MergeAttribute("aria-label", label);
             }
 
             return tagBuilder;
         }
 
-        public virtual TagBuilder SpanTagCreator(string label, string classNames, bool isAreaHidden = false)
-        {
-            var tagBuilder = new TagBuilder("span");
-
-            if (!string.IsNullOrWhiteSpace(classNames))
-            {
-                tagBuilder.AddCssClass(classNames);
-            }
-
-            if (isAreaHidden)
-            {
-                tagBuilder.Attributes.Add("aria-hidden", "true");
-            }
-
-            tagBuilder.InnerHtmlAppend(label);
-
-            return tagBuilder;
-        }
-
-        public virtual TagBuilder SpanIconTagCreator(string label)
+        public virtual TagBuilder TagCreatorSpanIcon(string label)
         {
             var tagBuilder = new TagBuilder("span");
 
@@ -419,25 +339,109 @@ namespace Gobln.Pager.Mvc
 
         public virtual IEnumerable<TagBuilder> PageNumbersCreator(bool numberRange = false)
         {
-            //todo VisableItemsPerSide
-            //var startIndex = _page.PageIndex - _pagerOptions.VisableItemsPerSide;
-            //var endIndex = _page.PageIndex + _pagerOptions.VisableItemsPerSide;
+            var tagBuilderList = new List<TagBuilder>();
+         
+            var elipseModifier = _pagerOptions.ShowEllipsis ? 1 : 0;
 
-            var startIndex = _page.PageIndex;
-            var endIndex = _page.PageIndex;
+            var startNumber =
+                Math.Max(
+                    Math.Min(
+                        // Original start
+                        _page.PageIndex - _pagerOptions.SiblingCount,
+                        // Page boundery +/- elipse
+                        _page.TotalPageCount - _pagerOptions.BoundaryCount - _pagerOptions.SiblingCount * 2 - elipseModifier
+                    ),
+                    // After start +/- elipse
+                    _pagerOptions.BoundaryCount + 1 + elipseModifier
+                );
 
-            if (startIndex < 1)
+            var endNumber = 
+                Math.Min(
+                    Math.Max(
+                        // Original end
+                        _page.PageIndex + _pagerOptions.SiblingCount,
+                        // Page boundery +/- elipse
+                        _pagerOptions.BoundaryCount + _pagerOptions.SiblingCount * 2 + 1 + elipseModifier
+
+                    ),
+                    // Before end +/- elipse
+                    _page.TotalPageCount - _pagerOptions.BoundaryCount - elipseModifier
+                );
+
+            var firstIndex = Math.Min(_pagerOptions.BoundaryCount, _page.TotalPageCount) - 1 + 1;
+            var lastIndex = _page.TotalPageCount - Math.Max(_page.TotalPageCount - _pagerOptions.BoundaryCount + 1, _pagerOptions.BoundaryCount + 1) + 1;
+
+            if (firstIndex > 0)
             {
-                startIndex = 1;
+                for (int index = 1; index <= firstIndex; index++)
+                {
+                    var isActive = _pagerOptions.DisplayActive && _page.PageIndex == index;
+
+                    var text = numberRange
+                        ? $"{((index - 1) * _page.PageSize) + 1} - {((index - 1) * _page.PageSize) + _page.PageSize}"
+                        : index.ToString();
+
+                    Dictionary<string, string?> attibutes = [];
+
+                    if (isActive)
+                    {
+                        attibutes.Add("aria-current", "page");
+                    }
+
+                    var il = TagCreatorLi(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink, isActive, attributes: attibutes);
+
+                    var link = isActive
+                        ? TagCreatorSpan(text, index,
+                                disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
+                        : TagCreatorLink(text, index,
+                                disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab);
+
+                    il.InnerHtmlAppend(link);
+
+                    tagBuilderList.Add(il);
+                }
             }
 
-            //todo
-            //if (endIndex > _page.TotalPageCount)
-            //{
-            endIndex = _page.TotalPageCount;
-            //}
+            if (_pagerOptions.ShowEllipsis)
+            {
+                if (startNumber > _pagerOptions.BoundaryCount + 2)
+                {
+                    var il = TagCreatorLi(true);
+                    il.InnerHtmlAppend(TagCreatorSpan("...", 0, disableTabing: true));
+                    tagBuilderList.Add(il);
+                }
+                else if (_pagerOptions.BoundaryCount + 1 < _page.TotalPageCount - _pagerOptions.BoundaryCount)
+                {
+                    var index = _pagerOptions.BoundaryCount + 1;
 
-            for (int index = startIndex; index <= endIndex; index++)
+                    var isActive = _pagerOptions.DisplayActive && _page.PageIndex == index;
+
+                    var text = numberRange
+                        ? $"{((index - 1) * _page.PageSize) + 1} - {((index - 1) * _page.PageSize) + _page.PageSize}"
+                        : index.ToString();
+
+                    Dictionary<string, string?> attibutes = [];
+
+                    if (isActive)
+                    {
+                        attibutes.Add("aria-current", "page");
+                    }
+
+                    var il = TagCreatorLi(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink, isActive, attributes: attibutes);
+
+                    var link = isActive
+                        ? TagCreatorSpan(text, index,
+                                disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
+                        : TagCreatorLink(text, index,
+                                disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab);
+
+                    il.InnerHtmlAppend(link);
+
+                    tagBuilderList.Add(il);
+                }
+            }
+
+            for (int index = startNumber; index <= endNumber; index++)
             {
                 var isActive = _pagerOptions.DisplayActive && _page.PageIndex == index;
 
@@ -452,18 +456,90 @@ namespace Gobln.Pager.Mvc
                     attibutes.Add("aria-current", "page");
                 }
 
-                var il = LiTagCreator(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink, isActive, attibutes);
+                var il = TagCreatorLi(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink, isActive, attributes: attibutes);
 
                 var link = isActive
-                    ? SpanTagCreator(text, index,
+                    ? TagCreatorSpan(text, index,
                             disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
-                    : LinkTagCreator(text, index,
+                    : TagCreatorLink(text, index,
                             disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab);
 
                 il.InnerHtmlAppend(link);
 
-                yield return il;
+                tagBuilderList.Add(il);
             }
+
+            if (_pagerOptions.ShowEllipsis)
+            {
+                if (endNumber < _page.TotalPageCount - _pagerOptions.BoundaryCount - 1)
+                {
+                    var il = TagCreatorLi(true);
+                    il.InnerHtmlAppend(TagCreatorSpan("...", 0, disableTabing: true));
+                    tagBuilderList.Add(il);
+                }
+                else if (_page.TotalPageCount - _pagerOptions.BoundaryCount > _pagerOptions.BoundaryCount)
+                {
+                    var index = _page.TotalPageCount - _pagerOptions.BoundaryCount;
+
+                    var isActive = _pagerOptions.DisplayActive && _page.PageIndex == index;
+
+                    var text = numberRange
+                        ? $"{((index - 1) * _page.PageSize) + 1} - {((index - 1) * _page.PageSize) + _page.PageSize}"
+                        : index.ToString();
+
+                    Dictionary<string, string?> attibutes = [];
+
+                    if (isActive)
+                    {
+                        attibutes.Add("aria-current", "page");
+                    }
+
+                    var il = TagCreatorLi(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink, isActive, attributes: attibutes);
+
+                    var link = isActive
+                        ? TagCreatorSpan(text, index,
+                                disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
+                        : TagCreatorLink(text, index,
+                                disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab);
+
+                    il.InnerHtmlAppend(link);
+
+                    tagBuilderList.Add(il);
+                }
+            }
+
+            if (lastIndex <= _page.TotalPageCount)
+            {
+                for (int index = _page.TotalPageCount - _pagerOptions.BoundaryCount + 1; index <= _page.TotalPageCount; index++)
+                {
+                    var isActive = _pagerOptions.DisplayActive && _page.PageIndex == index;
+
+                    var text = numberRange
+                        ? $"{((index - 1) * _page.PageSize) + 1} - {((index - 1) * _page.PageSize) + _page.PageSize}"
+                        : index.ToString();
+
+                    Dictionary<string, string?> attibutes = [];
+
+                    if (isActive)
+                    {
+                        attibutes.Add("aria-current", "page");
+                    }
+
+                    var il = TagCreatorLi(_page.PageIndex == index && _pagerOptions.AllowDisabledPageLink, isActive, attributes: attibutes);
+
+                    var link = isActive
+                        ? TagCreatorSpan(text, index,
+                                disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab)
+                        : TagCreatorLink(text, index,
+                                disableTabing: _page.PageIndex == index && _pagerOptions.AllowDisabledPageLinkTab);
+
+                    il.InnerHtmlAppend(link);
+
+                    tagBuilderList.Add(il);
+                }
+            }
+
+            return tagBuilderList;
         }
 
         /// <summary>
@@ -473,7 +549,7 @@ namespace Gobln.Pager.Mvc
         /// <returns></returns>
         private string? UrlCreator(int pageIndex)
         {
-            //return null if  page index larger than total page count or smaller then 1
+            //todo: return null if  page index larger than total page count or smaller then 1
             if (pageIndex > _page.TotalPageCount || pageIndex < 1)
             {
                 return null;
@@ -483,7 +559,7 @@ namespace Gobln.Pager.Mvc
             return Gobln.Pager.Mvc.Infrastructure.UrlHelper.AddQueryValuesToUrlString(_pagerOptions.HRefUrl ?? "#", new Dictionary<string, string> { { _pagerOptions.PageIndexName, pageIndex.ToString() } });
         }
 
-        #endregion Generate
+#endregion Generate
 
     }
 }

@@ -21,8 +21,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gobln.Pager.Json.Newtonsoft
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gobln.Pager.TestHelper", "test\Gobln.Pager.TestHelper\Gobln.Pager.TestHelper.csproj", "{B7448277-61C8-4601-B1F1-7E1AC5ADEB17}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "examples", "examples", "{F167F704-E1EE-45FE-B7AA-4EE3C1FCF786}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gobln.Pager.Mvc", "scr\Gobln.Pager.Mvc\Gobln.Pager.Mvc.csproj", "{0F12DD46-8F82-4446-B1A4-73FE62073119}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gobln.Pager.Blazor", "scr\Gobln.Pager.Blazor\Gobln.Pager.Blazor.csproj", "{68C6A177-6604-48C0-BFD5-70BBF0DDA261}"

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Interface\" />
+    <Folder Include="Contracts\" />
   </ItemGroup>
   
 </Project>

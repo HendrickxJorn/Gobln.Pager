@@ -46,10 +46,8 @@ namespace Gobln.Pager.MvcTest
             {
                 NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
                 UlTagHtmlAttributes = new { @class = "pagination-lg" },
-                ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
+                ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
                 AllowDisabledPageLink = false,
                 AllowDisabledPageLinkTab = false,
@@ -57,6 +55,10 @@ namespace Gobln.Pager.MvcTest
                 DisplayActive = false,
 
                 HRefUrl = "#",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -92,9 +94,6 @@ namespace Gobln.Pager.MvcTest
                 NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
                 ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AllowDisabledPageLink = false,
                 AllowDisabledPageLinkTab = false,
 
@@ -104,6 +103,10 @@ namespace Gobln.Pager.MvcTest
                 NextPageLinkIconLabel = "&raquo;",
 
                 HRefUrl = "#",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -139,10 +142,11 @@ namespace Gobln.Pager.MvcTest
 
                 AllowDisabledPageLinkTab = false,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 HRefUrl = "#",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -174,6 +178,12 @@ namespace Gobln.Pager.MvcTest
                 AllowDisabledPageLinkTab = false,
 
                 HRefUrl = "#",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
+                ShowPreviousButtonLink = ShowPageLink.Never,
+                ShowNextButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -205,6 +215,12 @@ namespace Gobln.Pager.MvcTest
                 AllowDisabledPageLinkTab = false,
 
                 HRefUrl = "#",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
+                ShowPreviousButtonLink = ShowPageLink.Never,
+                ShowNextButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -237,15 +253,16 @@ namespace Gobln.Pager.MvcTest
                 UlTagHtmlAttributes = new { @class = "justify-content-center" },
                 ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AllowDisabledPageLink = false,
                 AllowDisabledPageLinkTab = false,
 
                 DisplayActive = false,
 
                 HRefUrl = "#",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -278,15 +295,16 @@ namespace Gobln.Pager.MvcTest
                 UlTagHtmlAttributes = new { @class = "justify-content-end" },
                 ShowItemOrder = [PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink],
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AllowDisabledPageLink = false,
                 AllowDisabledPageLinkTab = false,
 
                 DisplayActive = false,
 
                 HRefUrl = "#",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());

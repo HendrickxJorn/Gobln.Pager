@@ -10,7 +10,14 @@
 </div>
 
 @{
-    var p = new int[]{ 1, 2, 3, 4, 5, 6, 7, 8, 9 }.ToPage();
+    Settings.DefaultPagerOptions.ShowEllipsis = true;
+    Settings.DefaultPagerOptions.BoundaryCount = 1;
+    Settings.DefaultPagerOptions.SiblingCount = 1;
+
+    var items = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 };
 }
 
-@Html.Pager(p)
+@foreach (var item in items)
+{
+    @Html.Pager(items.ToPage(item, 1))
+}

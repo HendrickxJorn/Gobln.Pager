@@ -22,13 +22,12 @@ namespace Gobln.Pager.Mvc
         /// <param name="page">Page that will be converted to an page</param>
         /// <returns></returns>
 #if NETFRAMEWORK
-
         public static MvcHtmlString Pager(this HtmlHelper html, IPage page)
 #else
         public static IHtmlContent Pager(this IHtmlHelper html, IPage page)
 #endif
         {
-            return Pager(html, page, new PagerOptions());
+            return Pager(html, page, Settings.DefaultPagerOptions);
         }
 
         /// <summary>

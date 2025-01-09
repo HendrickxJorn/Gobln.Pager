@@ -14,6 +14,7 @@ namespace Gobln.Pager.MvcTest
         private readonly IPage _page1;
         private readonly IPage _page3;
         private readonly IPage _page5;
+        private readonly IPage _page20;
 
         public Bootstrap5ExtraTest()
         {
@@ -21,6 +22,7 @@ namespace Gobln.Pager.MvcTest
             _page1 = new int[] { 1 }.ToPage(1, 1);
             _page3 = new int[] { 1, 2, 3 }.ToPage(1, 1);
             _page5 = new int[] { 1, 2, 3, 4, 5 }.ToPage(1, 1);
+            _page20 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }.ToPage(1, 1);
         }
 
         [Fact]
@@ -53,10 +55,11 @@ namespace Gobln.Pager.MvcTest
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 HRefUrl = "#",
+                
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -116,12 +119,15 @@ namespace Gobln.Pager.MvcTest
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AlwaysShowPager = true,
 
                 HRefUrl = "#",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
+                SiblingCount = 0,
+                BoundaryCount = 0,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -162,10 +168,11 @@ namespace Gobln.Pager.MvcTest
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AlwaysShowPager = true,
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -211,10 +218,11 @@ namespace Gobln.Pager.MvcTest
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AlwaysShowPager = true,
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -254,12 +262,13 @@ namespace Gobln.Pager.MvcTest
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AlwaysShowPager = true,
 
                 HRefUrl = "http://pagerList.com/",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -305,12 +314,196 @@ namespace Gobln.Pager.MvcTest
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AlwaysShowPager = true,
 
                 HRefUrl = "http://pagerList.com/search",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
+            });
+
+            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+        }
+
+        [Fact]
+        public void Default02()
+        {
+            var target = """
+            <nav aria-label="Page navigation example">
+                <ul class="pagination-lg pagination">
+            		<li class="page-item">
+            	        <a class="page-link" href="#">First</a>
+                    </li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">Previous</a>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">1</a>
+            		</li>
+            		<li class="disabled page-item">
+            			<span class="page-link" tabindex="-1">...</span>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">5</a>
+            		</li>
+            		<li aria-current="page" class="active page-item">
+            			<span class="page-link" tabindex="-1">6</span>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">7</a>
+            		</li>
+            		<li class="disabled page-item">
+            			<span class="page-link" tabindex="-1">...</span>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">20</a>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">Next</a>
+            		</li>
+            		<li class="page-item">
+            	        <a class="page-link" href="#">Last</a>
+                    </li>
+            	</ul>
+            </nav>
+            """;
+
+            var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+            var page20 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }.ToPage(6, 1);
+
+            var result = mockHtmlHelper.Pager(page20, new PagerOptions()
+            {
+                NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+                UlTagHtmlAttributes = new { @class = "pagination-lg" },
+
+                ShowItemOrder = [PageLinkItem.FirstPageLink, PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink, PageLinkItem.LastPageLink],
+
+                HRefUrl = "#",
+
+            });
+
+            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+        }
+
+        [Fact]
+        public void Default03()
+        {
+            var target = """
+            <nav aria-label="Page navigation example">
+                <ul class="pagination-lg pagination">
+            		<li class="page-item">
+            	        <a class="page-link" href="#">First</a>
+                    </li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">Previous</a>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">1</a>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">2</a>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">3</a>
+            		</li>
+            		<li aria-current="page" class="active page-item">
+            			<span class="page-link" tabindex="-1">4</span>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">5</a>
+            		</li>
+            		<li class="disabled page-item">
+            			<span class="page-link" tabindex="-1">...</span>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">20</a>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">Next</a>
+            		</li>
+            		<li class="page-item">
+            	        <a class="page-link" href="#">Last</a>
+                    </li>
+            	</ul>
+            </nav>
+            """;
+
+            var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+            var page20 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }.ToPage(4, 1);
+
+            var result = mockHtmlHelper.Pager(page20, new PagerOptions()
+            {
+                NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+                UlTagHtmlAttributes = new { @class = "pagination-lg" },
+
+                ShowItemOrder = [PageLinkItem.FirstPageLink, PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink, PageLinkItem.LastPageLink],
+
+                HRefUrl = "#",
+
+            });
+
+            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+        }
+
+        [Fact]
+        public void Default04()
+        {
+            var target = """
+            <nav aria-label="Page navigation example">
+                <ul class="pagination-lg pagination">
+            		<li class="page-item">
+            	        <a class="page-link" href="#">First</a>
+                    </li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">Previous</a>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">1</a>
+            		</li>
+            		<li class="disabled page-item">
+            			<span class="page-link" tabindex="-1">...</span>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">16</a>
+            		</li>
+            		<li aria-current="page" class="active page-item">
+            			<span class="page-link" tabindex="-1">17</span>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">18</a>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">19</a>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">20</a>
+            		</li>
+            		<li class="page-item">
+            			<a class="page-link" href="#">Next</a>
+            		</li>
+            		<li class="page-item">
+            	        <a class="page-link" href="#">Last</a>
+                    </li>
+            	</ul>
+            </nav>
+            """;
+
+            var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+            var page20 = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 }.ToPage(17, 1);
+
+            var result = mockHtmlHelper.Pager(page20, new PagerOptions()
+            {
+                NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+                UlTagHtmlAttributes = new { @class = "pagination-lg" },
+
+                ShowItemOrder = [PageLinkItem.FirstPageLink, PageLinkItem.PreviousPageLink, PageLinkItem.PageLinks, PageLinkItem.NextPageLink, PageLinkItem.LastPageLink],
+
+                HRefUrl = "#",
+
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());

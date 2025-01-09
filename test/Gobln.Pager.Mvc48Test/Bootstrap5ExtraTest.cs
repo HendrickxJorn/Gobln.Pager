@@ -53,10 +53,11 @@ namespace Gobln.Pager.Mvc48Test
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 HRefUrl = "#",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
@@ -116,12 +117,15 @@ namespace Gobln.Pager.Mvc48Test
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AlwaysShowPager = true,
 
                 HRefUrl = "#",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
+                SiblingCount = 0,
+                BoundaryCount = 0,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
@@ -161,12 +165,13 @@ namespace Gobln.Pager.Mvc48Test
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AlwaysShowPager = true,
 
                 HRefUrl = null,
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
@@ -212,12 +217,13 @@ namespace Gobln.Pager.Mvc48Test
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AlwaysShowPager = true,
 
                 HRefUrl = null,
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
@@ -257,12 +263,13 @@ namespace Gobln.Pager.Mvc48Test
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AlwaysShowPager = true,
 
                 HRefUrl = "http://pagerList.com/",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
@@ -308,12 +315,13 @@ namespace Gobln.Pager.Mvc48Test
 
                 AllowDisabledPageLinkTab = true,
 
-                PreviousPageLinkAlwaysShow = true,
-                NextPageLinkAlwaysShow = true,
-
                 AlwaysShowPager = true,
 
                 HRefUrl = "http://pagerList.com/search",
+
+                //new 
+                ShowFirstButtonLink = ShowPageLink.Never,
+                ShowLastButtonLink = ShowPageLink.Never,
             });
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());

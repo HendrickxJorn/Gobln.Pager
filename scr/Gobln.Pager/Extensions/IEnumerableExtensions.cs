@@ -14,7 +14,11 @@ namespace Gobln.Pager
         {
             var pd = new PageDefinition(pageIndex, pageSize, totalItemCount);
 
-            return new Page<T>(prePaged || pd.TotalItemCount < 1 ? collection : collection.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+            return new Page<T>(
+                prePaged || pd.TotalItemCount < 1
+                    ? collection
+                    : collection.Skip(pd.SkipIndex).Take(pd.PageSize)
+                , pd);
         }
 
         #region ToPage

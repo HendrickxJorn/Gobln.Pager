@@ -4,10 +4,8 @@
     {
         FirstPageLink = 0,
         PreviousPageLink = 1,
-        EllipsisPreviousPageLink = 2,
-        PageLinks = 3,
-        EllipsisNextPageLink = 4,
-        NextPageLink = 5,
-        LastPageLink = 6,
+        PageLinks = 2,
+        NextPageLink = 3,
+        LastPageLink = 4,
     }
 }

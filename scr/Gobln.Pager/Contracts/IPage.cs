@@ -6,7 +6,7 @@ namespace Gobln.Pager
     /// Interface <see cref="Page{T}"/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IPage<out T> : IPage, IEnumerable<T> 
+    public interface IPage<out T> : IPage, IEnumerable<T>
     {
     }
 
