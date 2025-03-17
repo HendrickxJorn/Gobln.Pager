@@ -27,8 +27,8 @@
             this.FirstPageLinkIconLabel = other.FirstPageLinkIconLabel;
             this.LastPageLinkIconLabel = other.LastPageLinkIconLabel;
             this.LastPageLinkLabel = other.LastPageLinkLabel;
-            this.PageIndexName = other.PageIndexName;
-            this.DataIndexName = other.DataIndexName;
+            this.PageIndexUrlName = other.PageIndexUrlName;
+            this.PageIndexDataName = other.PageIndexDataName;
             this.HRefUrl = other.HRefUrl;
             this.SiblingCount = other.SiblingCount;
             this.BoundaryCount = other.BoundaryCount;
@@ -135,11 +135,15 @@
         // todo Rename
         public bool DisplayActive { get; set; } = true;
 
-        // Todo Remane
-        public string PageIndexName { get; set; } = "pageIndex";
+        /// <summary>
+        /// The name of the pageindex for the href in the a-link
+        /// </summary>
+        public string PageIndexUrlName { get; set; } = "pageIndex";
 
-        // Todo Remane
-        public string? DataIndexName { get; set; } = null;
+        /// <summary>
+        /// The name of the pageindex for the data in the a-link
+        /// </summary>
+        public string? PageIndexDataName { get; set; } = null;
 
         public PagerOptions Clone()
         {

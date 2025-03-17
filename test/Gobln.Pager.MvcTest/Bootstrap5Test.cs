@@ -6,6 +6,11 @@ namespace Gobln.Pager.MvcTest
 {
     public class Bootstrap5Test
     {
+        // https://getbootstrap.com/docs/5.3/components/pagination/
+
+        //todo
+        // https://github.com/HtmlTags/htmltags check for testing
+
         private readonly HelperHtml _helperHtml;
         private readonly IPage _page3;
 
@@ -266,7 +271,7 @@ namespace Gobln.Pager.MvcTest
         {
             var target = """
             <nav aria-label="Page navigation example">
-              <ul class=" justify-content-end pagination">
+              <ul class="justify-content-end pagination">
                 <li class="page-item">
                   <a class="page-link" href="#">Previous</a>
                 </li>

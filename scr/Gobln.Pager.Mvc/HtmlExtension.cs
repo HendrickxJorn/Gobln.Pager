@@ -42,6 +42,45 @@ namespace Gobln.Pager.Mvc
         public static IHtmlContent Pager(this IHtmlHelper html, IPage page, IPagerOptions pagerOptions)
 #endif
         {
+            //if (pagerOptions.HRefUrl is not "#")
+            //{
+            //    if (string.IsNullOrWhiteSpace(pagerOptions.HRefUrl))
+            //    {
+            //        if (!Infrastructure.UrlHelper.HasCurrentUrlString(html))
+            //        {
+            //            pagerOptions.HRefUrl = "#";
+            //        }
+            //        else
+            //        {
+            //            pagerOptions.HRefUrl = Infrastructure.UrlHelper.GetCurrentUrlString(html);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        pagerOptions.HRefUrl = Uri.TryCreate(pagerOptions.HRefUrl, UriKind.Absolute, out Uri? uriResult)
+            //            ? uriResult.ToString()
+            //            : null;
+            //    }
+            //}
+
+            //var pagerFactory = new PagerFactory();
+
+            //pagerFactory.SetOptions(pagerOptions);
+
+            //return Pager(html, page, pagerFactory);
+
+            return Pager(html, page, pagerOptions, new PagerFactory());
+        }
+
+#if NETFRAMEWORK
+
+        public static MvcHtmlString Pager<T>(this HtmlHelper html, IPage page, T pagerOptions, IPagerFactory<T> pagerFactory)
+            where T : IPagerOptions
+#else
+        public static IHtmlContent Pager<T>(this IHtmlHelper html, IPage page, T pagerOptions, IPagerFactory<T> pagerFactory)
+            where T : IPagerOptions
+#endif
+        {
             if (pagerOptions.HRefUrl is not "#")
             {
                 if (string.IsNullOrWhiteSpace(pagerOptions.HRefUrl))
@@ -63,7 +102,9 @@ namespace Gobln.Pager.Mvc
                 }
             }
 
-            return Pager(html, page, new PagerFactory(pagerOptions));
+            pagerFactory.SetOptions(pagerOptions);
+
+            return Pager(html, page, pagerFactory);
         }
 
         /// <summary>
@@ -71,7 +112,7 @@ namespace Gobln.Pager.Mvc
         /// </summary>
         /// <param name="html">The HTML helper instance that this method extends.</param>
         /// <param name="page">Page that will be converted to an page</param>
-        /// <param name="pagerFactory">IPagerFactory</param>
+        /// <param name="pagerFactory"><see cref="IPagerFactory"></param>
         /// <returns></returns>
 #if NETFRAMEWORK
 
@@ -80,7 +121,7 @@ namespace Gobln.Pager.Mvc
         public static IHtmlContent Pager(this IHtmlHelper html, IPage page, IPagerFactory pagerFactory)
 #endif
         {
-            pagerFactory.Validate();
+            //pagerFactory.Validate();
 
             return pagerFactory.Render(page);
         }

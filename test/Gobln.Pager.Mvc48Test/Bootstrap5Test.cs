@@ -9,12 +9,8 @@ namespace Gobln.Pager.Mvc48Test
     {
         // https://getbootstrap.com/docs/5.3/components/pagination/
 
+        //todo
         // https://github.com/HtmlTags/htmltags check for testing
-
-        //todo:
-        //  - if disabled add tabindex="-1"
-        //  - if 2 is active, previous and next can not be disabled
-        //  - Add test with first and end
 
         private readonly HelperHtml _helperHtml;
         private readonly IPage _page3;

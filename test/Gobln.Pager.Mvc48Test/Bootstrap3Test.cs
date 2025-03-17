@@ -57,9 +57,12 @@ namespace Gobln.Pager.Mvc48Test
                 NextPageLinkIconLabel = "&raquo;",
 
                 HRefUrl = "#",
+
+                ShowFirstButtonLink = WhenToShowEnum.Never,
+                ShowLastButtonLink = WhenToShowEnum.Never,
             };
 
-            var result = mockHtmlHelper.Pager(_page5, new Bootstrap3Pager(pagerOptions));
+            var result = mockHtmlHelper.Pager(_page5, pagerOptions, new Bootstrap3Pager());
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
         }
@@ -67,18 +70,24 @@ namespace Gobln.Pager.Mvc48Test
         [Fact]
         public void DisabledAndActive01()
         {
-            // readable target
+            //readable target
             var target = """
             <nav aria-label="Page navigation">
               <ul class="pagination">
-                <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-                <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+                <li class="disabled">
+                  <span>
+                    <span aria-hidden="true">&laquo;</span>
+                  </span>
+                </li>
+                <li class="active">
+                  <span>1 <span class="sr-only">(current)</span></span>
+                </li>
                 <li><a href="#">2</a></li>
                 <li><a href="#">3</a></li>
                 <li><a href="#">4</a></li>
                 <li><a href="#">5</a></li>
                 <li>
-                  <a href="#" aria-label="Next">
+                  <a aria-label="Next" href="#">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
                 </li>
@@ -94,8 +103,14 @@ namespace Gobln.Pager.Mvc48Test
 
                 AllowDisabledPageLinkTab = false,
 
+                PreviousPageLinkIconLabel = "&laquo;",
+                NextPageLinkIconLabel = "&raquo;",
+
                 HRefUrl = "#",
-            });
+
+                ShowFirstButtonLink = WhenToShowEnum.Never,
+                ShowLastButtonLink = WhenToShowEnum.Never,
+            }, new Bootstrap3Pager());
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
         }
@@ -107,7 +122,7 @@ namespace Gobln.Pager.Mvc48Test
             <nav aria-label="Page navigation">
               <ul class="pagination pagination-lg">
                 <li>
-                  <a href="#" aria-label="Previous">
+                  <a aria-label="Previous" href="#">
                     <span aria-hidden="true">&laquo;</span>
                   </a>
                 </li>
@@ -117,7 +132,7 @@ namespace Gobln.Pager.Mvc48Test
                 <li><a href="#">4</a></li>
                 <li><a href="#">5</a></li>
                 <li>
-                  <a href="#" aria-label="Next">
+                  <a aria-label="Next" href="#">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
                 </li>
@@ -137,8 +152,14 @@ namespace Gobln.Pager.Mvc48Test
 
                 DisplayActive = false,
 
+                PreviousPageLinkIconLabel = "&laquo;",
+                NextPageLinkIconLabel = "&raquo;",
+
                 HRefUrl = "#",
-            });
+
+                ShowFirstButtonLink = WhenToShowEnum.Never,
+                ShowLastButtonLink = WhenToShowEnum.Never,
+            }, new Bootstrap3Pager());
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
         }
@@ -150,7 +171,7 @@ namespace Gobln.Pager.Mvc48Test
             <nav aria-label="Page navigation">
               <ul class="pagination pagination-sm">
                 <li>
-                  <a href="#" aria-label="Previous">
+                  <a aria-label="Previous" href="#">
                     <span aria-hidden="true">&laquo;</span>
                   </a>
                 </li>
@@ -160,7 +181,7 @@ namespace Gobln.Pager.Mvc48Test
                 <li><a href="#">4</a></li>
                 <li><a href="#">5</a></li>
                 <li>
-                  <a href="#" aria-label="Next">
+                  <a aria-label="Next" href="#">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
                 </li>
@@ -180,8 +201,14 @@ namespace Gobln.Pager.Mvc48Test
 
                 DisplayActive = false,
 
+                PreviousPageLinkIconLabel = "&laquo;",
+                NextPageLinkIconLabel = "&raquo;",
+
                 HRefUrl = "#",
-            });
+
+                ShowFirstButtonLink = WhenToShowEnum.Never,
+                ShowLastButtonLink = WhenToShowEnum.Never,
+            }, new Bootstrap3Pager());;
 
             Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
         }

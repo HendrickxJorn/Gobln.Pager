@@ -55,7 +55,7 @@ namespace Gobln.Pager.Mvc48Test
                 ShowLastButtonLink = WhenToShowEnum.Never,
             });
 
-            Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
+            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace Gobln.Pager.Mvc48Test
 
             var result = mockHtmlHelper.Pager(page);
 
-            Assert.Equal(target, result.ToString());
+            Assert.Equal(target, result.ToHtmlString());
         }
 
         [Fact]
@@ -81,7 +81,7 @@ namespace Gobln.Pager.Mvc48Test
 
             var result = mockHtmlHelper.Pager(null);
 
-            Assert.Equal(target, result.ToString());
+            Assert.Equal(target, result.ToHtmlString());
         }
 
         [Fact]
@@ -122,7 +122,7 @@ namespace Gobln.Pager.Mvc48Test
                 BoundaryCount = 0,
             });
 
-            Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
+            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
         }
 
         [Fact]
@@ -165,7 +165,7 @@ namespace Gobln.Pager.Mvc48Test
                 ShowLastButtonLink = WhenToShowEnum.Never,
             });
 
-            Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
+            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
         }
 
         [Fact]
@@ -214,7 +214,7 @@ namespace Gobln.Pager.Mvc48Test
                 ShowLastButtonLink = WhenToShowEnum.Never,
             });
 
-            Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
+            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
         }
 
         [Fact]
@@ -257,7 +257,7 @@ namespace Gobln.Pager.Mvc48Test
                 ShowLastButtonLink = WhenToShowEnum.Never,
             });
 
-            Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
+            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
         }
 
         [Fact]
@@ -306,7 +306,56 @@ namespace Gobln.Pager.Mvc48Test
                 ShowLastButtonLink = WhenToShowEnum.Never,
             });
 
-            Assert.Equal(HtmlStringHelper.Minify(target), result.ToString());
+            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+        }
+
+        [Fact]
+        public void DataParameterPagerTest01()
+        {
+            var target = """
+             <nav aria-label="Page navigation example">
+             	<ul class="pagination">
+             		<li class="page-item disabled">
+             			<span class="page-link" tabindex="-1">First</span>
+             		</li>
+             		<li class="page-item disabled">
+             			<span class="page-link" tabindex="-1">Previous</span>
+             		</li>
+             		<li aria-current="page" class="page-item active">
+             			<span class="page-link" tabindex="-1">1</span>
+             		</li>
+             		<li class="page-item">
+             			<a class="page-link" data-pageindex="2" href="#">2</a>
+             		</li>
+             		<li class="page-item">
+             			<a class="page-link" data-pageindex="3" href="#">3</a>
+             		</li>
+             		<li class="page-item">
+             			<a class="page-link" data-pageindex="4" href="#">4</a>
+             		</li>
+             		<li class="page-item">
+             			<a class="page-link" data-pageindex="5" href="#">5</a>
+             		</li>
+             		<li class="page-item">
+             			<a class="page-link" data-pageindex="2" href="#">Next</a>
+             		</li>
+             		<li class="page-item">
+             			<a class="page-link" data-pageindex="5" href="#">Last</a>
+             		</li>
+             	</ul>
+             </nav>
+             """;
+
+            var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+            var result = mockHtmlHelper.Pager(_page5, new PagerOptions()
+            {
+                NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+
+                PageIndexDataName = "pageindex",
+            });
+
+            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
         }
     }
 }

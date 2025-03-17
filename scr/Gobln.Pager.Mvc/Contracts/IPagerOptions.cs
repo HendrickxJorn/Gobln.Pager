@@ -64,9 +64,15 @@
 
         string LastPageLinkLabel { get; set; }
 
-        string PageIndexName { get; set; }
+        /// <summary>
+        /// The name of the url to use for the page index
+        /// </summary>
+        string PageIndexUrlName { get; set; }
 
-        string? DataIndexName { get; set; }
+        /// <summary>
+        /// The name of the data to use for the page index
+        /// </summary>
+        string? PageIndexDataName { get; set; }
 
         /// <summary>
         /// The url to use for the page links
