@@ -12,3 +12,14 @@ Use DynamicComponents to show????
 	Dan meegeven als paramter
 https://stackoverflow.com/questions/60718087/list-of-blazor-components-that-implement-an-interface
 https://mikaelkoskinen.net/post/razor-components-implement-interface
+
+
+
+
+
+
+https://github.com/vikramlearning/blazorbootstrap/blob/main/blazorbootstrap/Components/Pagination/Pagination.razor.cs
+https://github.com/vikramlearning/blazorbootstrap/blob/main/blazorbootstrap/Components/Pagination/Pagination.razor
+
+
+

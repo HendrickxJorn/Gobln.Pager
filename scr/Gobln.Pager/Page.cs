@@ -17,7 +17,7 @@ namespace Gobln.Pager
     {
         #region Members
 
-        internal T[] _items = [];
+        internal IEnumerable<T> _items = [];
 
         #endregion Members
 
@@ -51,7 +51,7 @@ namespace Gobln.Pager
         /// <summary>
         /// Does the page contain any elements
         /// </summary>
-        public bool IsEmpty => this == null || _items.Length == 0;
+        public bool IsEmpty => this == null || !_items.Any();
 
         #endregion Properties
 
@@ -109,7 +109,7 @@ namespace Gobln.Pager
         {
             if (collection != null && pageDefinitions.TotalItemCount > 0 && collection.Any())
             {
-                _items = collection.ToArray();
+                _items = collection.AsEnumerable();
 
                 PageIndex = pageDefinitions.PageIndex;
                 TotalPageCount = pageDefinitions.PageCount;
@@ -142,9 +142,9 @@ namespace Gobln.Pager
     }
 
     /// <summary>
-    /// Represents a strongly typed <see cref="Page"/>
+    /// Static class to create instances of <see cref="Page{T}"/>
     /// </summary>
-    public class Page
+    public static class Page
     {
         /// <summary>
         /// Converts a collection of <typeparamref name="T"/> to an single <see cref="Page"/>

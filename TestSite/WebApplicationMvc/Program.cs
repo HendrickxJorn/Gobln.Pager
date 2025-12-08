@@ -1,3 +1,5 @@
+using Gobln.Pager.Mvc;
+
 namespace WebApplicationMvc
 {
     public class Program
@@ -8,6 +10,12 @@ namespace WebApplicationMvc
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddMvcPager();
+            //builder.Services.AddMvcPager(option =>
+            //{
+            //    option.HRefUrl = "/Home/Index";
+            //});
 
             var app = builder.Build();
 

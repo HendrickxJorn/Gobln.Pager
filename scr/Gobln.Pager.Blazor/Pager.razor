@@ -1,0 +1,43 @@
+﻿@inherits ComponentBase
+
+@namespace Gobln.Pager.Blazor
+
+<nav aria-label="page navigation">
+    <ul class="pagination">
+        <PagerItem Text="First" IsDisabled=@(1 == PageIndex) @onclick="_ => InvokePageChange(1)" />
+        <PagerItem Text="Previous" IsDisabled=@(1 == PageIndex) @onclick="_ => InvokePageChange(Math.Max(1, PageIndex - 1))" />
+        @if (StartBoundery > 0)
+        {
+            for (int i = 1; i <= StartBoundery; i++)
+            {
+                var tempPageIndex = i;
+                <PagerItem Text="@tempPageIndex.ToString()" IsActive=@(tempPageIndex == PageIndex) @onclick="_ => InvokePageChange(tempPageIndex)" />
+            }
+        }
+        @if (ShowEllipsis && !((StartBoundery + 1) >= StartNumber))
+        {
+            <PagerItem Text="..." IsDisabled=true />
+        }
+        @for (int i = StartNumber; i <= EndNumber; i++)
+        {
+			// need to use a temporary variable
+			// if use i directly in the lambda expression, then all links will point to the last value of i
+            var tempPageIndex = i;
+            <PagerItem Text="@tempPageIndex.ToString()" IsActive=@(tempPageIndex == PageIndex) @onclick="_ => InvokePageChange(tempPageIndex)" />
+        }
+        @if (ShowEllipsis && !(TotalPageCount - BoundaryCount <= EndNumber))
+        {
+            <PagerItem Text="..." IsDisabled=true />
+        }
+        @if (EndBoundery <= TotalPageCount)
+        {
+            for (int i = TotalPageCount - BoundaryCount + 1; i <= TotalPageCount; i++)
+            {
+                var tempPageIndex = i;
+                <PagerItem Text="@tempPageIndex.ToString()" IsActive=@(tempPageIndex == PageIndex) @onclick="_ => InvokePageChange(tempPageIndex)" />
+            }
+        }
+        <PagerItem Text="Next" IsDisabled=@(TotalPageCount == PageIndex) @onclick="_ => InvokePageChange(Math.Min(TotalPageCount, PageIndex + 1))" />
+        <PagerItem Text="Last" IsDisabled=@(TotalPageCount == PageIndex) @onclick="_ => InvokePageChange(TotalPageCount)" />
+    </ul>
+</nav>

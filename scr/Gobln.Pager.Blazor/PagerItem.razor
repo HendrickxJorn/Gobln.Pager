@@ -1,0 +1,21 @@
+﻿@* @inherits ComponentBase *@
+
+@namespace Gobln.Pager.Blazor
+
+<li class="@Classdd" aria-current="page" @attributes="AdditionalAttributes">
+	@* aria-current="page" *@
+  @*   <a class="page-link" href="#">Next</a> *@
+
+	@if (IsActive)
+	{
+		<span class="page-link pointer">
+			@Text
+		</span>
+	}
+	else
+	{
+		<a class="page-link" href="">
+			@Text
+		</a>
+	}
+</li>
