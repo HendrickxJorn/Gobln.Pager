@@ -3,215 +3,214 @@ using Gobln.Pager.MvcTest.Helper;
 using Gobln.Pager.Test.Helper;
 using Xunit;
 
-namespace Gobln.Pager.MvcTest
+namespace Gobln.Pager.MvcTest;
+
+public class Bootstrap3Test
 {
-    public class Bootstrap3Test
+    //https://getbootstrap.com/docs/3.4/components/#pagination
+
+    private readonly HelperHtml _helperHtml;
+    private readonly IPage _page5;
+
+    public Bootstrap3Test()
     {
-        //https://getbootstrap.com/docs/3.4/components/#pagination
+        _helperHtml = new HelperHtml();
+        _page5 = new int[] { 1, 2, 3, 4, 5 }.ToPage(1, 1);
+    }
 
-        private readonly HelperHtml _helperHtml;
-        private readonly IPage _page5;
+    [Fact]
+    public void Default01()
+    {
+        var target = """
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li>
+              <a aria-label="Previous" href="#">
+                <span aria-hidden="true">&amp;laquo;</span>
+              </a>
+            </li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li>
+              <a aria-label="Next" href="#">
+                <span aria-hidden="true">&amp;raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        """;
 
-        public Bootstrap3Test()
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+        var pagerOptions = new PagerOptions()
         {
-            _helperHtml = new HelperHtml();
-            _page5 = new int[] { 1, 2, 3, 4, 5 }.ToPage(1, 1);
-        }
+            NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
 
-        [Fact]
-        public void Default01()
+            AllowDisabledPageLink = false,
+            AllowDisabledPageLinkTab = false,
+
+            DisplayActive = false,
+
+            PreviousPageLinkIconLabel = "&laquo;",
+            NextPageLinkIconLabel = "&raquo;",
+
+            HRefUrl = "#",
+
+            ShowFirstButtonLink = WhenToShowEnum.Never,
+            ShowLastButtonLink = WhenToShowEnum.Never,
+        };
+
+        var result = mockHtmlHelper.Pager(_page5, pagerOptions, new Bootstrap3Pager());
+
+        Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+    }
+
+    [Fact]
+    public void DisabledAndActive01()
+    {
+        //readable target
+        var target = """
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li class="disabled">
+              <span>
+                <span aria-hidden="true">&amp;laquo;</span>
+              </span>
+            </li>
+            <li class="active">
+              <span>1 <span class="sr-only">(current)</span></span>
+            </li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li>
+              <a aria-label="Next" href="#">
+                <span aria-hidden="true">&amp;raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        """;
+
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+        var result = mockHtmlHelper.Pager(_page5, new PagerOptions()
         {
-            var target = """
-            <nav aria-label="Page navigation example">
-              <ul class="pagination">
-                <li>
-                  <a aria-label="Previous" href="#">
-                    <span aria-hidden="true">&amp;laquo;</span>
-                  </a>
-                </li>
-                <li><a href="#">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">4</a></li>
-                <li><a href="#">5</a></li>
-                <li>
-                  <a aria-label="Next" href="#">
-                    <span aria-hidden="true">&amp;raquo;</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-            """;
+            NavTagHtmlAttributes = new { aria_label = "Page navigation" },
 
-            var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+            AllowDisabledPageLinkTab = false,
 
-            var pagerOptions = new PagerOptions()
-            {
-                NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+            PreviousPageLinkIconLabel = "&laquo;",
+            NextPageLinkIconLabel = "&raquo;",
 
-                AllowDisabledPageLink = false,
-                AllowDisabledPageLinkTab = false,
+            HRefUrl = "#",
 
-                DisplayActive = false,
+            ShowFirstButtonLink = WhenToShowEnum.Never,
+            ShowLastButtonLink = WhenToShowEnum.Never,
+        }, new Bootstrap3Pager());
 
-                PreviousPageLinkIconLabel = "&laquo;",
-                NextPageLinkIconLabel = "&raquo;",
+        Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+    }
 
-                HRefUrl = "#",
+    [Fact]
+    public void Sizing01()
+    {
+        var target = """
+        <nav aria-label="Page navigation">
+          <ul class="pagination-lg pagination">
+            <li>
+              <a aria-label="Previous" href="#">
+                <span aria-hidden="true">&amp;laquo;</span>
+              </a>
+            </li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li>
+              <a aria-label="Next" href="#">
+                <span aria-hidden="true">&amp;raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        """;
 
-                ShowFirstButtonLink = WhenToShowEnum.Never,
-                ShowLastButtonLink = WhenToShowEnum.Never,
-            };
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
 
-            var result = mockHtmlHelper.Pager(_page5, pagerOptions, new Bootstrap3Pager());
-
-            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
-        }
-
-        [Fact]
-        public void DisabledAndActive01()
+        var result = mockHtmlHelper.Pager(_page5, new PagerOptions()
         {
-            //readable target
-            var target = """
-            <nav aria-label="Page navigation">
-              <ul class="pagination">
-                <li class="disabled">
-                  <span>
-                    <span aria-hidden="true">&amp;laquo;</span>
-                  </span>
-                </li>
-                <li class="active">
-                  <span>1 <span class="sr-only">(current)</span></span>
-                </li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">4</a></li>
-                <li><a href="#">5</a></li>
-                <li>
-                  <a aria-label="Next" href="#">
-                    <span aria-hidden="true">&amp;raquo;</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-            """;
+            NavTagHtmlAttributes = new { aria_label = "Page navigation" },
+            UlTagHtmlAttributes = new { @class = "pagination-lg" },
 
-            var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+            AllowDisabledPageLink = false,
+            AllowDisabledPageLinkTab = false,
 
-            var result = mockHtmlHelper.Pager(_page5, new PagerOptions()
-            {
-                NavTagHtmlAttributes = new { aria_label = "Page navigation" },
+            DisplayActive = false,
 
-                AllowDisabledPageLinkTab = false,
+            PreviousPageLinkIconLabel = "&laquo;",
+            NextPageLinkIconLabel = "&raquo;",
 
-                PreviousPageLinkIconLabel = "&laquo;",
-                NextPageLinkIconLabel = "&raquo;",
+            HRefUrl = "#",
 
-                HRefUrl = "#",
+            ShowFirstButtonLink = WhenToShowEnum.Never,
+            ShowLastButtonLink = WhenToShowEnum.Never,
+        }, new Bootstrap3Pager());
 
-                ShowFirstButtonLink = WhenToShowEnum.Never,
-                ShowLastButtonLink = WhenToShowEnum.Never,
-            }, new Bootstrap3Pager());
+        Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+    }
 
-            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
-        }
+    [Fact]
+    public void Sizing02()
+    {
+        var target = """
+        <nav aria-label="Page navigation">
+          <ul class="pagination-sm pagination">
+            <li>
+              <a aria-label="Previous" href="#">
+                <span aria-hidden="true">&amp;laquo;</span>
+              </a>
+            </li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li>
+              <a aria-label="Next" href="#">
+                <span aria-hidden="true">&amp;raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        """;
 
-        [Fact]
-        public void Sizing01()
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+        var result = mockHtmlHelper.Pager(_page5, new PagerOptions()
         {
-            var target = """
-            <nav aria-label="Page navigation">
-              <ul class="pagination-lg pagination">
-                <li>
-                  <a aria-label="Previous" href="#">
-                    <span aria-hidden="true">&amp;laquo;</span>
-                  </a>
-                </li>
-                <li><a href="#">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">4</a></li>
-                <li><a href="#">5</a></li>
-                <li>
-                  <a aria-label="Next" href="#">
-                    <span aria-hidden="true">&amp;raquo;</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-            """;
+            NavTagHtmlAttributes = new { aria_label = "Page navigation" },
+            UlTagHtmlAttributes = new { @class = "pagination-sm" },
 
-            var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+            AllowDisabledPageLink = false,
+            AllowDisabledPageLinkTab = false,
 
-            var result = mockHtmlHelper.Pager(_page5, new PagerOptions()
-            {
-                NavTagHtmlAttributes = new { aria_label = "Page navigation" },
-                UlTagHtmlAttributes = new { @class = "pagination-lg" },
+            DisplayActive = false,
 
-                AllowDisabledPageLink = false,
-                AllowDisabledPageLinkTab = false,
+            PreviousPageLinkIconLabel = "&laquo;",
+            NextPageLinkIconLabel = "&raquo;",
 
-                DisplayActive = false,
+            HRefUrl = "#",
 
-                PreviousPageLinkIconLabel = "&laquo;",
-                NextPageLinkIconLabel = "&raquo;",
+            ShowFirstButtonLink = WhenToShowEnum.Never,
+            ShowLastButtonLink = WhenToShowEnum.Never,
+        }, new Bootstrap3Pager());;
 
-                HRefUrl = "#",
-
-                ShowFirstButtonLink = WhenToShowEnum.Never,
-                ShowLastButtonLink = WhenToShowEnum.Never,
-            }, new Bootstrap3Pager());
-
-            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
-        }
-
-        [Fact]
-        public void Sizing02()
-        {
-            var target = """
-            <nav aria-label="Page navigation">
-              <ul class="pagination-sm pagination">
-                <li>
-                  <a aria-label="Previous" href="#">
-                    <span aria-hidden="true">&amp;laquo;</span>
-                  </a>
-                </li>
-                <li><a href="#">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">4</a></li>
-                <li><a href="#">5</a></li>
-                <li>
-                  <a aria-label="Next" href="#">
-                    <span aria-hidden="true">&amp;raquo;</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-            """;
-
-            var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
-
-            var result = mockHtmlHelper.Pager(_page5, new PagerOptions()
-            {
-                NavTagHtmlAttributes = new { aria_label = "Page navigation" },
-                UlTagHtmlAttributes = new { @class = "pagination-sm" },
-
-                AllowDisabledPageLink = false,
-                AllowDisabledPageLinkTab = false,
-
-                DisplayActive = false,
-
-                PreviousPageLinkIconLabel = "&laquo;",
-                NextPageLinkIconLabel = "&raquo;",
-
-                HRefUrl = "#",
-
-                ShowFirstButtonLink = WhenToShowEnum.Never,
-                ShowLastButtonLink = WhenToShowEnum.Never,
-            }, new Bootstrap3Pager());;
-
-            Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
-        }
+        Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
     }
 }

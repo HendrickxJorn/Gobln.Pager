@@ -35,6 +35,10 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8|AnyCPU'">
   	<DocumentationFile>bin\Debug\net8\Gobln.Pager.xml</DocumentationFile>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10|AnyCPU'">
+    <DocumentationFile>bin\Debug\net10\Gobln.Pager.xml</DocumentationFile>
+  </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
     <DocumentationFile>bin\Debug\netstandard2.0\Gobln.Pager.xml</DocumentationFile>
@@ -67,6 +71,12 @@
   	<DebugType>none</DebugType>
   	<DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
+
+  <!--<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10|AnyCPU'">
+    <DocumentationFile>bin\Release\net10\Gobln.Pager.xml</DocumentationFile>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>-->
   
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">
     <DocumentationFile>bin\Release\netstandard2.0\Gobln.Pager.xml</DocumentationFile>

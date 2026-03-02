@@ -2,109 +2,108 @@
 using System.Web.Mvc;
 using System.Web.UI.WebControls;
 
-namespace Gobln.Pager.Mvc48Test.Helper
+namespace Gobln.Pager.Mvc48Test.Helper;
+
+internal class Bootstrap3Pager() : PagerFactory()
 {
-    internal class Bootstrap3Pager() : PagerFactory()
+    public override TagBuilder TagCreatorLi(bool isDisabled = false, bool isActive = false, Dictionary<string, string?>? attributes = null)
     {
-        public override TagBuilder TagCreatorLi(bool isDisabled = false, bool isActive = false, Dictionary<string, string?>? attributes = null)
+        var tagBuilder = new TagBuilder("li");
+
+        if (attributes is not null && attributes.Count > 0)
         {
-            var tagBuilder = new TagBuilder("li");
-
-            if (attributes is not null && attributes.Count > 0)
-            {
-                tagBuilder.MergeAttributes(attributes);
-            }
-
-            if (isDisabled && !isActive)
-            {
-                tagBuilder.AddCssClass("disabled");
-            }
-
-            if (isActive)
-            {
-                tagBuilder.AddCssClass("active");
-            }
-
-            return tagBuilder;
+            tagBuilder.MergeAttributes(attributes);
         }
 
-        public override TagBuilder TagCreatorLink(string label, int pageIndex, string? icon = null, bool disableTabing = false, string? dataIndexName = null, Dictionary<string, string?>? attributes = null)
+        if (isDisabled && !isActive)
         {
-            var tagBuilder = new TagBuilder("a");
-
-            if (!string.IsNullOrWhiteSpace(dataIndexName))
-            {
-                tagBuilder.Attributes.Add($"data-{dataIndexName}", pageIndex.ToString());
-            }
-
-            if (disableTabing)
-            {
-                tagBuilder.Attributes.Add("tabindex", "-1");
-            }
-
-            var url = "#";
-
-            if (PagerOptions.HRefUrl is not "#")
-            {
-                var tempUrl = UrlCreator(pageIndex);
-
-                if (!string.IsNullOrWhiteSpace(tempUrl))
-                {
-                    url = tempUrl;
-                }
-            }
-
-            tagBuilder.Attributes.Add("href", url);
-
-            if (icon is null || string.IsNullOrWhiteSpace(icon))
-            {
-                tagBuilder.InnerHtml += label;
-            }
-            else
-            {
-                tagBuilder.InnerHtml += TagCreatorSpanIcon(icon);
-                tagBuilder.MergeAttribute("aria-label", label);
-            }
-
-            return tagBuilder;
+            tagBuilder.AddCssClass("disabled");
         }
 
-        public override TagBuilder TagCreatorSpan(string label, string? icon = null, bool disableTabing = false, bool isActive = false, Dictionary<string, string?>? attributes = null)
+        if (isActive)
         {
-            var tagBuilder = new TagBuilder("span");
+            tagBuilder.AddCssClass("active");
+        }
 
-            if (attributes is not null && attributes.Count > 0)
-            {
-                tagBuilder.MergeAttributes(attributes);
-            }
-
-            if (disableTabing)
-            {
-                tagBuilder.Attributes.Add("tabindex", "-1");
-            }
-
-            if (icon is not null && !string.IsNullOrWhiteSpace(icon))
-            {
-                tagBuilder.InnerHtml += TagCreatorSpanIcon(icon);
-            }
-            else if(isActive)
-            {
-                tagBuilder.InnerHtml += label + " ";
-
-                var attributesCurrentSpan = new Dictionary<string, string?>()
-                {
-                    { "class", "sr-only" }
-                };
-
-                tagBuilder.InnerHtml += TagCreatorSpan("(current)", attributes: attributesCurrentSpan);
+        return tagBuilder;
     }
-            else
-            {
-                tagBuilder.InnerHtml += label;
-            }
 
-            return tagBuilder;
+    public override TagBuilder TagCreatorLink(string label, int pageIndex, string? icon = null, bool disableTabing = false, string? dataIndexName = null, Dictionary<string, string?>? attributes = null)
+    {
+        var tagBuilder = new TagBuilder("a");
+
+        if (!string.IsNullOrWhiteSpace(dataIndexName))
+        {
+            tagBuilder.Attributes.Add($"data-{dataIndexName}", pageIndex.ToString());
         }
 
+        if (disableTabing)
+        {
+            tagBuilder.Attributes.Add("tabindex", "-1");
+        }
+
+        var url = "#";
+
+        if (PagerOptions.HRefUrl is not "#")
+        {
+            var tempUrl = UrlCreator(pageIndex);
+
+            if (!string.IsNullOrWhiteSpace(tempUrl))
+            {
+                url = tempUrl;
+            }
+        }
+
+        tagBuilder.Attributes.Add("href", url);
+
+        if (icon is null || string.IsNullOrWhiteSpace(icon))
+        {
+            tagBuilder.InnerHtml += label;
+        }
+        else
+        {
+            tagBuilder.InnerHtml += TagCreatorSpanIcon(icon);
+            tagBuilder.MergeAttribute("aria-label", label);
+        }
+
+        return tagBuilder;
     }
+
+    public override TagBuilder TagCreatorSpan(string label, string? icon = null, bool disableTabing = false, bool isActive = false, Dictionary<string, string?>? attributes = null)
+    {
+        var tagBuilder = new TagBuilder("span");
+
+        if (attributes is not null && attributes.Count > 0)
+        {
+            tagBuilder.MergeAttributes(attributes);
+        }
+
+        if (disableTabing)
+        {
+            tagBuilder.Attributes.Add("tabindex", "-1");
+        }
+
+        if (icon is not null && !string.IsNullOrWhiteSpace(icon))
+        {
+            tagBuilder.InnerHtml += TagCreatorSpanIcon(icon);
+        }
+        else if(isActive)
+        {
+            tagBuilder.InnerHtml += label + " ";
+
+            var attributesCurrentSpan = new Dictionary<string, string?>()
+            {
+                { "class", "sr-only" }
+            };
+
+            tagBuilder.InnerHtml += TagCreatorSpan("(current)", attributes: attributesCurrentSpan);
+}
+        else
+        {
+            tagBuilder.InnerHtml += label;
+        }
+
+        return tagBuilder;
+    }
+
 }

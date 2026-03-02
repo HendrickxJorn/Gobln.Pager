@@ -1,59 +1,58 @@
 ﻿using System;
 
-namespace Gobln.Pager
+namespace Gobln.Pager;
+
+internal static class Validator
 {
-    internal static class Validator
+    private const string LESSTHENZEROORZEROEXCEPTIONSTRING = "Can not be less then zero or zero";
+    private const string LESSTHENZEROEXCEPTIONSTRING = "Can not be less then zero";
+
+    internal static void Validate(int pageIndex, int pageSize, int? totalItemCount = null)
     {
-        private const string LESSTHENZEROORZEROEXCEPTIONSTRING = "Can not be less then zero or zero";
-        private const string LESSTHENZEROEXCEPTIONSTRING = "Can not be less then zero";
-
-        internal static void Validate(int pageIndex, int pageSize, int? totalItemCount = null)
+        if (pageIndex < 1)
         {
-            if (pageIndex < 1)
-            {
-                throw new ArgumentOutOfRangeException(nameof(pageIndex), LESSTHENZEROORZEROEXCEPTIONSTRING);
-            }
-
-            ValidatePageSize(pageSize);
-
-            if (totalItemCount is not null)
-            {
-                ValidateTotalItemCount(totalItemCount.Value);
-            }
+            throw new ArgumentOutOfRangeException(nameof(pageIndex), LESSTHENZEROORZEROEXCEPTIONSTRING);
         }
 
-        internal static void Validate(IPageFilter pagerFilter, int? totalItemCount = null)
+        ValidatePageSize(pageSize);
+
+        if (totalItemCount is not null)
         {
-            if (pagerFilter.PageIndex < 1)
-            {
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", LESSTHENZEROORZEROEXCEPTIONSTRING);
-            }
+            ValidateTotalItemCount(totalItemCount.Value);
+        }
+    }
 
-            if (pagerFilter.PageSize < 1)
-            {
-                throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", LESSTHENZEROORZEROEXCEPTIONSTRING);
-            }
-
-            if (totalItemCount is not null)
-            {
-                ValidateTotalItemCount(totalItemCount.Value);
-            }
+    internal static void Validate(IPageFilter pagerFilter, int? totalItemCount = null)
+    {
+        if (pagerFilter.PageIndex < 1)
+        {
+            throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", LESSTHENZEROORZEROEXCEPTIONSTRING);
         }
 
-        internal static void ValidatePageSize(int pageSize)
+        if (pagerFilter.PageSize < 1)
         {
-            if (pageSize < 1)
-            {
-                throw new ArgumentOutOfRangeException(nameof(pageSize), LESSTHENZEROORZEROEXCEPTIONSTRING);
-            }
+            throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", LESSTHENZEROORZEROEXCEPTIONSTRING);
         }
 
-        internal static void ValidateTotalItemCount(int totalItemCount)
+        if (totalItemCount is not null)
         {
-            if (totalItemCount < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(totalItemCount), LESSTHENZEROEXCEPTIONSTRING);
-            }
+            ValidateTotalItemCount(totalItemCount.Value);
+        }
+    }
+
+    internal static void ValidatePageSize(int pageSize)
+    {
+        if (pageSize < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(pageSize), LESSTHENZEROORZEROEXCEPTIONSTRING);
+        }
+    }
+
+    internal static void ValidateTotalItemCount(int totalItemCount)
+    {
+        if (totalItemCount < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(totalItemCount), LESSTHENZEROEXCEPTIONSTRING);
         }
     }
 }

@@ -1,11 +1,10 @@
-﻿namespace Gobln.Pager.Mvc
+﻿namespace Gobln.Pager.Mvc;
+
+public enum PageLinkItem
 {
-    public enum PageLinkItem
-    {
-        FirstPageLink = 0,
-        PreviousPageLink = 1,
-        PageLinks = 2,
-        NextPageLink = 3,
-        LastPageLink = 4,
-    }
+    FirstPageLink = 0,
+    PreviousPageLink = 1,
+    PageLinks = 2,
+    NextPageLink = 3,
+    LastPageLink = 4,
 }

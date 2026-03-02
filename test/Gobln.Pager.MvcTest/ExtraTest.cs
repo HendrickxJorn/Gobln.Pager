@@ -1,32 +1,31 @@
 ﻿using Gobln.Pager.Mvc;
 using Xunit;
 
-namespace Gobln.Pager.MvcTest
+namespace Gobln.Pager.MvcTest;
+
+public  class ExtraTest
 {
-    public  class ExtraTest
+    [Fact]
+    public void CloneTest01()
     {
-        [Fact]
-        public void CloneTest01()
+        var target = new PagerOptions()
         {
-            var target = new PagerOptions()
-            {
-                NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
-                UlTagHtmlAttributes = new { @class = "justify-content-end" },
+            NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+            UlTagHtmlAttributes = new { @class = "justify-content-end" },
 
-                AllowDisabledPageLink = false,
-                AllowDisabledPageLinkTab = false,
+            AllowDisabledPageLink = false,
+            AllowDisabledPageLinkTab = false,
 
-                DisplayActive = false,
+            DisplayActive = false,
 
-                HRefUrl = "#",
+            HRefUrl = "#",
 
-                ShowFirstButtonLink = WhenToShowEnum.Never,
-                ShowLastButtonLink = WhenToShowEnum.Never,
-            };
+            ShowFirstButtonLink = WhenToShowEnum.Never,
+            ShowLastButtonLink = WhenToShowEnum.Never,
+        };
 
-            var result = target.Clone();
+        var result = target.Clone();
 
-            Assert.Equivalent(target, result, strict:true);
-        }
+        Assert.Equivalent(target, result, strict:true);
     }
 }

@@ -1,53 +1,43 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
-namespace Gobln.Pager.Blazor
+namespace Gobln.Pager.Blazor;
+
+public partial class PagerItem
 {
-    public partial class PagerItem : ComponentBase
-    {
-        protected override void OnParametersSet()
-        {
+    /// <summary>
+    /// The text to display in the pager item.
+    /// </summary>
+    [DefaultValue(null)]
+    [Description("The text to display in the pager item.")]
+    [Parameter]
+    public string? Text { get; set; }
 
-            base.OnParametersSet();
-        }
+    /// <summary>
+    /// Indicates whether the pager item is active.
+    /// </summary>
+    [DefaultValue(false)]
+    [Description("Indicates whether the pager item is active.")]
+    [Parameter]
+    public bool IsActive { get; set; } = false;
 
-        protected string Classdd
-        {
-            get
-            {
-                return "page-item"
-                    + (IsDisabled ? " disabled" : "")
-                    + (IsActive ? " active" : "");
-            }
-        }
+    /// <summary>
+    /// Indicates whether the pager item is disabled.
+    /// </summary>
+    [DefaultValue(false)]
+    [Description("Indicates whether the pager item is disabled.")]
+    [Parameter]
+    public bool IsDisabled { get; set; } = false;
 
-        /// <summary>
-        /// The text to display in the pager item.
-        /// </summary>
-        [Parameter]
-        public string? Text { get; set; }
+    /// <summary>
+    /// Gets or sets additional attributes that will be applied to the component.
+    /// </summary>
+    [DefaultValue(null)]
+    [Description("Gets or sets additional attributes that will be applied to the component.")]
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> AdditionalAttributes { get; set; } = [];
 
-        /// <summary>
-        /// Indicates whether the pager item is active.
-        /// </summary>
-        [Parameter]
-        public bool IsActive { get; set; } = false;
-
-        /// <summary>
-        /// Indicates whether the pager item is disabled.
-        /// </summary>
-        [Parameter]
-        public bool IsDisabled { get; set; } = false;
-
-        //https://learn.microsoft.com/en-us/aspnet/core/blazor/components/splat-attributes-and-arbitrary-parameters?view=aspnetcore-8.0
-        //https://stackoverflow.com/questions/62448581/blazor-button-use-parent-component-onclick
-
-        [Parameter(CaptureUnmatchedValues = true)]
-        public Dictionary<string, object> AdditionalAttributes { get; set; }
-    }
+    private string ClassNames => "page-item"
+        + (IsDisabled ? " disabled" : "")
+        + (IsActive ? " active" : "");
 }

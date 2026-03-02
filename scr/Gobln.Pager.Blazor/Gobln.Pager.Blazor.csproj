@@ -30,4 +30,8 @@
     <ProjectReference Include="..\Gobln.Pager\Gobln.Pager.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
 </Project>

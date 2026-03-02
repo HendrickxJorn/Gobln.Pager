@@ -9,51 +9,50 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace Gobln.Pager.Mvc48Test.Helper
+namespace Gobln.Pager.Mvc48Test.Helper;
+
+public class HelperHtml
 {
-    public class HelperHtml
+    public HtmlHelper CreateHtmlHelper(ViewDataDictionary? viewData = null, string? url = null)
     {
-        public HtmlHelper CreateHtmlHelper(ViewDataDictionary? viewData = null, string? url = null)
+        return CreateHtmlHelper<string>(viewData, url);
+    }
+
+    public HtmlHelper<T> CreateHtmlHelper<T>(ViewDataDictionary? viewData = null, string? url = null)
+    {
+        viewData ??= new ViewDataDictionary("Test");
+
+        var request = new Mock<HttpRequestBase>();
+
+        if (url is not null)
         {
-            return CreateHtmlHelper<string>(viewData, url);
+            request.Setup(r => r.Url).Returns(new Uri(url));
         }
 
-        public HtmlHelper<T> CreateHtmlHelper<T>(ViewDataDictionary? viewData = null, string? url = null)
-        {
-            viewData ??= new ViewDataDictionary("Test");
+        var hcb = new Mock<HttpContextBase>();
+        hcb.Setup(c => c.Request).Returns(request.Object);
 
-            var request = new Mock<HttpRequestBase>();
+        var cc = new Mock<ControllerContext>(
+            hcb.Object,
+            //hcb,
+            new RouteData(),
+            new Mock<ControllerBase>().Object);
 
-            if (url is not null)
-            {
-                request.Setup(r => r.Url).Returns(new Uri(url));
-            }
+        cc.Setup(c => c.HttpContext).Returns(hcb.Object);
 
-            var hcb = new Mock<HttpContextBase>();
-            hcb.Setup(c => c.Request).Returns(request.Object);
+        var mockViewContext = new Mock<ViewContext>(
+            cc.Object,
+            new Mock<IView>().Object,
+            viewData,
+            new TempDataDictionary(),
+            TextWriter.Null);
 
-            var cc = new Mock<ControllerContext>(
-                hcb.Object,
-                //hcb,
-                new RouteData(),
-                new Mock<ControllerBase>().Object);
+        mockViewContext.Setup(c => c.HttpContext).Returns(hcb.Object);
 
-            cc.Setup(c => c.HttpContext).Returns(hcb.Object);
+        var mockViewDataContainer = new Mock<IViewDataContainer>();
 
-            var mockViewContext = new Mock<ViewContext>(
-                cc.Object,
-                new Mock<IView>().Object,
-                viewData,
-                new TempDataDictionary(),
-                TextWriter.Null);
+        mockViewDataContainer.Setup(v => v.ViewData).Returns(viewData);
 
-            mockViewContext.Setup(c => c.HttpContext).Returns(hcb.Object);
-
-            var mockViewDataContainer = new Mock<IViewDataContainer>();
-
-            mockViewDataContainer.Setup(v => v.ViewData).Returns(viewData);
-
-            return new HtmlHelper<T>(mockViewContext.Object, mockViewDataContainer.Object);
-        }
+        return new HtmlHelper<T>(mockViewContext.Object, mockViewDataContainer.Object);
     }
 }

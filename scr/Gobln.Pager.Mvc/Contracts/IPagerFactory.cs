@@ -8,20 +8,19 @@ using Microsoft.AspNetCore.Html;
 
 #endif
 
-namespace Gobln.Pager.Mvc
-{
-    public interface IPagerFactory<T>
-        : IPagerFactory
-    {
-        void SetOptions(T options);
-    }
+namespace Gobln.Pager.Mvc;
 
-    public interface IPagerFactory
-    {
+public interface IPagerFactory<T>
+    : IPagerFactory
+{
+    void SetOptions(T options);
+}
+
+public interface IPagerFactory
+{
 #if NETFRAMEWORK
-        MvcHtmlString Render(IPage page);
+    MvcHtmlString Render(IPage page);
 #else
-        IHtmlContent Render(IPage page);
+    IHtmlContent Render(IPage page);
 #endif
-    }
 }

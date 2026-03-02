@@ -14,29 +14,36 @@ Welcome to your new app.
 </p>
 
 <Gobln.Pager.Blazor.Pager Page="TestPage"
-                          PageChanging="OnPageChangAsync" />
+                          PageIndexChanged="OnPageChangAsync" />
 
 <Gobln.Pager.Blazor.Pager Page="TestPage"
                           ShowEllipsis=true
-                          PageChanging="OnPageChangAsync" />
+                          PageIndexChanged="OnPageChangAsync" />
 
 <Gobln.Pager.Blazor.Pager Page="TestPage"
                           BoundaryCount="1"
-                          PageChanging="OnPageChangAsync" />
+                          PageIndexChanged="OnPageChangAsync" />
 
 <Gobln.Pager.Blazor.Pager Page="TestPage"
                           BoundaryCount="1"
                           ShowEllipsis=true
-                          PageChanging="OnPageChangAsync" />
+                          PageIndexChanged="OnPageChangAsync" />
 
 <Gobln.Pager.Blazor.Pager Page="TestPage"
                           BoundaryCount="2"
-                          PageChanging="OnPageChangAsync" />
+                          PageIndexChanged="OnPageChangAsync" />
 
 <Gobln.Pager.Blazor.Pager Page="TestPage"
                           BoundaryCount="2"
+                          SiblingCount="3"
                           ShowEllipsis=true
-                          PageChanging="OnPageChangAsync" />
+                          PageIndexChanged="OnPageChangAsync" />
+
+<Gobln.Pager.Blazor.Pager Page="TestPage"
+                          BoundaryCount="2"
+                          SiblingCount="50"
+                          ShowEllipsis=true
+                          PageIndexChanged="OnPageChangAsync" />
 
 @foreach (var item in Items)
 {
@@ -60,13 +67,9 @@ Welcome to your new app.
         TestPage = TestTable.GetPage();
     }
 
-    private async Task OnPageChangAsync(int newPage)
+    private void OnPageChangAsync(int newPage)
     {
-        await Task.Run(() =>
-        {
-			TestTable.PageIndex = newPage;
-            TestPage = TestTable.GetPage();
-        });
+        TestTable.PageIndex = newPage;
+        TestPage = TestTable.GetPage();
     }
-
 }

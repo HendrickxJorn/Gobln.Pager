@@ -1,114 +1,116 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
+using System.ComponentModel;
 
+namespace Gobln.Pager.Blazor;
 
-namespace Gobln.Pager.Blazor
+public partial class Pager
 {
-    public partial class Pager : ComponentBase
+    [Parameter, EditorRequired]
+    public IPage Page { get; set; }
+
+    /// <summary>
+    /// The number of sibling pages to show on each side of the current page.
+    /// </summary>
+    [DefaultValue(1)]
+    [Description("The number of sibling pages to show on each side of the current page.")]
+    [Parameter]
+    public int SiblingCount { get; set; } = 1;
+
+    /// <summary>
+    /// The number of always visible pages at the beginning and end.
+    /// </summary>
+    [DefaultValue(0)]
+    [Description("The number of always visible pages at the beginning and end.")]
+    [Parameter]
+    public int BoundaryCount { get; set; } = 0;
+
+    /// <summary>
+    /// Show ellipsis.
+    /// </summary>
+    [DefaultValue(false)]
+    [Description("Show ellipsis.")]
+    [Parameter]
+    public bool ShowEllipsis { get; set; } = false;
+
+    /// <summary>
+    /// This event is triggered when the page index changes.
+    /// </summary>
+    [Description("This event is triggered when the page index changes.")]
+    [Parameter]
+    public EventCallback<int> PageIndexChanged { get; set; }
+
+    protected override void OnParametersSet()
     {
-        [Parameter, EditorRequired]
-        public IPage Page { get; set; }
+        base.OnParametersSet();
 
-        /// <summary>
-        /// The number of sibling pages to show on each side of the current page.
-        /// </summary>
-        [Parameter]
-        public int SiblingCount { get; set; } = 1;
-
-
-        /// <summary>
-        /// The number of always visible pages at the beginning and end.
-        /// </summary>
-        [Parameter]
-        public int BoundaryCount { get; set; } = 0;
-
-
-        /// <summary>
-        /// Show ellipsis
-        /// </summary>
-        [Parameter]
-        public bool ShowEllipsis { get; set; } = false;
-
-
-        // fires when changing the page, retuns the current page
-        // todo rename
-        [Parameter]
-        public EventCallback<int> PageChanging { get; set; }
-
-
-        protected override void OnParametersSet()
+        if (Page == null)
         {
-            base.OnParametersSet();
+            throw new ArgumentNullException(nameof(Page), "Page parameter is required.");
+        }
 
-            if (Page == null)
-            {
-                throw new ArgumentNullException(nameof(Page), "Page parameter is required.");
-            }
+        // normalize inputs
+        if (SiblingCount < 0) 
+            SiblingCount = 0;
 
-            PageIndex = Page.PageIndex;
+        if (BoundaryCount < 0) 
+            BoundaryCount = 0;
+
+        if (Page.TotalPageCount < 1)
+        {
+            // nothing to render, but keep values safe
+            PageIndex = 1;
+            TotalPageCount = 1;
+        }
+        else
+        {
+            PageIndex = Math.Clamp(Page.PageIndex, 1, Page.TotalPageCount);
             TotalPageCount = Page.TotalPageCount;
         }
+    }
 
-        private int PageIndex;
+    private int PageIndex;
 
-        private int TotalPageCount;
+    private int TotalPageCount;
 
-        private int StartBoundery => Math.Min(BoundaryCount, TotalPageCount);
+    private int StartBoundery => Math.Min(BoundaryCount, TotalPageCount);
 
-        private int EndBoundery => TotalPageCount - Math.Max(TotalPageCount - BoundaryCount + 1, BoundaryCount + 1) + 1;
+    private int EndBoundery => TotalPageCount - Math.Max(TotalPageCount - BoundaryCount + 1, BoundaryCount + 1) + 1;
 
-        private int StartNumber
-        {
-            get
-            {
-                var elipseModifier = ShowEllipsis ? 0 : 0;
-
-                return Math.Max(
-                            Math.Min(
-                                // Original start
-                                PageIndex - SiblingCount,
-                                // Page boundery +/- elipse
-                                TotalPageCount - BoundaryCount - SiblingCount * 2 - elipseModifier
-                            ),
-                            // After start +/- elipse
-                            BoundaryCount + 1 + elipseModifier
-                        );
-            }
-        }
-
-        private int EndNumber
-        {
-            get
-            {
-                var elipseModifier = ShowEllipsis ? 0 : 0;
-
-                return Math.Min(
-                            Math.Max(
-                                // Original end
-                                PageIndex + SiblingCount,
-                                // Page boundery +/- elipse
-                                BoundaryCount + SiblingCount * 2 + 1 + elipseModifier
-
-                            ),
-                            // Before end +/- elipse
-                            TotalPageCount - BoundaryCount - elipseModifier
+    private int StartNumber => Math.Max(
+                        Math.Min(
+                            // Original start
+                            PageIndex - SiblingCount,
+                            // Page boundery
+                            TotalPageCount - BoundaryCount - SiblingCount * 2
+                        ),
+                        // After start
+                        BoundaryCount + 1
                     );
-            }
-        }
 
-        private async Task InvokePageChange(int pagenm)
+    private int EndNumber => Math.Min(
+                        Math.Max(
+                            // Original end
+                            PageIndex + SiblingCount,
+                            // Page boundery
+                            BoundaryCount + SiblingCount * 2 + 1
+
+                        ),
+                        // Before end
+                        TotalPageCount - BoundaryCount
+                );
+
+    private async Task InvokePageChange(int pagenm)
+    {
+        if (TotalPageCount <= 0) return;
+
+        // clamp pagenm to valid range
+        var target = Math.Clamp(pagenm, 1, TotalPageCount);
+
+        if (PageIndex != target)
         {
-            if (PageIndex != pagenm)
-            {
-                PageIndex = pagenm;
+            PageIndex = target;
 
-                await PageChanging.InvokeAsync(pagenm);
-            }
+            await PageIndexChanged.InvokeAsync(target);
         }
     }
 }

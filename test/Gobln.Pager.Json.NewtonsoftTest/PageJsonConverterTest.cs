@@ -6,237 +6,236 @@ using Gobln.Pager.TestHelper.Model;
 using Newtonsoft.Json;
 using Xunit;
 
-namespace Gobln.Pager.Json.NewtonsoftTest
+namespace Gobln.Pager.Json.NewtonsoftTest;
+
+public class PageJsonConverterTest
 {
-    public class PageJsonConverterTest
+    /// <summary>
+    /// Serialize default Page. Deserialize Page in class
+    /// </summary>
+    [Fact]
+    public void Serialize_Default_Page_Deserialize_Page_01()
     {
-        /// <summary>
-        /// Serialize default Page. Deserialize Page in class
-        /// </summary>
-        [Fact]
-        public void Serialize_Default_Page_Deserialize_Page_01()
+        var serializeOptions = new JsonSerializerSettings
         {
-            var serializeOptions = new JsonSerializerSettings
-            {
-                Converters = {
-                    new PageJsonConverter(),
-                },
-            };
+            Converters = {
+                new PageJsonConverter(),
+            },
+        };
 
-            var data = UserData.UserList;
+        var data = UserData.UserList;
 
-            var page = new List<User>().ToPage();
+        var page = new List<User>().ToPage();
 
-            var json = JsonConvert.SerializeObject(page, serializeOptions);
+        var json = JsonConvert.SerializeObject(page, serializeOptions);
 
-            var result = JsonConvert.DeserializeObject<Page<User>>(json, serializeOptions);
+        var result = JsonConvert.DeserializeObject<Page<User>>(json, serializeOptions);
 
-            Assert.Equal(page, result, new UserComparer());
-        }
+        Assert.Equal(page, result, new UserComparer());
+    }
 
-        /// <summary>
-        /// Serialize Empty Page in class. Deserialize Page in class
-        /// </summary>
-        [Fact]
-        public void Serialize_Empty_Page_Class_Deserialize_Empty_Page_Class_01()
+    /// <summary>
+    /// Serialize Empty Page in class. Deserialize Page in class
+    /// </summary>
+    [Fact]
+    public void Serialize_Empty_Page_Class_Deserialize_Empty_Page_Class_01()
+    {
+        var serializeOptions = new JsonSerializerSettings
         {
-            var serializeOptions = new JsonSerializerSettings
-            {
-                Converters = {
-                    new PageJsonConverter()
-                },
-            };
+            Converters = {
+                new PageJsonConverter()
+            },
+        };
 
-            var data = UserData.UserList;
+        var data = UserData.UserList;
 
-            var pageInClass = new PageInClass()
-            {
-                User = null
-            };
-
-            var json = JsonConvert.SerializeObject(pageInClass, serializeOptions);
-
-            var result = JsonConvert.DeserializeObject<PageInClass>(json, serializeOptions);
-
-            Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
-            Assert.Equal(pageInClass.User, result.User, new UserComparer());
-        }
-
-        /// <summary>
-        /// Serialize Page in class. Deserialize Page in class
-        /// </summary>
-        [Fact]
-        public void Serialize_Empty_Page_Deserialize_Empty_Page_01()
+        var pageInClass = new PageInClass()
         {
-            var serializeOptions = new JsonSerializerSettings
-            {
-                Converters = {
-                    new PageJsonConverter()
-                },
-            };
+            User = null
+        };
 
-            var data = UserData.UserList;
+        var json = JsonConvert.SerializeObject(pageInClass, serializeOptions);
 
-            Page<User> page = null;
+        var result = JsonConvert.DeserializeObject<PageInClass>(json, serializeOptions);
 
-            var json = JsonConvert.SerializeObject(page, serializeOptions);
+        Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
+        Assert.Equal(pageInClass.User, result.User, new UserComparer());
+    }
 
-            var result = JsonConvert.DeserializeObject<Page<User>>(json, serializeOptions);
-
-            Assert.Equal(page, result, new UserComparer());
-        }
-
-        /// <summary>
-        /// Serialize IPage in class. Deserialize IPage in class
-        /// </summary>
-        [Fact]
-        public void Serialize_IPage_Class_Deserialize_IPage_Class_01()
+    /// <summary>
+    /// Serialize Page in class. Deserialize Page in class
+    /// </summary>
+    [Fact]
+    public void Serialize_Empty_Page_Deserialize_Empty_Page_01()
+    {
+        var serializeOptions = new JsonSerializerSettings
         {
-            var serializeOptions = new JsonSerializerSettings
-            {
-                Converters = {
-                    new PageJsonConverter(),
-                },
-            };
+            Converters = {
+                new PageJsonConverter()
+            },
+        };
 
-            var data = UserData.UserList;
+        var data = UserData.UserList;
 
-            var pageInClass = new PageInClassGenericType()
-            {
-                User = data.ToPage()
-            };
+        Page<User> page = null;
 
-            var json = JsonConvert.SerializeObject(pageInClass, serializeOptions);
+        var json = JsonConvert.SerializeObject(page, serializeOptions);
 
-            var result = JsonConvert.DeserializeObject<PageInClassGenericType>(json, serializeOptions);
+        var result = JsonConvert.DeserializeObject<Page<User>>(json, serializeOptions);
 
-            Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
-            Assert.Equal(pageInClass.User, result.User, new UserComparer());
-        }
+        Assert.Equal(page, result, new UserComparer());
+    }
 
-        /// <summary>
-        /// Serialize IPage. Deserialize to IPage
-        /// Will give exception, PageJsonConverter can not Deserialize to interface.
-        /// </summary>
-        [Fact]
-        public void Serialize_IPage_Deserialize_IPage_02()
+    /// <summary>
+    /// Serialize IPage in class. Deserialize IPage in class
+    /// </summary>
+    [Fact]
+    public void Serialize_IPage_Class_Deserialize_IPage_Class_01()
+    {
+        var serializeOptions = new JsonSerializerSettings
         {
-            var serializeOptions = new JsonSerializerSettings
-            {
-                Converters = {
-                    new PageJsonConverter(),
-                },
-            };
+            Converters = {
+                new PageJsonConverter(),
+            },
+        };
 
-            var data = UserData.UserList;
+        var data = UserData.UserList;
 
-            IPage<User> page = data.ToPage();
-
-            var json = JsonConvert.SerializeObject(page, serializeOptions);
-
-            var result = JsonConvert.DeserializeObject<IPage<User>>(json, serializeOptions);
-
-            Assert.Equal(page, result, new UserComparer());
-        }
-
-        /// <summary>
-        /// Serialize IPage. Deserialize to Page
-        /// </summary>
-        [Fact]
-        public void Serialize_IPage_Deserialize_Page_01()
+        var pageInClass = new PageInClassGenericType()
         {
-            var serializeOptions = new JsonSerializerSettings
-            {
-                Converters = {
-                    new PageJsonConverter(),
-                },
-            };
+            User = data.ToPage()
+        };
 
-            var data = UserData.UserList;
+        var json = JsonConvert.SerializeObject(pageInClass, serializeOptions);
 
-            IPage<User> page = data.ToPage();
+        var result = JsonConvert.DeserializeObject<PageInClassGenericType>(json, serializeOptions);
 
-            var json = JsonConvert.SerializeObject(page, serializeOptions);
+        Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
+        Assert.Equal(pageInClass.User, result.User, new UserComparer());
+    }
 
-            var result = JsonConvert.DeserializeObject<Page<User>>(json, serializeOptions);
-
-            Assert.Equal(page, result, new UserComparer());
-        }
-
-        /// <summary>
-        /// Serialize Page in class. Deserialize Page in class
-        /// </summary>
-        [Fact]
-        public void Serialize_Page_Class_Deserialize_Page_Class_01()
+    /// <summary>
+    /// Serialize IPage. Deserialize to IPage
+    /// Will give exception, PageJsonConverter can not Deserialize to interface.
+    /// </summary>
+    [Fact]
+    public void Serialize_IPage_Deserialize_IPage_02()
+    {
+        var serializeOptions = new JsonSerializerSettings
         {
-            var serializeOptions = new JsonSerializerSettings
-            {
-                Converters = {
-                    new PageJsonConverter(),
-                },
-            };
+            Converters = {
+                new PageJsonConverter(),
+            },
+        };
 
-            var data = UserData.UserList;
+        var data = UserData.UserList;
 
-            var pageInClass = new PageInClass()
-            {
-                User = data.ToPage()
-            };
+        IPage<User> page = data.ToPage();
 
-            var json = JsonConvert.SerializeObject(pageInClass, serializeOptions);
+        var json = JsonConvert.SerializeObject(page, serializeOptions);
 
-            var result = JsonConvert.DeserializeObject<PageInClass>(json, serializeOptions);
+        var result = JsonConvert.DeserializeObject<IPage<User>>(json, serializeOptions);
 
-            Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
-            Assert.Equal(pageInClass.User, result.User, new UserComparer());
-        }
+        Assert.Equal(page, result, new UserComparer());
+    }
 
-        /// <summary>
-        /// Serialize Page in class (null). Deserialize Page in class
-        /// </summary>
-        [Fact]
-        public void Serialize_Page_Class_Null_Deserialize_Empty_Page_Class_01()
+    /// <summary>
+    /// Serialize IPage. Deserialize to Page
+    /// </summary>
+    [Fact]
+    public void Serialize_IPage_Deserialize_Page_01()
+    {
+        var serializeOptions = new JsonSerializerSettings
         {
-            var serializeOptions = new JsonSerializerSettings
-            {
-                Converters = {
-                    new PageJsonConverter(),
-                },
-            };
+            Converters = {
+                new PageJsonConverter(),
+            },
+        };
 
-            var data = UserData.UserList;
+        var data = UserData.UserList;
 
-            PageInClass pageInClass = null;
+        IPage<User> page = data.ToPage();
 
-            var json = JsonConvert.SerializeObject(pageInClass, serializeOptions);
+        var json = JsonConvert.SerializeObject(page, serializeOptions);
 
-            var result = JsonConvert.DeserializeObject<PageInClass>(json, serializeOptions);
+        var result = JsonConvert.DeserializeObject<Page<User>>(json, serializeOptions);
 
-            Assert.Equal(pageInClass, result);
-        }
+        Assert.Equal(page, result, new UserComparer());
+    }
 
-        /// <summary>
-        /// Serialize Page. Deserialize to Page
-        /// </summary>
-        [Fact]
-        public void Serialize_Page_Deserialize_Page_01()
+    /// <summary>
+    /// Serialize Page in class. Deserialize Page in class
+    /// </summary>
+    [Fact]
+    public void Serialize_Page_Class_Deserialize_Page_Class_01()
+    {
+        var serializeOptions = new JsonSerializerSettings
         {
-            var serializeOptions = new JsonSerializerSettings
-            {
-                Converters = {
-                    new PageJsonConverter()
-                },
-            };
+            Converters = {
+                new PageJsonConverter(),
+            },
+        };
 
-            var data = UserData.UserList;
+        var data = UserData.UserList;
 
-            var page = data.ToPage();
+        var pageInClass = new PageInClass()
+        {
+            User = data.ToPage()
+        };
 
-            var json = JsonConvert.SerializeObject(page, serializeOptions);
+        var json = JsonConvert.SerializeObject(pageInClass, serializeOptions);
 
-            var result = JsonConvert.DeserializeObject<Page<User>>(json, serializeOptions);
+        var result = JsonConvert.DeserializeObject<PageInClass>(json, serializeOptions);
 
-            Assert.Equal(page, result, new UserComparer());
-        }
+        Assert.Equal(pageInClass.SomeNumber, result.SomeNumber);
+        Assert.Equal(pageInClass.User, result.User, new UserComparer());
+    }
+
+    /// <summary>
+    /// Serialize Page in class (null). Deserialize Page in class
+    /// </summary>
+    [Fact]
+    public void Serialize_Page_Class_Null_Deserialize_Empty_Page_Class_01()
+    {
+        var serializeOptions = new JsonSerializerSettings
+        {
+            Converters = {
+                new PageJsonConverter(),
+            },
+        };
+
+        var data = UserData.UserList;
+
+        PageInClass pageInClass = null;
+
+        var json = JsonConvert.SerializeObject(pageInClass, serializeOptions);
+
+        var result = JsonConvert.DeserializeObject<PageInClass>(json, serializeOptions);
+
+        Assert.Equal(pageInClass, result);
+    }
+
+    /// <summary>
+    /// Serialize Page. Deserialize to Page
+    /// </summary>
+    [Fact]
+    public void Serialize_Page_Deserialize_Page_01()
+    {
+        var serializeOptions = new JsonSerializerSettings
+        {
+            Converters = {
+                new PageJsonConverter()
+            },
+        };
+
+        var data = UserData.UserList;
+
+        var page = data.ToPage();
+
+        var json = JsonConvert.SerializeObject(page, serializeOptions);
+
+        var result = JsonConvert.DeserializeObject<Page<User>>(json, serializeOptions);
+
+        Assert.Equal(page, result, new UserComparer());
     }
 }
