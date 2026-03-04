@@ -60,14 +60,9 @@ public static class HtmlExtension
         {
             if (string.IsNullOrWhiteSpace(pagerOptions.HRefUrl))
             {
-                if (!Infrastructure.UrlHelper.HasCurrentUrlString(html))
-                {
-                    pagerOptions.HRefUrl = "#";
-                }
-                else
-                {
-                    pagerOptions.HRefUrl = Infrastructure.UrlHelper.GetCurrentUrlString(html);
-                }
+                pagerOptions.HRefUrl = !Infrastructure.UrlHelper.HasCurrentUrlString(html) 
+                    ? "#" 
+                    : Infrastructure.UrlHelper.GetCurrentUrlString(html);
             }
             else
             {

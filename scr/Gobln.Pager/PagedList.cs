@@ -64,7 +64,7 @@ public class PagedList<T> : IPagedList<T>, IReadOnlyList<T>
     public PagedList(IEnumerable<T> collection, int pageSize)
         : this(pageSize)
     {
-        _list = new List<T>(collection);
+        _list = [.. collection ?? []];
 
         RecalculatePageCount();
     }

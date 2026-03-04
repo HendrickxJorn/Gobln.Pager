@@ -14,7 +14,7 @@ namespace Gobln.Pager.Mvc;
 
 public class PagerFactory() : IPagerFactory<IPagerOptions>
 {
-    internal IPage _page { get; set; }
+    internal IPage InternalPage { get; set; } = default!;
 
     public IPagerOptions PagerOptions { get; internal set; }
 
@@ -48,7 +48,7 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
 #endif
         }
 
-        _page = page;
+        InternalPage = page;
 
 #if NETFRAMEWORK
         return MvcHtmlString.Create(RenderPager().ToString(TagRenderMode.Normal));
@@ -62,13 +62,13 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
         var tagBuilders = new List<TagBuilder>();
 
         if( PagerOptions.ShowFirstButtonLink == WhenToShowEnum.Always
-            || (PagerOptions.ShowFirstButtonLink == WhenToShowEnum.IfNecessary && _page.PageIndex > 1))
+            || (PagerOptions.ShowFirstButtonLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex > 1))
         {
             tagBuilders.Add(CreateFirstTag());
         }
 
         if (PagerOptions.ShowPreviousButtonLink == WhenToShowEnum.Always 
-            || (PagerOptions.ShowPreviousButtonLink == WhenToShowEnum.IfNecessary && _page.PageIndex > 1))
+            || (PagerOptions.ShowPreviousButtonLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex > 1))
         {
             tagBuilders.Add(CreatePreviousTag());
         }
@@ -80,13 +80,13 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
         }
 
         if (PagerOptions.ShowPreviousButtonLink == WhenToShowEnum.Always
-            || (PagerOptions.ShowPreviousButtonLink == WhenToShowEnum.IfNecessary && _page.PageIndex < _page.TotalPageCount))
+            || (PagerOptions.ShowPreviousButtonLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex < InternalPage.TotalPageCount))
         {
             tagBuilders.Add(CreateNextTag());
         }
 
         if (PagerOptions.ShowLastButtonLink == WhenToShowEnum.Always
-            || (PagerOptions.ShowLastButtonLink == WhenToShowEnum.IfNecessary && _page.PageIndex < _page.TotalPageCount))
+            || (PagerOptions.ShowLastButtonLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex < InternalPage.TotalPageCount))
         {
             tagBuilders.Add(CreateLastTag());
         }
@@ -106,18 +106,18 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
     {
         var index = 1;
 
-        var isActive = _page.PageIndex == index && PagerOptions.DisplayActive;
+        var isActive = InternalPage.PageIndex == index && PagerOptions.DisplayActive;
 
-        var li = TagCreatorLi(_page.PageIndex == index && PagerOptions.AllowDisabledPageLink);
+        var li = TagCreatorLi(InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLink);
 
         li.InnerHtmlAppend(
             isActive
             ? TagCreatorSpan(PagerOptions.FirstPageLinkLabel,
                 icon: PagerOptions.FirstPageLinkIconLabel,
-                disableTabing: _page.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
+                disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
             : TagCreatorLink(PagerOptions.FirstPageLinkLabel, index,
                 icon: PagerOptions.FirstPageLinkIconLabel,
-                disableTabing: _page.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
+                disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
                 dataIndexName: PagerOptions.PageIndexDataName)
         );
 
@@ -126,22 +126,22 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
 
     public virtual TagBuilder CreatePreviousTag()
     {
-        var index = _page.PageIndex - 1;
+        var index = InternalPage.PageIndex - 1;
 
         index = index < 1 ? 1 : index;
 
-        var isActive = _page.PageIndex == index && PagerOptions.DisplayActive;
+        var isActive = InternalPage.PageIndex == index && PagerOptions.DisplayActive;
 
-        var li = TagCreatorLi(_page.PageIndex == index && PagerOptions.AllowDisabledPageLink);
+        var li = TagCreatorLi(InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLink);
 
         li.InnerHtmlAppend(
             isActive
             ? TagCreatorSpan(PagerOptions.PreviousPageLinkLabel,
                 icon: PagerOptions.PreviousPageLinkIconLabel,
-                disableTabing: _page.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
+                disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
             : TagCreatorLink(PagerOptions.PreviousPageLinkLabel, index,
                 icon: PagerOptions.PreviousPageLinkIconLabel,
-                disableTabing: _page.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
+                disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
                 dataIndexName: PagerOptions.PageIndexDataName)
         );
 
@@ -150,22 +150,22 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
 
     public virtual TagBuilder CreateNextTag()
     {
-        var index = _page.PageIndex + 1;
+        var index = InternalPage.PageIndex + 1;
 
-        index = index > _page.TotalPageCount ? _page.TotalPageCount : index;
+        index = index > InternalPage.TotalPageCount ? InternalPage.TotalPageCount : index;
 
-        var isActive = _page.PageIndex == index && PagerOptions.DisplayActive;
+        var isActive = InternalPage.PageIndex == index && PagerOptions.DisplayActive;
 
-        var li = TagCreatorLi(_page.PageIndex == index && PagerOptions.AllowDisabledPageLink);
+        var li = TagCreatorLi(InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLink);
 
         li.InnerHtmlAppend(
             isActive
             ? TagCreatorSpan(PagerOptions.NextPageLinkLabel,
                 icon: PagerOptions.NextPageLinkIconLabel,
-                disableTabing: _page.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
+                disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
             : TagCreatorLink(PagerOptions.NextPageLinkLabel, index,
                 icon: PagerOptions.NextPageLinkIconLabel,
-                disableTabing: _page.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
+                disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
                 dataIndexName: PagerOptions.PageIndexDataName)
         );
 
@@ -174,20 +174,20 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
 
     public virtual TagBuilder CreateLastTag()
     {
-        var index = _page.TotalPageCount;
+        var index = InternalPage.TotalPageCount;
 
-        var isActive = _page.PageIndex == index && PagerOptions.DisplayActive;
+        var isActive = InternalPage.PageIndex == index && PagerOptions.DisplayActive;
 
-        var li = TagCreatorLi(_page.PageIndex == index && PagerOptions.AllowDisabledPageLink);
+        var li = TagCreatorLi(InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLink);
 
         li.InnerHtmlAppend(
             isActive
             ? TagCreatorSpan(PagerOptions.LastPageLinkLabel,
                 icon: PagerOptions.LastPageLinkIconLabel,
-                disableTabing: _page.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
+                disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
             : TagCreatorLink(PagerOptions.LastPageLinkLabel, index,
                 icon: PagerOptions.LastPageLinkIconLabel,
-                disableTabing: _page.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
+                disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
                 dataIndexName: PagerOptions.PageIndexDataName)
         );
 
@@ -222,23 +222,23 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
 
     private TagBuilder PrivatePageNumberCreator(int index)
     {
-        var isActive = PagerOptions.DisplayActive && _page.PageIndex == index;
+        var isActive = PagerOptions.DisplayActive && InternalPage.PageIndex == index;
 
         var text = PagerOptions.ShowIndexAsRange
-            ? $"{((index - 1) * _page.PageSize) + 1} - {((index - 1) * _page.PageSize) + _page.PageSize}"
+            ? $"{((index - 1) * InternalPage.PageSize) + 1} - {((index - 1) * InternalPage.PageSize) + InternalPage.PageSize}"
             : index.ToString();
 
         var li = TagCreatorLi(
-            _page.PageIndex == index && PagerOptions.AllowDisabledPageLink,
+            InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLink,
             isActive: isActive
             );
 
         var link = isActive
             ? TagCreatorSpan(text,
-                    disableTabing: _page.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
+                    disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
                     isActive: isActive)
             : TagCreatorLink(text, index,
-                    disableTabing: _page.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
+                    disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
                     dataIndexName: PagerOptions.PageIndexDataName);
 
         li.InnerHtmlAppend(link);
@@ -282,7 +282,7 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
     {
         var tagBuilder = PrivateTagCreator("a", attributes: attributes, cssClasses: [ "page-link" ]);
 
-        if (!string.IsNullOrWhiteSpace(dataIndexName) && !(pageIndex > _page.TotalPageCount || pageIndex < 1))
+        if (!string.IsNullOrWhiteSpace(dataIndexName) && !(pageIndex > InternalPage.TotalPageCount || pageIndex < 1))
         {
             tagBuilder.Attributes.Add($"data-{dataIndexName}", pageIndex.ToString());
         }
@@ -362,9 +362,9 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
             Math.Max(
                 Math.Min(
                     // Original start
-                    _page.PageIndex - PagerOptions.SiblingCount,
+                    InternalPage.PageIndex - PagerOptions.SiblingCount,
                     // Page boundery +/- elipse
-                    _page.TotalPageCount - PagerOptions.BoundaryCount - PagerOptions.SiblingCount * 2 - elipseModifier
+                    InternalPage.TotalPageCount - PagerOptions.BoundaryCount - PagerOptions.SiblingCount * 2 - elipseModifier
                 ),
                 // After start +/- elipse
                 PagerOptions.BoundaryCount + 1 + elipseModifier
@@ -374,17 +374,17 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
             Math.Min(
                 Math.Max(
                     // Original end
-                    _page.PageIndex + PagerOptions.SiblingCount,
+                    InternalPage.PageIndex + PagerOptions.SiblingCount,
                     // Page boundery +/- elipse
                     PagerOptions.BoundaryCount + PagerOptions.SiblingCount * 2 + 1 + elipseModifier
 
                 ),
                 // Before end +/- elipse
-                _page.TotalPageCount - PagerOptions.BoundaryCount - elipseModifier
+                InternalPage.TotalPageCount - PagerOptions.BoundaryCount - elipseModifier
             );
 
-        var firstIndex = Math.Min(PagerOptions.BoundaryCount, _page.TotalPageCount) - 1 + 1;
-        var lastIndex = _page.TotalPageCount - Math.Max(_page.TotalPageCount - PagerOptions.BoundaryCount + 1, PagerOptions.BoundaryCount + 1) + 1;
+        var firstIndex = Math.Min(PagerOptions.BoundaryCount, InternalPage.TotalPageCount) - 1 + 1;
+        var lastIndex = InternalPage.TotalPageCount - Math.Max(InternalPage.TotalPageCount - PagerOptions.BoundaryCount + 1, PagerOptions.BoundaryCount + 1) + 1;
 
         if (firstIndex > 0)
         {
@@ -402,7 +402,7 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
                 li.InnerHtmlAppend(TagCreatorSpan("...", disableTabing: true));
                 tagBuilderList.Add(li);
             }
-            else if (PagerOptions.BoundaryCount + 1 < _page.TotalPageCount - PagerOptions.BoundaryCount)
+            else if (PagerOptions.BoundaryCount + 1 < InternalPage.TotalPageCount - PagerOptions.BoundaryCount)
             {
                 tagBuilderList.Add(PrivatePageNumberCreator(PagerOptions.BoundaryCount + 1));
             }
@@ -415,21 +415,21 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
 
         if (PagerOptions.ShowEllipsis)
         {
-            if (endNumber < _page.TotalPageCount - PagerOptions.BoundaryCount - 1)
+            if (endNumber < InternalPage.TotalPageCount - PagerOptions.BoundaryCount - 1)
             {
                 var li = TagCreatorLi(true);
                 li.InnerHtmlAppend(TagCreatorSpan("...", disableTabing: true));
                 tagBuilderList.Add(li);
             }
-            else if (_page.TotalPageCount - PagerOptions.BoundaryCount > PagerOptions.BoundaryCount)
+            else if (InternalPage.TotalPageCount - PagerOptions.BoundaryCount > PagerOptions.BoundaryCount)
             {
-                tagBuilderList.Add(PrivatePageNumberCreator(_page.TotalPageCount - PagerOptions.BoundaryCount));
+                tagBuilderList.Add(PrivatePageNumberCreator(InternalPage.TotalPageCount - PagerOptions.BoundaryCount));
             }
         }
 
-        if (lastIndex <= _page.TotalPageCount)
+        if (lastIndex <= InternalPage.TotalPageCount)
         {
-            for (int index = _page.TotalPageCount - PagerOptions.BoundaryCount + 1; index <= _page.TotalPageCount; index++)
+            for (int index = InternalPage.TotalPageCount - PagerOptions.BoundaryCount + 1; index <= InternalPage.TotalPageCount; index++)
             {
                 tagBuilderList.Add(PrivatePageNumberCreator(index));
             }
@@ -445,7 +445,7 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
     /// <returns></returns>
     public virtual string? UrlCreator(int pageIndex)
     {
-        if (_page.TotalPageCount < pageIndex || pageIndex < 1)
+        if (InternalPage.TotalPageCount < pageIndex || pageIndex < 1)
         {
             return null;
         }

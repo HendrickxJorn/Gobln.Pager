@@ -51,7 +51,7 @@ public class Page<T> : IPage<T>, IEnumerable
     /// <summary>
     /// Does the page contain any elements
     /// </summary>
-    public bool IsEmpty => this == null || !_items.Any();
+    public bool IsEmpty => _items is null ||  !_items.Any();
 
     #endregion Properties
 
@@ -141,78 +141,40 @@ public class Page<T> : IPage<T>, IEnumerable
     #endregion Implementation of IEnumerable
 }
 
-///// <summary>
-///// Static class to create instances of <see cref="Page{T}"/>
-///// </summary>
-//public static class Page
-//{
-//    /// <summary>
-//    /// Converts a collection of <typeparamref name="T"/> to an single <see cref="Page"/>
-//    /// </summary>
-//    /// <typeparam name="T"></typeparam>
-//    /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
-//    /// <returns></returns>
-//    /// <exception cref="ArgumentOutOfRangeException">Can not be less then zero or zero</exception>
-//    public static Page<T> FromEnumerable<T>(IEnumerable<T> source)
-//    {
-//        return source == null
-//            ? new Page<T>()
-//            : new Page<T>(source);
-//    }
-
-//    /// <summary>
-//    /// Converts collection of <typeparamref name="T"/> to an single <see cref="Page"/>
-//    /// </summary>
-//    /// <typeparam name="T"></typeparam>
-//    /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
-//    /// <param name="pageIndex">The currently selected page in the original collection</param>
-//    /// <param name="pageSize">Size of an individual page</param>
-//    /// <exception cref="ArgumentOutOfRangeException">Can not be less then zero or zero</exception>
-//    /// <returns></returns>
-//    public static Page<T> FromEnumerable<T>(IEnumerable<T> collection, int pageIndex, int pageSize)
-//    {
-//        Validator.Validate(pageIndex, pageSize);
-
-//        return collection == null
-//            ? new Page<T>()
-//            : new Page<T>(collection, new PageDefinition(pageIndex, pageSize, collection.Count()));
-//    }
-
-//    /// <summary>
-//    /// Converts a pre-paged collection of <typeparamref name="T"/> to an single <see cref="Page"/>
-//    /// </summary>
-//    /// <typeparam name="T"></typeparam>
-//    /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
-//    /// <param name="pageIndex">The currently selected page in the original collection</param>
-//    /// <param name="pageSize">Size of an individual page</param>
-//    /// <param name="totalItemCount">Total item count in the original collection</param>
-//    /// <returns></returns>
-//    public static Page<T> FromEnumerable<T>(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)
-//    {
-//        Validator.Validate(pageIndex, pageSize, totalItemCount);
-
-//        return collection == null
-//            ? new Page<T>()
-//            : new Page<T>(collection, new PageDefinition(pageIndex, pageSize, totalItemCount));
-//    }
-//}
-
-// todo check if this can work for blazor ????
 /// <summary>
 /// Static class to create instances of <see cref="Page{T}"/>
 /// </summary>
 public class Page: IPage
 {
+    /// <summary>
+    /// The index of the current page in the original collection
+    /// </summary>
     public int PageIndex { get; set; }
 
+    /// <summary>
+    /// The size of the page
+    /// </summary>
     public int PageSize { get; set; }
 
+
+    /// <summary>
+    /// Total amount of items in the original collection
+    /// </summary>
     public int TotalItemCount { get; set; }
 
+    /// <summary>
+    /// Total amount of pages in the original collection
+    /// </summary>
     public int TotalPageCount { get; set; }
 
+    /// <summary>
+    /// Is paging available (has more than one page in the original collection)
+    /// </summary>
     public bool HasPaging { get; set; }
 
+    /// <summary>
+    /// Does the page contain any elements
+    /// </summary>
     public bool IsEmpty { get; set; }
 
     /// <summary>

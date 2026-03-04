@@ -31,7 +31,8 @@ public static class IEnumerableExtensions
     /// <returns></returns>
     public static Page<T> ToPage<T>(this IEnumerable<T> source)
     {
-        return PrivateToPage(source, 1, source.Count(), source.Count());
+        var list = source.ToList();  // Materialize once
+        return PrivateToPage(list, 1, list.Count, list.Count);
     }
 
     /// <summary>
