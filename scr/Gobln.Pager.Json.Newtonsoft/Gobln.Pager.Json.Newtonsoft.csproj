@@ -8,7 +8,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Version>1.0.0</Version>
     <Authors>Jorn Hendrickx</Authors>
-    <Description>todo</Description>
+    <Description>Newtonsoft.Json converters for Gobln.Pager. Serializes and deserializes Page and PagedList objects, keeping a Page's index, size, and total item count intact across the wire.</Description>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
   </PropertyGroup>
 

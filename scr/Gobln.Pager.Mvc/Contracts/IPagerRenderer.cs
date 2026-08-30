@@ -10,13 +10,13 @@ using Microsoft.AspNetCore.Html;
 
 namespace Gobln.Pager.Mvc;
 
-public interface IPagerFactory<T>
-    : IPagerFactory
+public interface IPagerRenderer<T>
+    : IPagerRenderer
 {
     void SetOptions(T options);
 }
 
-public interface IPagerFactory
+public interface IPagerRenderer
 {
 #if NETFRAMEWORK
     MvcHtmlString Render(IPage page);

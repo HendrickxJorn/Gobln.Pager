@@ -7,8 +7,8 @@ Targets `net462`, `net48`, `net6.0`, `net8.0`, `net10.0`. Namespace `Gobln.Pager
 ```csharp
 IHtmlContent Pager(this IHtmlHelper html, IPage page);
 IHtmlContent Pager(this IHtmlHelper html, IPage page, IPagerOptions pagerOptions);
-IHtmlContent Pager(this IHtmlHelper html, IPage page, IPagerFactory pagerFactory);
-IHtmlContent Pager<T>(this IHtmlHelper html, IPage page, T pagerOptions, IPagerFactory<T> pagerFactory) where T : IPagerOptions;
+IHtmlContent Pager(this IHtmlHelper html, IPage page, IPagerRenderer pagerRenderer);
+IHtmlContent Pager<T>(this IHtmlHelper html, IPage page, T pagerOptions, IPagerRenderer<T> pagerRenderer) where T : IPagerOptions;
 ```
 
 Simplest usage, using whatever options were registered via `AddMvcPager()` (or the library defaults if none were registered):
@@ -35,16 +35,17 @@ Implements `IPagerOptions`; construct directly or via `Clone()`. Defaults shown:
 | Property | Default | Description |
 |---|---|---|
 | `ShowPager` | `IfNecessary` | Whether to render the pager at all (`Never` / `IfNecessary` / `Always`). |
-| `ShowFirstButtonLink` | `Always` | Show the "First" link. |
-| `ShowPreviousButtonLink` | `Always` | Show the "Previous" link. |
+| `ShowButtonFirstLink` | `Always` | Show the "First" link. |
+| `ShowButtonPreviousLink` | `Always` | Show the "Previous" link. |
 | `ShowPagerButtonLinks` | `Always` | Show numbered page links. |
-| `ShowNextButtonLink` | `Always` | Show the "Next" link. |
-| `ShowLastButtonLink` | `Always` | Show the "Last" link. |
+| `ShowButtonNextLink` | `Always` | Show the "Next" link. |
+| `ShowButtonLastLink` | `Always` | Show the "Last" link. |
 | `SiblingCount` | `1` | Page links shown on each side of the current page. |
 | `BoundaryCount` | `1` | Page links always shown at the start/end. |
 | `ShowEllipsis` | `true` | Render `…` between boundary and sibling ranges. |
 | `ShowIndexAsRange` | `false` | Show an item range instead of a page index (label text only; see `todo` comments in source — not yet wired up to output text). |
-| `FirstPageLinkLabel` / `PreviousPageLinkLabel` / `NextPageLinkLabel` / `LastPageLinkLabel` | `"First"` / `"Previous"` / `"Next"` / `"Last"` | Link text. |
+| `ButtonFirstLinkLabel` / `ButtonPreviousLinkLabel` / `ButtonNextLinkLabel` / `ButtonLastLinkLabel` | `"First"` / `"Previous"` / `"Next"` / `"Last"` | Link text. |
+| `ButtonFirstLinkIcon` / `ButtonPreviousLinkIcon` / `ButtonNextLinkIcon` / `ButtonLastLinkIcon` | `null` | Icon markup rendered in place of the link text; the label then becomes the `aria-label`. |
 | `HRefUrl` | `null` | Explicit URL for page links. `null` = current request URL; `"#"` = all links point to `#`. |
 | `PageIndexUrlName` | `"pageIndex"` | Query-string key used for the page index in generated links. |
 | `AllowDisabledPageLink` / `AllowDisabledPageLinkTab` | `true` | Whether disabled links are still rendered/tabbable. |
@@ -64,9 +65,9 @@ builder.Services.AddMvcPager(options => options.ShowEllipsis = true);
 
 These set `PagerSettings.DefaultPagerOptions`, used whenever `Html.Pager(page)` is called without explicit options. `AddMvcPager` is only compiled under `NET6_0_OR_GREATER` — on .NET Framework targets, construct and pass a `PagerOptions` instance explicitly instead.
 
-## Custom rendering via `IPagerFactory`
+## Custom rendering via `IPagerRenderer`
 
-`Html.Pager(page, pagerFactory)` / `Html.Pager(page, pagerOptions, pagerFactory)` let you swap in your own `IPagerFactory` / `IPagerFactory<T>` implementation. The built-in `PagerFactory : IPagerFactory<IPagerOptions>` builds the `<nav><ul class="pagination">…</ul></nav>` markup via a set of `virtual TagCreator*` methods, so you can subclass it to change individual pieces of the markup instead of writing a renderer from scratch.
+`Html.Pager(page, pagerRenderer)` / `Html.Pager(page, pagerOptions, pagerRenderer)` let you swap in your own `IPagerRenderer` / `IPagerRenderer<T>` implementation. The built-in `PagerRenderer : IPagerRenderer<IPagerOptions>` builds the `<nav><ul class="pagination">…</ul></nav>` markup via a set of `virtual TagCreator*` methods, so you can subclass it to change individual pieces of the markup instead of writing a renderer from scratch.
 
 ## Display helpers
 

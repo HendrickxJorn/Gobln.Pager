@@ -1,6 +1,6 @@
 # JSON Serialization
 
-Two separate packages provide converters, mirroring each other's feature set for `System.Text.Json` and `Newtonsoft.Json` respectively. Both project-reference the core `Gobln.Pager` package and target the same framework matrix as core (net462, net48, net6.0, net8.0, net10.0, netstandard2.0, netstandard2.1). Current version: `1.0.0`.
+Two separate packages provide converters, mirroring each other's feature set for `System.Text.Json` and `Newtonsoft.Json` respectively. Both project-reference the core `Gobln.Pager` package and target the same framework matrix as core (net462, net48, net6.0, net8.0, net10.0, netstandard2.0, netstandard2.1).
 
 Each package ships two converters:
 
@@ -60,5 +60,3 @@ var page = JsonConvert.DeserializeObject<Page<MyItem>>(json, settings);
 > Both packages assert this shared format against the same literal JSON in their own test suites (`JsonWireFormatTest`), so the two cannot drift apart unnoticed.
 
 Both `Page<T>` converters reconstruct via `new Page<T>(items, pageIndex, pageSize, totalItemCount)`, and treat an empty/missing `PageItems` array as an empty `Page<T>`. Both `PagedList<T>` converters reconstruct via `new PagedList<T>(items)` (default page size 10).
-
-> **Upgrading:** before 1.0.0 the `System.Text.Json` package wrapped `Page<T>` in a one-element array (`[{…}]`). It no longer writes or accepts that shape — reading it now throws `JsonException` rather than half-parsing. Any persisted payloads in the old format need unwrapping.

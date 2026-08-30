@@ -20,8 +20,8 @@ public  class ExtraTest
 
             HRefUrl = "#",
 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         };
 
         var result = target.Clone();

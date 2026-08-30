@@ -51,8 +51,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = "#",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -116,8 +116,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = "#",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
             SiblingCount = 0,
             BoundaryCount = 0,
         });
@@ -161,8 +161,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = null,
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -210,8 +210,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = null,
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -253,8 +253,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = "http://pagerList.com/",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -302,8 +302,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = "http://pagerList.com/search",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -353,6 +353,80 @@ public class Bootstrap5ExtraTest
             NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
 
             PageIndexDataName = "pageindex",
+        });
+
+        Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+    }
+
+    [Fact]
+    public void ShowButtonNextLinkNeverTest01()
+    {
+        // Next is driven by its own option; hiding it must leave Previous alone.
+        var target = """
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="disabled page-item">
+                    <span class="page-link" tabindex="-1">Previous</span>
+                </li>
+                <li aria-current="page" class="active page-item">
+                    <span class="page-link" tabindex="-1">1</span>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+            </ul>
+        </nav>
+        """;
+
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+        var result = mockHtmlHelper.Pager(_page3, new PagerOptions()
+        {
+            NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+
+            AllowDisabledPageLinkTab = true,
+
+            HRefUrl = "#",
+
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
+            ShowButtonNextLink = WhenToShowEnum.Never,
+        });
+
+        Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+    }
+
+    [Fact]
+    public void ShowButtonPreviousLinkNeverTest01()
+    {
+        // ... and hiding Previous must leave Next alone.
+        var target = """
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li aria-current="page" class="active page-item">
+                    <span class="page-link" tabindex="-1">1</span>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+        """;
+
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+        var result = mockHtmlHelper.Pager(_page3, new PagerOptions()
+        {
+            NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+
+            AllowDisabledPageLinkTab = true,
+
+            HRefUrl = "#",
+
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
+            ShowButtonPreviousLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());

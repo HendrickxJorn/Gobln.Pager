@@ -13,7 +13,7 @@
     <RootNamespace>Gobln.Pager</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>2.0.0</Version>
-    <Description>todo A portable pager library written in C#, to allow you covert IEnumarble/IQueryable to an PageList or Page object.</Description>
+    <Description>A portable paging library for .NET. Converts IEnumerable and IQueryable collections into strongly-typed Page or PagedList objects, with support for pre-paged data, asynchronous paging, and Entity Framework.</Description>
     <RepositoryUrl>https://github.com/HendrickxJorn/Gobln.Pager</RepositoryUrl>
     <PackageIcon>Gobln Pager.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>

@@ -52,13 +52,13 @@ public static class HtmlExtension
         public IHtmlContent Pager(IPage page, IPagerOptions pagerOptions)
 #endif
         {
-            return Pager(html, page, pagerOptions, new PagerFactory());
+            return Pager(html, page, pagerOptions, new PagerRenderer());
         }
 
 #if NETFRAMEWORK
-        public MvcHtmlString Pager<T>(IPage page, T pagerOptions, IPagerFactory<T> pagerFactory)
+        public MvcHtmlString Pager<T>(IPage page, T pagerOptions, IPagerRenderer<T> pagerRenderer)
 #else
-        public IHtmlContent Pager<T>(IPage page, T pagerOptions, IPagerFactory<T> pagerFactory)
+        public IHtmlContent Pager<T>(IPage page, T pagerOptions, IPagerRenderer<T> pagerRenderer)
 #endif
             where T : IPagerOptions
         {
@@ -78,9 +78,9 @@ public static class HtmlExtension
                 }
             }
 
-            pagerFactory.SetOptions(pagerOptions);
+            pagerRenderer.SetOptions(pagerOptions);
 
-            return Pager(html, page, pagerFactory);
+            return Pager(html, page, pagerRenderer);
         }
 
         /// <summary>
@@ -88,15 +88,15 @@ public static class HtmlExtension
         /// </summary>
         /// <param name="html">The HTML helper instance that this method extends.</param>
         /// <param name="page">Page that will be converted to an page</param>
-        /// <param name="pagerFactory"><see cref="IPagerFactory"></param>
+        /// <param name="pagerRenderer"><see cref="IPagerRenderer"></param>
         /// <returns></returns>
 #if NETFRAMEWORK
-        public MvcHtmlString Pager(IPage page, IPagerFactory pagerFactory)
+        public MvcHtmlString Pager(IPage page, IPagerRenderer pagerRenderer)
 #else
-        public IHtmlContent Pager(IPage page, IPagerFactory pagerFactory)
+        public IHtmlContent Pager(IPage page, IPagerRenderer pagerRenderer)
 #endif
         {
-            return pagerFactory.Render(page);
+            return pagerRenderer.Render(page);
         }
     }
 }

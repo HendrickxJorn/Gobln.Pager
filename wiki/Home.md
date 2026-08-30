@@ -2,11 +2,6 @@
 
 **Gobln.Pager** is a portable, zero-dependency paging library for .NET. It converts collections (`IEnumerable<T>`, `IQueryable<T>`) into strongly-typed paginated results, with optional integrations for Blazor, ASP.NET MVC/Core, and JSON serialization.
 
-- **License:** MIT
-- **Author:** Jorn Hendrickx
-- **Repository:** [github.com/HendrickxJorn/Gobln.Pager](https://github.com/HendrickxJorn/Gobln.Pager)
-- **Core package version:** 2.0.0
-
 ## Why Gobln.Pager?
 
 - **Framework agnostic:** targets .NET Framework 4.6.2/4.8, .NET Standard 2.0/2.1, and .NET 6/8/10
@@ -37,5 +32,3 @@
 | `Gobln.Pager.Mvc` | net462, net48, net6.0, net8.0, net10.0 | `Html.Pager()` helper for ASP.NET MVC / ASP.NET Core |
 | `Gobln.Pager.Json.Microsoft` | net462, net48, net6.0, net8.0, net10.0, netstandard2.0, netstandard2.1 | `System.Text.Json` converters |
 | `Gobln.Pager.Json.Newtonsoft` | net462, net48, net6.0, net8.0, net10.0, netstandard2.0, netstandard2.1 | `Newtonsoft.Json` converters |
-
-> **Note:** This wiki was rewritten directly from the current source code (August 2026) to correct several inaccuracies that existed in earlier documentation — including a fabricated `ToPagedResultAsync` method, incorrect `PagedList<T>` constructor signatures, and wrong Blazor component parameter names. See each page for the verified API surface.

@@ -8,25 +8,25 @@ public class PagerOptions : IPagerOptions
 
     protected PagerOptions(PagerOptions other)
     {
-        this.ShowNextButtonLink = other.ShowNextButtonLink;
-        this.ShowLastButtonLink = other.ShowLastButtonLink;
+        this.ShowButtonNextLink = other.ShowButtonNextLink;
+        this.ShowButtonLastLink = other.ShowButtonLastLink;
         this.ShowPagerButtonLinks = other.ShowPagerButtonLinks;
-        this.ShowPreviousButtonLink = other.ShowPreviousButtonLink;
-        this.ShowFirstButtonLink = other.ShowFirstButtonLink;
+        this.ShowButtonPreviousLink = other.ShowButtonPreviousLink;
+        this.ShowButtonFirstLink = other.ShowButtonFirstLink;
         this.ShowPager = other.ShowPager;
         this.NavTagHtmlAttributes = other.NavTagHtmlAttributes;
         this.UlTagHtmlAttributes = other.UlTagHtmlAttributes;
-        this.FirstPageLinkLabel = other.FirstPageLinkLabel;
-        this.PreviousPageLinkLabel = other.PreviousPageLinkLabel;
+        this.ButtonFirstLinkLabel = other.ButtonFirstLinkLabel;
+        this.ButtonPreviousLinkLabel = other.ButtonPreviousLinkLabel;
         this.AllowDisabledPageLink = other.AllowDisabledPageLink;
         this.AllowDisabledPageLinkTab = other.AllowDisabledPageLinkTab;
-        this.NextPageLinkLabel = other.NextPageLinkLabel;
+        this.ButtonNextLinkLabel = other.ButtonNextLinkLabel;
         this.DisplayActive = other.DisplayActive;
-        this.PreviousPageLinkIconLabel = other.PreviousPageLinkIconLabel;
-        this.NextPageLinkIconLabel = other.NextPageLinkIconLabel;
-        this.FirstPageLinkIconLabel = other.FirstPageLinkIconLabel;
-        this.LastPageLinkIconLabel = other.LastPageLinkIconLabel;
-        this.LastPageLinkLabel = other.LastPageLinkLabel;
+        this.ButtonPreviousLinkIcon = other.ButtonPreviousLinkIcon;
+        this.ButtonNextLinkIcon = other.ButtonNextLinkIcon;
+        this.ButtonFirstLinkIcon = other.ButtonFirstLinkIcon;
+        this.ButtonLastLinkIcon = other.ButtonLastLinkIcon;
+        this.ButtonLastLinkLabel = other.ButtonLastLinkLabel;
         this.PageIndexUrlName = other.PageIndexUrlName;
         this.PageIndexDataName = other.PageIndexDataName;
         this.HRefUrl = other.HRefUrl;
@@ -44,12 +44,12 @@ public class PagerOptions : IPagerOptions
     /// <summary>
     /// Show the first button link
     /// </summary>
-    public WhenToShowEnum ShowFirstButtonLink { get; set; } = WhenToShowEnum.Always;
+    public WhenToShowEnum ShowButtonFirstLink { get; set; } = WhenToShowEnum.Always;
 
     /// <summary>
     /// Show the previous button link
     /// </summary>
-    public WhenToShowEnum ShowPreviousButtonLink { get; set; } = WhenToShowEnum.Always;
+    public WhenToShowEnum ShowButtonPreviousLink { get; set; } = WhenToShowEnum.Always;
 
     /// <summary>
     /// Show the pager button links
@@ -59,12 +59,12 @@ public class PagerOptions : IPagerOptions
     /// <summary>
     /// Show the next button link
     /// </summary>
-    public WhenToShowEnum ShowNextButtonLink { get; set; } = WhenToShowEnum.Always;
+    public WhenToShowEnum ShowButtonNextLink { get; set; } = WhenToShowEnum.Always;
 
     /// <summary>
     /// Show the last button link
     /// </summary>
-    public WhenToShowEnum ShowLastButtonLink { get; set; } = WhenToShowEnum.Always;
+    public WhenToShowEnum ShowButtonLastLink { get; set; } = WhenToShowEnum.Always;
 
     /// <summary>
     /// The number of sibling pages to show on each side of the current page.
@@ -86,32 +86,25 @@ public class PagerOptions : IPagerOptions
     /// </summary>
     public bool ShowIndexAsRange { get; set; }
 
+    public string ButtonPreviousLinkLabel { get; set; } = "Previous";
 
-
-    // todo :Add page items to show text as "Page {0} of {1}."[=> 0= pageindex, 1=> max page] or "Showing items {0} through {1} of {2}." [=> 0= pageindex, 1=> max item in page, 2=> maxitem]
-    // todo :can do this whit a replace "Page {PageIndex} of {PagerSize}." => "Page 1 of 10."
-
-    public string PreviousPageLinkLabel { get; set; } = "Previous";
-
-    //rename to LabelPreviousButtonLinkIcon
-    public string? PreviousPageLinkIconLabel { get; set; } = null;
+    public string? ButtonPreviousLinkIcon { get; set; } = null;
 
     public bool AllowDisabledPageLink { get; set; } = true;
 
     public bool AllowDisabledPageLinkTab { get; set; } = true;
 
-    public string NextPageLinkLabel { get; set; } = "Next";
+    public string ButtonNextLinkLabel { get; set; } = "Next";
 
-    //todo ?? rename to LabelNextButtonLinkIcon
-    public string? NextPageLinkIconLabel { get; set; } = null;
+    public string? ButtonNextLinkIcon { get; set; } = null;
 
-    public string FirstPageLinkLabel { get; set; } = "First";
+    public string ButtonFirstLinkLabel { get; set; } = "First";
 
-    public string? FirstPageLinkIconLabel { get; set; } = null;
+    public string? ButtonFirstLinkIcon { get; set; } = null;
 
-    public string? LastPageLinkIconLabel { get; set; } = null;
+    public string? ButtonLastLinkIcon { get; set; } = null;
 
-    public string LastPageLinkLabel { get; set; } = "Last";
+    public string ButtonLastLinkLabel { get; set; } = "Last";
 
     /// <summary>
     /// The url to use for the page links
@@ -120,19 +113,16 @@ public class PagerOptions : IPagerOptions
     /// </summary>
     public string? HRefUrl { get; set; } = null;
 
-    //todo ???  rename
     /// <summary>
     /// Nav Tag Attributes
     /// </summary>
     public object? NavTagHtmlAttributes { get; set; } = null;
 
-    //todo ???  rename
     /// <summary>
     /// Ul Tag Attributes
     /// </summary>
     public object? UlTagHtmlAttributes { get; set; } = null;
 
-    // todo Rename
     public bool DisplayActive { get; set; } = true;
 
     /// <summary>

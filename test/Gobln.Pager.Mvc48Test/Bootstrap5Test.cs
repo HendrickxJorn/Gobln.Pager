@@ -7,11 +7,6 @@ namespace Gobln.Pager.Mvc48Test;
 
 public class Bootstrap5Test
 {
-    // https://getbootstrap.com/docs/5.3/components/pagination/
-
-    //todo
-    // https://github.com/HtmlTags/htmltags check for testing
-
     private readonly HelperHtml _helperHtml;
     private readonly IPage _page3;
 
@@ -61,8 +56,8 @@ public class Bootstrap5Test
             HRefUrl = "#",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -102,14 +97,14 @@ public class Bootstrap5Test
 
             DisplayActive = false,
 
-            PreviousPageLinkIconLabel = "&laquo;",
-            NextPageLinkIconLabel = "&raquo;",
+            ButtonPreviousLinkIcon = "&laquo;",
+            ButtonNextLinkIcon = "&raquo;",
 
             HRefUrl = "#",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -147,8 +142,8 @@ public class Bootstrap5Test
             HRefUrl = "#",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -181,10 +176,10 @@ public class Bootstrap5Test
             HRefUrl = "#",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
-            ShowPreviousButtonLink = WhenToShowEnum.Never,
-            ShowNextButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
+            ShowButtonPreviousLink = WhenToShowEnum.Never,
+            ShowButtonNextLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -217,10 +212,10 @@ public class Bootstrap5Test
             HRefUrl = "#",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
-            ShowPreviousButtonLink = WhenToShowEnum.Never,
-            ShowNextButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
+            ShowButtonPreviousLink = WhenToShowEnum.Never,
+            ShowButtonNextLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -260,8 +255,8 @@ public class Bootstrap5Test
             HRefUrl = "#",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -301,8 +296,8 @@ public class Bootstrap5Test
             HRefUrl = "#",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());

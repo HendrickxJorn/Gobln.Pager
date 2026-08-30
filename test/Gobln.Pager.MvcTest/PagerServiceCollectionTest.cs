@@ -51,8 +51,8 @@ public class PagerServiceCollectionTest : IDisposable
         new ServiceCollection().AddMvcPager(new PagerOptions
         {
             HRefUrl = "#",
-            FirstPageLinkLabel = "Configured first",
-            LastPageLinkLabel = "Configured last",
+            ButtonFirstLinkLabel = "Configured first",
+            ButtonLastLinkLabel = "Configured last",
         });
 
         var html = _helperHtml.CreateHtmlHelper().Pager(_page3).ToHtmlString();
@@ -67,7 +67,7 @@ public class PagerServiceCollectionTest : IDisposable
         new ServiceCollection().AddMvcPager(options =>
         {
             options.HRefUrl = "#";
-            options.NextPageLinkLabel = "Configured next";
+            options.ButtonNextLinkLabel = "Configured next";
         });
 
         var html = _helperHtml.CreateHtmlHelper().Pager(_page3).ToHtmlString();

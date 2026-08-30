@@ -54,13 +54,13 @@ public class Bootstrap3Test
 
             DisplayActive = false,
 
-            PreviousPageLinkIconLabel = "&laquo;",
-            NextPageLinkIconLabel = "&raquo;",
+            ButtonPreviousLinkIcon = "&laquo;",
+            ButtonNextLinkIcon = "&raquo;",
 
             HRefUrl = "#",
 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         };
 
         var result = mockHtmlHelper.Pager(_page5, pagerOptions, new Bootstrap3Pager());
@@ -104,13 +104,13 @@ public class Bootstrap3Test
 
             AllowDisabledPageLinkTab = false,
 
-            PreviousPageLinkIconLabel = "&laquo;",
-            NextPageLinkIconLabel = "&raquo;",
+            ButtonPreviousLinkIcon = "&laquo;",
+            ButtonNextLinkIcon = "&raquo;",
 
             HRefUrl = "#",
 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         }, new Bootstrap3Pager());
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -153,13 +153,13 @@ public class Bootstrap3Test
 
             DisplayActive = false,
 
-            PreviousPageLinkIconLabel = "&laquo;",
-            NextPageLinkIconLabel = "&raquo;",
+            ButtonPreviousLinkIcon = "&laquo;",
+            ButtonNextLinkIcon = "&raquo;",
 
             HRefUrl = "#",
 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         }, new Bootstrap3Pager());
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -202,13 +202,13 @@ public class Bootstrap3Test
 
             DisplayActive = false,
 
-            PreviousPageLinkIconLabel = "&laquo;",
-            NextPageLinkIconLabel = "&raquo;",
+            ButtonPreviousLinkIcon = "&laquo;",
+            ButtonNextLinkIcon = "&raquo;",
 
             HRefUrl = "#",
 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         }, new Bootstrap3Pager());;
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());

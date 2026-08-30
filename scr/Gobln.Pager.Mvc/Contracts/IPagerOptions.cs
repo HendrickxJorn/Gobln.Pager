@@ -10,12 +10,12 @@ public interface IPagerOptions
     /// <summary>
     /// Show the first button link
     /// </summary>
-    WhenToShowEnum ShowFirstButtonLink { get; set; }
+    WhenToShowEnum ShowButtonFirstLink { get; set; }
 
     /// <summary>
     /// Show the previous button link
     /// </summary>
-    WhenToShowEnum ShowPreviousButtonLink { get; set; }
+    WhenToShowEnum ShowButtonPreviousLink { get; set; }
 
     /// <summary>
     /// Show the pager button links
@@ -25,12 +25,12 @@ public interface IPagerOptions
     /// <summary>
     /// Show the next button link
     /// </summary>
-    WhenToShowEnum ShowNextButtonLink { get; set; }
+    WhenToShowEnum ShowButtonNextLink { get; set; }
 
     /// <summary>
     /// Show the last button link
     /// </summary>
-    WhenToShowEnum ShowLastButtonLink { get; set; }
+    WhenToShowEnum ShowButtonLastLink { get; set; }
 
     /// <summary>
     /// Nav Tag Attributes
@@ -42,27 +42,27 @@ public interface IPagerOptions
     /// </summary>
     object? UlTagHtmlAttributes { get; set; }
 
-    string FirstPageLinkLabel { get; set; }
+    string ButtonFirstLinkLabel { get; set; }
 
-    string PreviousPageLinkLabel { get; set; }
+    string ButtonPreviousLinkLabel { get; set; }
 
     bool AllowDisabledPageLink { get; set; }
 
     bool AllowDisabledPageLinkTab { get; set; }
 
-    string NextPageLinkLabel { get; set; }
+    string ButtonNextLinkLabel { get; set; }
 
     bool DisplayActive { get; set; }
 
-    string? PreviousPageLinkIconLabel { get; set; }
+    string? ButtonPreviousLinkIcon { get; set; }
 
-    string? NextPageLinkIconLabel { get; set; }
+    string? ButtonNextLinkIcon { get; set; }
 
-    string? FirstPageLinkIconLabel { get; set; }
+    string? ButtonFirstLinkIcon { get; set; }
 
-    string? LastPageLinkIconLabel { get; set; }
+    string? ButtonLastLinkIcon { get; set; }
 
-    string LastPageLinkLabel { get; set; }
+    string ButtonLastLinkLabel { get; set; }
 
     /// <summary>
     /// The name of the url to use for the page index

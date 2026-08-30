@@ -8,11 +8,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 #endif
 
-// TODO Rename????
-// TODO make functions virtual
 namespace Gobln.Pager.Mvc;
 
-public class PagerFactory() : IPagerFactory<IPagerOptions>
+public class PagerRenderer() : IPagerRenderer<IPagerOptions>
 {
     internal IPage InternalPage { get; set; } = default!;
 
@@ -61,14 +59,14 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
     {
         var tagBuilders = new List<TagBuilder>();
 
-        if( PagerOptions.ShowFirstButtonLink == WhenToShowEnum.Always
-            || (PagerOptions.ShowFirstButtonLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex > 1))
+        if( PagerOptions.ShowButtonFirstLink == WhenToShowEnum.Always
+            || (PagerOptions.ShowButtonFirstLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex > 1))
         {
             tagBuilders.Add(CreateFirstTag());
         }
 
-        if (PagerOptions.ShowPreviousButtonLink == WhenToShowEnum.Always 
-            || (PagerOptions.ShowPreviousButtonLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex > 1))
+        if (PagerOptions.ShowButtonPreviousLink == WhenToShowEnum.Always 
+            || (PagerOptions.ShowButtonPreviousLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex > 1))
         {
             tagBuilders.Add(CreatePreviousTag());
         }
@@ -79,14 +77,14 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
             tagBuilders.AddRange(PageNumbersCreator());
         }
 
-        if (PagerOptions.ShowPreviousButtonLink == WhenToShowEnum.Always
-            || (PagerOptions.ShowPreviousButtonLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex < InternalPage.TotalPageCount))
+        if (PagerOptions.ShowButtonNextLink == WhenToShowEnum.Always
+            || (PagerOptions.ShowButtonNextLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex < InternalPage.TotalPageCount))
         {
             tagBuilders.Add(CreateNextTag());
         }
 
-        if (PagerOptions.ShowLastButtonLink == WhenToShowEnum.Always
-            || (PagerOptions.ShowLastButtonLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex < InternalPage.TotalPageCount))
+        if (PagerOptions.ShowButtonLastLink == WhenToShowEnum.Always
+            || (PagerOptions.ShowButtonLastLink == WhenToShowEnum.IfNecessary && InternalPage.PageIndex < InternalPage.TotalPageCount))
         {
             tagBuilders.Add(CreateLastTag());
         }
@@ -112,11 +110,11 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
 
         li.InnerHtmlAppend(
             isActive
-            ? TagCreatorSpan(PagerOptions.FirstPageLinkLabel,
-                icon: PagerOptions.FirstPageLinkIconLabel,
+            ? TagCreatorSpan(PagerOptions.ButtonFirstLinkLabel,
+                icon: PagerOptions.ButtonFirstLinkIcon,
                 disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
-            : TagCreatorLink(PagerOptions.FirstPageLinkLabel, index,
-                icon: PagerOptions.FirstPageLinkIconLabel,
+            : TagCreatorLink(PagerOptions.ButtonFirstLinkLabel, index,
+                icon: PagerOptions.ButtonFirstLinkIcon,
                 disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
                 dataIndexName: PagerOptions.PageIndexDataName)
         );
@@ -136,11 +134,11 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
 
         li.InnerHtmlAppend(
             isActive
-            ? TagCreatorSpan(PagerOptions.PreviousPageLinkLabel,
-                icon: PagerOptions.PreviousPageLinkIconLabel,
+            ? TagCreatorSpan(PagerOptions.ButtonPreviousLinkLabel,
+                icon: PagerOptions.ButtonPreviousLinkIcon,
                 disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
-            : TagCreatorLink(PagerOptions.PreviousPageLinkLabel, index,
-                icon: PagerOptions.PreviousPageLinkIconLabel,
+            : TagCreatorLink(PagerOptions.ButtonPreviousLinkLabel, index,
+                icon: PagerOptions.ButtonPreviousLinkIcon,
                 disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
                 dataIndexName: PagerOptions.PageIndexDataName)
         );
@@ -160,11 +158,11 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
 
         li.InnerHtmlAppend(
             isActive
-            ? TagCreatorSpan(PagerOptions.NextPageLinkLabel,
-                icon: PagerOptions.NextPageLinkIconLabel,
+            ? TagCreatorSpan(PagerOptions.ButtonNextLinkLabel,
+                icon: PagerOptions.ButtonNextLinkIcon,
                 disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
-            : TagCreatorLink(PagerOptions.NextPageLinkLabel, index,
-                icon: PagerOptions.NextPageLinkIconLabel,
+            : TagCreatorLink(PagerOptions.ButtonNextLinkLabel, index,
+                icon: PagerOptions.ButtonNextLinkIcon,
                 disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
                 dataIndexName: PagerOptions.PageIndexDataName)
         );
@@ -182,11 +180,11 @@ public class PagerFactory() : IPagerFactory<IPagerOptions>
 
         li.InnerHtmlAppend(
             isActive
-            ? TagCreatorSpan(PagerOptions.LastPageLinkLabel,
-                icon: PagerOptions.LastPageLinkIconLabel,
+            ? TagCreatorSpan(PagerOptions.ButtonLastLinkLabel,
+                icon: PagerOptions.ButtonLastLinkIcon,
                 disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab)
-            : TagCreatorLink(PagerOptions.LastPageLinkLabel, index,
-                icon: PagerOptions.LastPageLinkIconLabel,
+            : TagCreatorLink(PagerOptions.ButtonLastLinkLabel, index,
+                icon: PagerOptions.ButtonLastLinkIcon,
                 disableTabing: InternalPage.PageIndex == index && PagerOptions.AllowDisabledPageLinkTab,
                 dataIndexName: PagerOptions.PageIndexDataName)
         );

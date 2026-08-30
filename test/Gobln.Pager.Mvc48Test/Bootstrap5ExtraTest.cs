@@ -51,8 +51,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = "#",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -116,8 +116,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = "#",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
             SiblingCount = 0,
             BoundaryCount = 0,
         });
@@ -161,8 +161,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = null,
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -210,8 +210,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = null,
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -253,8 +253,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = "http://pagerList.com/",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
@@ -302,8 +302,8 @@ public class Bootstrap5ExtraTest
             HRefUrl = "http://pagerList.com/search",
 
             //new 
-            ShowFirstButtonLink = WhenToShowEnum.Never,
-            ShowLastButtonLink = WhenToShowEnum.Never,
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());

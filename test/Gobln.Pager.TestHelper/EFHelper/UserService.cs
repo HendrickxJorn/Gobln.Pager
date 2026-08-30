@@ -1,11 +1,5 @@
-﻿using Gobln.Pager;
-using Gobln.Pager.TestHelper.Model;
+﻿using Gobln.Pager.TestHelper.Model;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-//todo https://learn.microsoft.com/en-us/ef/ef6/fundamentals/testing/mocking
 
 namespace Gobln.Pager.TestHelper.EFHelper;
 

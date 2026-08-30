@@ -4,7 +4,7 @@ using System.Web.UI.WebControls;
 
 namespace Gobln.Pager.Mvc48Test.Helper;
 
-internal class Bootstrap3Pager() : PagerFactory()
+internal class Bootstrap3Pager() : PagerRenderer()
 {
     public override TagBuilder TagCreatorLi(bool isDisabled = false, bool isActive = false, Dictionary<string, string?>? attributes = null)
     {

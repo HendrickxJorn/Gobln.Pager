@@ -2,9 +2,9 @@
 
 public enum PageLinkItem
 {
-    FirstPageLink = 0,
-    PreviousPageLink = 1,
+    ButtonFirstLink = 0,
+    ButtonPreviousLink = 1,
     PageLinks = 2,
-    NextPageLink = 3,
-    LastPageLink = 4,
+    ButtonNextLink = 3,
+    ButtonLastLink = 4,
 }
