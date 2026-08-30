@@ -70,9 +70,10 @@ public class Page<T> : IPage<T>, IEnumerable
     /// </summary>
     public Page(IEnumerable<T> collection)
     {
-        var pageDefinitions = new PageDefinition(1, collection.Count(), collection.Count());
+        var list = collection.ToList();
+        var pageDefinitions = new PageDefinition(1, list.Count, list.Count);
 
-        FillPageData(collection, pageDefinitions);
+        FillPageData(list, pageDefinitions);
     }
 
     /// <summary>
@@ -195,35 +196,35 @@ public class Page: IPage
     /// Converts collection of <typeparamref name="T"/> to an single <see cref="Page"/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
+    /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
     /// <param name="pageIndex">The currently selected page in the original collection</param>
     /// <param name="pageSize">Size of an individual page</param>
     /// <exception cref="ArgumentOutOfRangeException">Can not be less then zero or zero</exception>
     /// <returns></returns>
-    public static Page<T> FromEnumerable<T>(IEnumerable<T> collection, int pageIndex, int pageSize)
+    public static Page<T> FromEnumerable<T>(IEnumerable<T> source, int pageIndex, int pageSize)
     {
         Validator.Validate(pageIndex, pageSize);
 
-        return collection == null
+        return source == null
             ? new Page<T>()
-            : new Page<T>(collection, new PageDefinition(pageIndex, pageSize, collection.Count()));
+            : new Page<T>(source, new PageDefinition(pageIndex, pageSize, source.Count()));
     }
 
     /// <summary>
     /// Converts a pre-paged collection of <typeparamref name="T"/> to an single <see cref="Page"/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
+    /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
     /// <param name="pageIndex">The currently selected page in the original collection</param>
     /// <param name="pageSize">Size of an individual page</param>
     /// <param name="totalItemCount">Total item count in the original collection</param>
     /// <returns></returns>
-    public static Page<T> FromEnumerable<T>(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)
+    public static Page<T> FromEnumerable<T>(IEnumerable<T> source, int pageIndex, int pageSize, int totalItemCount)
     {
         Validator.Validate(pageIndex, pageSize, totalItemCount);
 
-        return collection == null
+        return source == null
             ? new Page<T>()
-            : new Page<T>(collection, new PageDefinition(pageIndex, pageSize, totalItemCount));
+            : new Page<T>(source, new PageDefinition(pageIndex, pageSize, totalItemCount));
     }
 }

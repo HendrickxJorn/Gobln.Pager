@@ -40,29 +40,23 @@ internal class IPageJsonConverter<T> : JsonConverter<IPage<T>>
     public override IPage<T> Read(
         ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType != JsonTokenType.StartArray)
+        if (reader.TokenType != JsonTokenType.StartObject)
         {
             throw new JsonException();
         }
 
-        reader.Read();
+        // Deserialize consumes the whole object and leaves the reader on its EndObject,
+        // which is the position a converter is required to return on. Do not Read() past it.
+        var temp = JsonSerializer.Deserialize<TempPage<T>>(ref reader, options);
 
-        var temp = JsonSerializer.Deserialize<TempPage<T>>(ref reader, options)!;
-
-        var elements = temp.PageItems?.Length == 0
+        return temp?.PageItems is null || temp.PageItems.Length == 0
             ? new Page<T>()
             : new Page<T>(temp.PageItems, temp.PageIndex, temp.PageSize, temp.TotalItemCount);
-
-        reader.Read();
-
-        return elements;
     }
 
     public override void Write(
         Utf8JsonWriter writer, IPage<T> value, JsonSerializerOptions options)
     {
-        writer.WriteStartArray();
-
         TempPage<T> tempPage;
 
         if (value == null)
@@ -87,7 +81,5 @@ internal class IPageJsonConverter<T> : JsonConverter<IPage<T>>
         }
 
         JsonSerializer.Serialize(writer, tempPage, options);
-
-        writer.WriteEndArray();
     }
 }

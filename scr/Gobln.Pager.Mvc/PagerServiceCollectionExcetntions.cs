@@ -7,27 +7,30 @@ public static class PagerMvcServiceCollectionExtensions
 {
     // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-9.0
 
-    public static IServiceCollection AddMvcPager(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        return services.AddMvcPager(new PagerOptions());
-    }
+        public IServiceCollection AddMvcPager()
+        {
+            return services.AddMvcPager(new PagerOptions());
+        }
 
-    public static IServiceCollection AddMvcPager(this IServiceCollection services, IPagerOptions pagerOptions)
-    {
-        ArgumentNullException.ThrowIfNull(pagerOptions, nameof(pagerOptions));
+        public IServiceCollection AddMvcPager(IPagerOptions pagerOptions)
+        {
+            ArgumentNullException.ThrowIfNull(pagerOptions, nameof(pagerOptions));
 
-        PagerSettings.DefaultPagerOptions = (PagerOptions)pagerOptions;
+            PagerSettings.DefaultPagerOptions = (PagerOptions)pagerOptions;
 
-        return services;
-    }
+            return services;
+        }
 
-    public static IServiceCollection AddMvcPager(this IServiceCollection services, Action<IPagerOptions> pagerOptions)
-    {
-        ArgumentNullException.ThrowIfNull(pagerOptions, nameof(pagerOptions));
+        public IServiceCollection AddMvcPager(Action<IPagerOptions> pagerOptions)
+        {
+            ArgumentNullException.ThrowIfNull(pagerOptions, nameof(pagerOptions));
 
-        pagerOptions.Invoke(PagerSettings.DefaultPagerOptions);
+            pagerOptions.Invoke(PagerSettings.DefaultPagerOptions);
 
-        return services;
+            return services;
+        }
     }
 }
 

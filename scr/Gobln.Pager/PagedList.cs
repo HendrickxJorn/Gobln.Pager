@@ -43,6 +43,11 @@ public class PagedList<T> : IPagedList<T>, IReadOnlyList<T>
         _currentPageIndex = 1;
         _pageSize = pageSize;
         _list = [];
+
+        // Without this an empty list reports PageCount 0, and the PageIndex setter then
+        // clamps every assignment down to 0. Clear() already establishes 1 as the page
+        // count of an empty list; construction has to agree with it.
+        RecalculatePageCount();
     }
 
     /// <summary>
@@ -321,7 +326,7 @@ public class PagedList<T> : IPagedList<T>, IReadOnlyList<T>
     /// <returns><see cref="IEnumerable"/> of <see cref="Page{T}"/></returns>
     public IEnumerable<Page<T>> GetPages()
     {
-        for (int i = 1; i < PageCount; i++)
+        for (int i = 1; i <= PageCount; i++)
         {
             yield return this.GetPage(i);
         }
@@ -372,14 +377,21 @@ public class PagedList<T> : IPagedList<T>, IReadOnlyList<T>
 public static class PagedList
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="PagedList{T}"/> class from the given list with the given page size.
+    /// 
     /// </summary>
-    /// <param name="collection">The elements of <typeparamref name="T"/></param>
-    /// <param name="pageSize">The number of elements displayed per page</param>
-    public static PagedList<T> FromEnumerable<T>(IEnumerable<T> collection, int pageSize = 10)
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source">The elements of <typeparamref name="T"/></param>
+    extension<T>(IEnumerable<T> source)
     {
-        Validator.ValidatePageSize(pageSize);
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PagedList{T}"/> class from the given list with the given page size.
+        /// </summary>
+        /// <param name="pageSize">The number of elements displayed per page</param>
+        public PagedList<T> FromEnumerable(int pageSize = 10)
+        {
+            Validator.ValidatePageSize(pageSize);
 
-        return new PagedList<T>(collection, pageSize);
+            return new PagedList<T>(source, pageSize);
+        }
     }
 }

@@ -29,7 +29,7 @@
         }
         @if (EndBoundery <= TotalPageCount)
         {
-            for (int i = TotalPageCount - BoundaryCount + 1; i <= TotalPageCount; i++)
+            for (int i = Math.Max(TotalPageCount - BoundaryCount + 1, StartBoundery + 1); i <= TotalPageCount; i++)
             {
                 var tempPageIndex = i;
                 <PagerItem Text="@tempPageIndex.ToString()" IsActive=@(tempPageIndex == PageIndex) @onclick="_ => InvokePageChange(tempPageIndex)" />

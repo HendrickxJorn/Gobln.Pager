@@ -72,6 +72,6 @@ internal class IPagedListJsonConverter<T> : JsonConverter<IPagedList<T>>
 
     public override void WriteJson(JsonWriter writer, IPagedList<T>? value, JsonSerializer serializer)
     {
-        writer.WriteRawValue(JsonConvert.SerializeObject(value));
+        serializer.Serialize(writer, value?.ToArray());
     }
 }

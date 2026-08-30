@@ -47,22 +47,14 @@ internal class IPagedListJsonConverter<T> : JsonConverter<IPagedList<T>>
 
         var temp = JsonSerializer.Deserialize<IEnumerable<T>>(ref reader, options)!;
 
-        var elements = temp.Count() == 0
+        return temp.Count() == 0
              ? new PagedList<T>()
              : new PagedList<T>(temp);
-
-        reader.Read();
-
-        return elements;
     }
 
     public override void Write(
         Utf8JsonWriter writer, IPagedList<T> value, JsonSerializerOptions options)
     {
-        writer.WriteStartArray();
-
         JsonSerializer.Serialize(writer, value.ToArray(), options);
-
-        writer.WriteEndArray();
     }
 }

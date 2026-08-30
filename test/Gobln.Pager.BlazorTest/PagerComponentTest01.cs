@@ -1,6 +1,6 @@
-﻿using Bunit;
-using Gobln.Pager;
+﻿using Gobln.Pager;
 using Gobln.Pager.Blazor;
+using Gobln.Pager.BlazorTest.Helpers;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Diagnostics.Metrics;
@@ -9,22 +9,6 @@ using System.Threading.Tasks;
 using Xunit;
 
 namespace Gobln.Pager.BlazorTest;
-
-// Minimal IPage implementation used for tests
-internal class TestPage : IPage
-{
-    public int PageIndex { get; set; }
-
-    public int TotalPageCount { get; set; }
-
-    public int PageSize => throw new NotImplementedException();
-
-    public int TotalItemCount => throw new NotImplementedException();
-
-    public bool HasPaging { get; set; }
-
-    public bool IsEmpty { get; set; }
-}
 
 public class PagerComponentTests01
 {
@@ -82,5 +66,29 @@ public class PagerComponentTests01
         // For PageIndex=5, SiblingCount=1, BoundaryCount=1, TotalPageCount=10
         Assert.Equal(4, startNumber);
         Assert.Equal(6, endNumber);
+    }
+
+    [Fact]
+    public void PageIndex_OfFirstNonEmptyPage_IsAdopted()
+    {
+        // A pager first rendered while its data is still loading (an empty Page) must
+        // still adopt the index of the real Page once it arrives -- including when the
+        // loading placeholder already carried that same index.
+        var pager = new Blazor.Pager
+        {
+            Page = new TestPage { PageIndex = 3, TotalPageCount = 0, HasPaging = false }
+        };
+
+        InvokeOnParametersSet(pager);
+
+        pager.Page = new TestPage { PageIndex = 3, TotalPageCount = 10, HasPaging = true };
+
+        InvokeOnParametersSet(pager);
+
+        var pageIndexField = pager.GetType().GetField("PageIndex", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        Assert.NotNull(pageIndexField);
+
+        Assert.Equal(3, (int)pageIndexField.GetValue(pager)!);
     }
 }

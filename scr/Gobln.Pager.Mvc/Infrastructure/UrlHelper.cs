@@ -6,12 +6,9 @@ using System.Web.Mvc;
 
 #else
 
-using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-
 #endif
-
 
 namespace Gobln.Pager.Mvc.Infrastructure;
 

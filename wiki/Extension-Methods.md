@@ -1,0 +1,88 @@
+# Extension Methods
+
+The core package adds `ToPage(...)` / `ToPagedList(...)` extension methods (plus async equivalents) to both `IEnumerable<T>` and `IQueryable<T>`. The overload sets are identical on both interfaces; the difference is *how* the page is materialized:
+
+- On **`IEnumerable<T>`**, paging happens in memory (`Skip`/`Take` over the sequence).
+- On **`IQueryable<T>`**, paging is translated into the query provider (e.g. Entity Framework issues `SKIP`/`TAKE` in SQL) — only the requested page is pulled into memory, *except* for `ToPagedList()`, see the warning below.
+
+## `ToPage(...)` overloads
+
+```csharp
+Page<T> ToPage();
+Page<T> ToPage(int pageIndex, int pageSize);
+Page<T> ToPage(IPageFilter pagerFilter);
+Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount);                 // pre-paged
+Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount);                     // pre-paged
+Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount, bool prePaged);
+Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount, bool prePaged);
+```
+
+- `ToPage()` with no arguments returns the entire sequence as a single page.
+- Overloads that take `totalItemCount` without a `prePaged` flag treat the source as **already paged** (`prePaged: true`) — i.e. they assume `source` is exactly the slice for `pageIndex`, and do not re-slice it. This is the fast path for data you've already paged at the database level.
+- The `prePaged` flag lets you be explicit either way.
+
+```csharp
+// In-memory paging
+var page = items.ToPage(pageIndex: 1, pageSize: 10);
+
+// Entity Framework — SKIP/TAKE happens in SQL
+var page = context.MyEntities.AsQueryable().ToPage(pageIndex: 2, pageSize: 5);
+
+// Pre-paged: you already ran the query with your own OFFSET/LIMIT and COUNT
+var alreadyPagedRows = await context.MyEntities
+    .Skip((pageIndex - 1) * pageSize)
+    .Take(pageSize)
+    .ToListAsync();
+var totalCount = await context.MyEntities.CountAsync();
+
+var page = alreadyPagedRows.ToPage(pageIndex, pageSize, totalCount); // prePaged: true implicitly
+```
+
+## `ToPagedList(...)` overloads
+
+```csharp
+PagedList<T> ToPagedList();
+PagedList<T> ToPagedList(int pageSize);
+```
+
+> **Warning:** on `IQueryable<T>`, `ToPagedList()` executes the entire query and loads all results into memory (this is documented directly on the method). Use `ToPage(...)` instead when you only need one page from a large/database-backed source.
+
+## Async variants
+
+Every overload above has an async twin with the same name plus `Async`, taking an optional trailing `CancellationToken`:
+
+```csharp
+Task<Page<T>> ToPageAsync(CancellationToken cancellationToken = default);
+Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default);
+Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, CancellationToken cancellationToken = default);
+Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, int totalItemCount, CancellationToken cancellationToken = default);
+Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, int totalItemCount, CancellationToken cancellationToken = default);
+Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default);
+Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default);
+
+Task<PagedList<T>> ToPagedListAsync(CancellationToken cancellationToken = default);
+Task<PagedList<T>> ToPagedListAsync(int pageSize, CancellationToken cancellationToken = default);
+```
+
+> There is **no** `ToPagedResultAsync` method — the real names are `ToPageAsync` and `ToPagedListAsync`. Internally these wrap the synchronous logic in `Task.Run(...)`; they do not change how an `IQueryable<T>` executes (EF's own async APIs like `ToListAsync`/`CountAsync` are not used internally).
+
+```csharp
+var page = await context.MyEntities
+    .AsQueryable()
+    .ToPageAsync(pageIndex: 1, pageSize: 10, cancellationToken);
+```
+
+## `PageFilter` as a parameter object
+
+Any overload accepting `IPageFilter` can take the built-in [`PageFilter`](Core-Library.md#pagefilter--pagination-parameter-dto) or your own implementation — handy for binding pagination straight from a request model:
+
+```csharp
+public class MyQueryModel : IPageFilter
+{
+    public int PageIndex { get; set; } = 1;
+    public int PageSize { get; set; } = 20;
+    // ...other filter fields
+}
+
+var page = items.ToPage((IPageFilter)model);
+```

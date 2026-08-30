@@ -57,16 +57,31 @@ public partial class Pager
 
         if (Page.TotalPageCount < 1)
         {
-            // nothing to render, but keep values safe
+            // nothing to render, but keep values safe.
+            // Deliberately leave _lastSeenPageIndex untouched, so the index of the
+            // first non-empty Page is still seen as a change and gets adopted below.
             PageIndex = 1;
             TotalPageCount = 1;
         }
         else
         {
-            PageIndex = Math.Clamp(Page.PageIndex, 1, Page.TotalPageCount);
             TotalPageCount = Page.TotalPageCount;
+
+            if (Page.PageIndex != _lastSeenPageIndex)
+            {
+                // Parent deliberately changed PageIndex — adopt it.
+                PageIndex = Math.Clamp(Page.PageIndex, 1, TotalPageCount);
+                _lastSeenPageIndex = Page.PageIndex;
+            }
+            else
+            {
+                // Unrelated re-render — keep our local state but re-clamp in case TotalPageCount shrank.
+                PageIndex = Math.Clamp(PageIndex, 1, TotalPageCount);
+            }
         }
     }
+
+    private int _lastSeenPageIndex;
 
     private int PageIndex;
 

@@ -65,7 +65,7 @@ internal class IPageJsonConverter<T> : JsonConverter<IPage<T>>
 
         var tempPage = jsonObj.ToObject<TempPage<T>>();
 
-        return tempPage is null || tempPage.PageItems?.Length == 0
+        return tempPage is null || tempPage.PageItems is null || tempPage.PageItems.Length == 0
            ? new Page<T>()
            : new Page<T>(tempPage.PageItems, tempPage.PageIndex, tempPage.PageSize, tempPage.TotalItemCount);
     }
@@ -79,8 +79,8 @@ internal class IPageJsonConverter<T> : JsonConverter<IPage<T>>
             tempPage = new TempPage<T>
             {
                 PageIndex = 1,
-                PageSize = int.MaxValue,
-                TotalItemCount = 1,
+                PageSize = 0,
+                TotalItemCount = 0,
                 PageItems = null
             };
         }
@@ -95,6 +95,6 @@ internal class IPageJsonConverter<T> : JsonConverter<IPage<T>>
             };
         }
 
-        writer.WriteRawValue(JsonConvert.SerializeObject(tempPage));
+        serializer.Serialize(writer, tempPage);
     }
 }
