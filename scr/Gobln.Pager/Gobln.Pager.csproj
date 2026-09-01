@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;net48;net6.0;net8.0;net10.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net462;net48;net8.0;net10.0;netstandard2.0;netstandard2.1</TargetFrameworks>
 	<LangVersion>14.0</LangVersion>
     <PackageId>$(AssemblyName)</PackageId>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
@@ -28,9 +28,6 @@
     <DocumentationFile>bin\Debug\net48\Gobln.Pager.xml</DocumentationFile>
   </PropertyGroup>
   
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6|AnyCPU'">
-    <DocumentationFile>bin\Debug\net6\Gobln.Pager.xml</DocumentationFile>
-  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8|AnyCPU'">
   	<DocumentationFile>bin\Debug\net8\Gobln.Pager.xml</DocumentationFile>
@@ -60,11 +57,6 @@
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
   
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6|AnyCPU'">
-    <DocumentationFile>bin\Release\net6\Gobln.Pager.xml</DocumentationFile>
-	<DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8|AnyCPU'">
   	<DocumentationFile>bin\Release\net8\Gobln.Pager.xml</DocumentationFile>

@@ -2,7 +2,7 @@
 
 ## Prerequisites
 
-- .NET Framework 4.6.2+, .NET Standard 2.0+, or .NET 6+
+- .NET Framework 4.6.2+, .NET Standard 2.0+, or .NET 8+
 - Visual Studio 2015+ or any .NET-compatible IDE
 
 ## Installing packages

@@ -30,8 +30,12 @@ All five libraries under `scr/`:
 | `Gobln.Pager` | 2.0.0 | 2.0.0 (unchanged) |
 | `Gobln.Pager.Mvc` | *(none)* | 2.0.0 |
 | `Gobln.Pager.Blazor` | *(none)* | 2.0.0 |
-| `Gobln.Pager.Json.Microsoft` | 1.0.0 | 1.0.0 (unchanged) |
-| `Gobln.Pager.Json.Newtonsoft` | 1.0.0 | 1.0.0 (unchanged) |
+| `Gobln.Pager.Json.Microsoft` | 1.0.0 | 2.0.0 |
+| `Gobln.Pager.Json.Newtonsoft` | 1.0.0 | 2.0.0 |
+
+All five packages ship as 2.0.0. The `net6.0` target framework was dropped from
+`Gobln.Pager`, `.Mvc`, `.Json.Microsoft` and `.Json.Newtonsoft`, which is a
+breaking change for consumers and is what the major version bump signals.
 
 ## Changes
 
@@ -194,9 +198,10 @@ workflow grants it the rights to push the tag and create the Release.
 
 ## Known limitations
 
-- **First run may skip `.Mvc` / `.Blazor`.** Both are set to 2.0.0. If either is
-  already published at 2.0.0 on nuget.org, `--skip-duplicate` skips it silently.
-  Check the run log after the first publish and bump if needed.
+- **First run may skip a package.** All five are set to 2.0.0. Any of them
+  already published at 2.0.0 on nuget.org is skipped silently by
+  `--skip-duplicate`. Check the run log after the first publish and bump if
+  needed.
 - **No path filter on the trigger.** A README-only push runs the full pipeline
   and publishes nothing. This costs CI minutes but avoids a filter list that
   drifts out of sync with what actually affects the packages.

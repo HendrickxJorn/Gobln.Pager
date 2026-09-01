@@ -16,7 +16,7 @@ And can be usable in any type of project.
 
 * .Net 4.6.1 and higher
 * .Net Standard 2.0 and higher
-* .Net 6.0 and higher
+* .Net 8.0 and higher
 
 ## Page
 

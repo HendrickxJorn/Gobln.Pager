@@ -1,6 +1,6 @@
 # JSON Serialization
 
-Two separate packages provide converters, mirroring each other's feature set for `System.Text.Json` and `Newtonsoft.Json` respectively. Both project-reference the core `Gobln.Pager` package and target the same framework matrix as core (net462, net48, net6.0, net8.0, net10.0, netstandard2.0, netstandard2.1).
+Two separate packages provide converters, mirroring each other's feature set for `System.Text.Json` and `Newtonsoft.Json` respectively. Both project-reference the core `Gobln.Pager` package and target the same framework matrix as core (net462, net48, net8.0, net10.0, netstandard2.0, netstandard2.1).
 
 Each package ships two converters:
 

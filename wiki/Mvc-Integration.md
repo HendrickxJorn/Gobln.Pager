@@ -1,6 +1,6 @@
 # MVC / ASP.NET Core Integration (`Gobln.Pager.Mvc`)
 
-Targets `net462`, `net48`, `net6.0`, `net8.0`, `net10.0`. Namespace `Gobln.Pager.Mvc`. Compiles against classic `System.Web.Mvc` (`MvcHtmlString`) on .NET Framework, and against `Microsoft.AspNetCore.Mvc.Rendering` (`IHtmlContent`) on modern .NET — the public method shapes below are the same either way, just with a different return type.
+Targets `net462`, `net48`, `net8.0`, `net10.0`. Namespace `Gobln.Pager.Mvc`. Compiles against classic `System.Web.Mvc` (`MvcHtmlString`) on .NET Framework, and against `Microsoft.AspNetCore.Mvc.Rendering` (`IHtmlContent`) on modern .NET — the public method shapes below are the same either way, just with a different return type.
 
 ## Rendering a pager: `Html.Pager(...)`
 
@@ -52,7 +52,7 @@ Implements `IPagerOptions`; construct directly or via `Clone()`. Defaults shown:
 
 `WhenToShowEnum` values: `Never = 0`, `IfNecessary = 1`, `Always = 2`.
 
-## Registering default options (ASP.NET Core, `net6.0`+ only)
+## Registering default options (ASP.NET Core, `net8.0`+ only)
 
 ```csharp
 // Program.cs
@@ -63,7 +63,7 @@ builder.Services.AddMvcPager(new PagerOptions { SiblingCount = 2 });
 builder.Services.AddMvcPager(options => options.ShowEllipsis = true);
 ```
 
-These set `PagerSettings.DefaultPagerOptions`, used whenever `Html.Pager(page)` is called without explicit options. `AddMvcPager` is only compiled under `NET6_0_OR_GREATER` — on .NET Framework targets, construct and pass a `PagerOptions` instance explicitly instead.
+These set `PagerSettings.DefaultPagerOptions`, used whenever `Html.Pager(page)` is called without explicit options. `AddMvcPager` is only compiled for the modern .NET targets — on .NET Framework targets, construct and pass a `PagerOptions` instance explicitly instead.
 
 ## Custom rendering via `IPagerRenderer`
 

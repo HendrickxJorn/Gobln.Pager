@@ -4,7 +4,7 @@
 
 ## Why Gobln.Pager?
 
-- **Framework agnostic:** targets .NET Framework 4.6.2/4.8, .NET Standard 2.0/2.1, and .NET 6/8/10
+- **Framework agnostic:** targets .NET Framework 4.6.2/4.8, .NET Standard 2.0/2.1, and .NET 8/10
 - **LINQ integration:** works on both `IEnumerable<T>` and `IQueryable<T>` (including Entity Framework), synchronously or asynchronously
 - **Pre-paged support:** wrap data you've already paged and counted at the database level without re-slicing it
 - **Dedicated UI packages:** ready-made Blazor component and ASP.NET MVC/Core HTML helper
@@ -27,8 +27,8 @@
 
 | Package | Target Frameworks | Purpose |
 |---|---|---|
-| `Gobln.Pager` | net462, net48, net6.0, net8.0, net10.0, netstandard2.0, netstandard2.1 | Core paging types and LINQ extension methods |
+| `Gobln.Pager` | net462, net48, net8.0, net10.0, netstandard2.0, netstandard2.1 | Core paging types and LINQ extension methods |
 | `Gobln.Pager.Blazor` | net8.0, net10.0 | `<Pager>` Razor component |
-| `Gobln.Pager.Mvc` | net462, net48, net6.0, net8.0, net10.0 | `Html.Pager()` helper for ASP.NET MVC / ASP.NET Core |
-| `Gobln.Pager.Json.Microsoft` | net462, net48, net6.0, net8.0, net10.0, netstandard2.0, netstandard2.1 | `System.Text.Json` converters |
-| `Gobln.Pager.Json.Newtonsoft` | net462, net48, net6.0, net8.0, net10.0, netstandard2.0, netstandard2.1 | `Newtonsoft.Json` converters |
+| `Gobln.Pager.Mvc` | net462, net48, net8.0, net10.0 | `Html.Pager()` helper for ASP.NET MVC / ASP.NET Core |
+| `Gobln.Pager.Json.Microsoft` | net462, net48, net8.0, net10.0, netstandard2.0, netstandard2.1 | `System.Text.Json` converters |
+| `Gobln.Pager.Json.Newtonsoft` | net462, net48, net8.0, net10.0, netstandard2.0, netstandard2.1 | `Newtonsoft.Json` converters |
