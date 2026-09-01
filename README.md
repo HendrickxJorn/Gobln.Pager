@@ -124,4 +124,4 @@ Full documentation lives in [`wiki/`](wiki/):
 
 ## License
 
-[MIT](LICENSE.md) — Jorn Hendrickx
+[MIT](LICENSE.md)
