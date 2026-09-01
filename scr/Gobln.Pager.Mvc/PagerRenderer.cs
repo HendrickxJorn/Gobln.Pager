@@ -437,7 +437,7 @@ public class PagerRenderer() : IPagerRenderer<IPagerOptions>
     }
 
     /// <summary>
-    /// Generate Url link for <see cref="pageIndex">
+    /// Generate Url link for <paramref name="pageIndex"/>
     /// </summary>
     /// <param name="pageIndex"></param>
     /// <returns></returns>

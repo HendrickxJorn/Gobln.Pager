@@ -86,9 +86,8 @@ public static class HtmlExtension
         /// <summary>
         /// Create pager
         /// </summary>
-        /// <param name="html">The HTML helper instance that this method extends.</param>
         /// <param name="page">Page that will be converted to an page</param>
-        /// <param name="pagerRenderer"><see cref="IPagerRenderer"></param>
+        /// <param name="pagerRenderer"><see cref="IPagerRenderer"/></param>
         /// <returns></returns>
 #if NETFRAMEWORK
         public MvcHtmlString Pager(IPage page, IPagerRenderer pagerRenderer)
