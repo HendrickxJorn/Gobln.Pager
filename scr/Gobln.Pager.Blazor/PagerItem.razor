@@ -1,16 +1,7 @@
 ﻿@namespace Gobln.Pager.Blazor
 
 <li class="@ClassNames" aria-current="page" @attributes="AdditionalAttributes">
-	@if (IsActive)
-	{
-		<span class="page-link pointer">
-			@Text
-		</span>
-	}
-	else
-	{
-		<a class="page-link" @onclick:preventDefault>
-			@Text
-		</a>
-	}
+	<a class="page-link" href="#" @onclick:preventDefault>
+		@Text
+	</a>
 </li>

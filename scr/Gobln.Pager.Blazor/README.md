@@ -49,11 +49,28 @@ private Task LoadDataForPage(int page)
 - `SiblingCount` (int): Number of sibling pages to show on each side of the current page. Default: `1`.
 - `BoundaryCount` (int): Number of always visible pages at the beginning and end. Default: `0`.
 - `ShowEllipsis` (bool): Whether to show ellipsis (...) between ranges. Default: `false`.
+- `ClassName` (string): Additional CSS classes appended to the pagination `<ul>`. Default: `null`.
 - `PageChanging` (EventCallback<int>): Fired when a new page is selected; provides the target page index.
 
 ## Styling
 
 The component renders a `<nav>` containing a `<ul class="pagination">`. It uses a `PagerItem` subcomponent for each item. Style it via your site CSS or a framework (Bootstrap classes are used by default in markup).
+
+Use `ClassName` to add your own classes alongside the built-in `pagination` class, for example Bootstrap sizing or alignment modifiers:
+
+```
+<Pager Page="@MyPage" ClassName="pagination-lg justify-content-center" />
+```
+
+renders:
+
+``` html
+<nav aria-label="page navigation">
+    <ul class="pagination pagination-lg justify-content-center">
+        ...
+    </ul>
+</nav>
+```
 
 ## Example: Blazor Server
 

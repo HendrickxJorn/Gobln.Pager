@@ -33,6 +33,14 @@ public partial class Pager
     public bool ShowEllipsis { get; set; } = false;
 
     /// <summary>
+    /// Additional CSS classes to apply to the pagination list.
+    /// </summary>
+    [DefaultValue(null)]
+    [Description("Additional CSS classes to apply to the pagination list.")]
+    [Parameter]
+    public string? ClassName { get; set; }
+
+    /// <summary>
     /// This event is triggered when the page index changes.
     /// </summary>
     [Description("This event is triggered when the page index changes.")]
@@ -86,6 +94,10 @@ public partial class Pager
     private int PageIndex;
 
     private int TotalPageCount;
+
+    private string ClassNames => string.IsNullOrWhiteSpace(ClassName)
+        ? "pagination"
+        : $"pagination {ClassName.Trim()}";
 
     private int StartBoundery => Math.Min(BoundaryCount, TotalPageCount);
 

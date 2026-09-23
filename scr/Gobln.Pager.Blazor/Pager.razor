@@ -1,7 +1,7 @@
 ﻿@namespace Gobln.Pager.Blazor
 
 <nav aria-label="page navigation">
-    <ul class="pagination">
+    <ul class="@ClassNames">
         <PagerItem Text="First" IsDisabled=@(1 == PageIndex) @onclick="_ => InvokePageChange(1)" />
         <PagerItem Text="Previous" IsDisabled=@(1 == PageIndex) @onclick="_ => InvokePageChange(Math.Max(1, PageIndex - 1))" />
         @if (StartBoundery > 0)
