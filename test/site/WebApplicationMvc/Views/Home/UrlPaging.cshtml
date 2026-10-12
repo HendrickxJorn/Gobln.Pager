@@ -1,0 +1,15 @@
+﻿@using Gobln.Pager
+@using Gobln.Pager.Mvc
+@model Page<int>
+@{
+    ViewData["Title"] = "Url paging";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Url paging</h1>
+    <p>The page index is kept in the url: the pager's links add <code>?pageIndex=</code> and the controller reads it back, so a page can be reloaded, bookmarked or shared.</p>
+</div>
+
+<p>Page @Model.PageIndex of @Model.TotalPageCount</p>
+
+@Html.Pager(Model)

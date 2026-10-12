@@ -26,7 +26,7 @@ With one-off options:
 @Html.Pager(Model, new PagerOptions { SiblingCount = 2, ShowEllipsis = true })
 ```
 
-When no explicit `HRefUrl` is set on the options, the helper automatically fills it in from the current request URL (via an internal `UrlHelper`), so page links point back to the current page/action with an updated page-index query parameter.
+When no explicit `HRefUrl` is set on the options, the helper resolves the url from the current request (via an internal `UrlHelper`), so page links point back to the current page/action with an updated page-index query parameter. The resolved url is passed to the renderer separately and never written back into the options, so one options instance can be shared between views and requests.
 
 ## `PagerOptions`
 
@@ -37,18 +37,19 @@ Implements `IPagerOptions`; construct directly or via `Clone()`. Defaults shown:
 | `ShowPager` | `IfNecessary` | Whether to render the pager at all (`Never` / `IfNecessary` / `Always`). |
 | `ShowButtonFirstLink` | `Always` | Show the "First" link. |
 | `ShowButtonPreviousLink` | `Always` | Show the "Previous" link. |
-| `ShowPagerButtonLinks` | `Always` | Show numbered page links. |
+| `ShowPagerButtonLinks` | `Always` | Show numbered page links. `IfNecessary` shows them only when there is more than one page. |
 | `ShowButtonNextLink` | `Always` | Show the "Next" link. |
 | `ShowButtonLastLink` | `Always` | Show the "Last" link. |
 | `SiblingCount` | `1` | Page links shown on each side of the current page. |
 | `BoundaryCount` | `1` | Page links always shown at the start/end. |
 | `ShowEllipsis` | `true` | Render `…` between boundary and sibling ranges. |
-| `ShowIndexAsRange` | `false` | Show an item range instead of a page index (label text only; see `todo` comments in source — not yet wired up to output text). |
-| `ButtonFirstLinkLabel` / `ButtonPreviousLinkLabel` / `ButtonNextLinkLabel` / `ButtonLastLinkLabel` | `"First"` / `"Previous"` / `"Next"` / `"Last"` | Link text. |
-| `ButtonFirstLinkIcon` / `ButtonPreviousLinkIcon` / `ButtonNextLinkIcon` / `ButtonLastLinkIcon` | `null` | Icon markup rendered in place of the link text; the label then becomes the `aria-label`. |
+| `ShowIndexAsRange` | `false` | Show the item range (`11 - 20`) instead of the page index. The last range ends at the last item. |
+| `ButtonFirstLinkLabel` / `ButtonPreviousLinkLabel` / `ButtonNextLinkLabel` / `ButtonLastLinkLabel` | `"First"` / `"Previous"` / `"Next"` / `"Last"` | Link text. Escaped on every target. |
+| `ButtonFirstLinkIcon` / `ButtonPreviousLinkIcon` / `ButtonNextLinkIcon` / `ButtonLastLinkIcon` | `null` | Icon markup rendered in place of the link text, not escaped (for example `&laquo;` or `<i class="bi bi-chevron-left"></i>`); the label then becomes the `aria-label`. |
 | `HRefUrl` | `null` | Explicit URL for page links. `null` = current request URL; `"#"` = all links point to `#`. |
 | `PageIndexUrlName` | `"pageIndex"` | Query-string key used for the page index in generated links. |
-| `AllowDisabledPageLink` / `AllowDisabledPageLinkTab` | `true` | Whether disabled links are still rendered/tabbable. |
+| `AllowDisabledPageLink` | `true` | Disable the buttons that point at the current page, and the current page number when `DisplayActive` is `false`: `disabled` class, rendered as a `<span>`. When `false` they stay working links. The active page itself is always a link with `aria-current="page"`, as in Bootstrap 5.3. |
+| `NavTagHtmlAttributes` / `UlTagHtmlAttributes` | `null` | Attributes for the `<nav>` / `<ul>`. Without an `aria-label` or `aria-labelledby`, the `<nav>` gets `aria-label="Page navigation"`. |
 
 `WhenToShowEnum` values: `Never = 0`, `IfNecessary = 1`, `Always = 2`.
 
@@ -63,11 +64,13 @@ builder.Services.AddMvcPager(new PagerOptions { SiblingCount = 2 });
 builder.Services.AddMvcPager(options => options.ShowEllipsis = true);
 ```
 
-These set `PagerSettings.DefaultPagerOptions`, used whenever `Html.Pager(page)` is called without explicit options. `AddMvcPager` is only compiled for the modern .NET targets — on .NET Framework targets, construct and pass a `PagerOptions` instance explicitly instead.
+These set `PagerSettings.DefaultPagerOptions`, used whenever `Html.Pager(page)` is called without explicit options. `AddMvcPager(options)` accepts any `IPagerOptions` and stores a copy. `AddMvcPager` is only compiled for the modern .NET targets — on .NET Framework targets, construct and pass a `PagerOptions` instance explicitly instead.
 
 ## Custom rendering via `IPagerRenderer`
 
 `Html.Pager(page, pagerRenderer)` / `Html.Pager(page, pagerOptions, pagerRenderer)` let you swap in your own `IPagerRenderer` / `IPagerRenderer<T>` implementation. The built-in `PagerRenderer : IPagerRenderer<IPagerOptions>` builds the `<nav><ul class="pagination">…</ul></nav>` markup via a set of `virtual TagCreator*` methods, so you can subclass it to change individual pieces of the markup instead of writing a renderer from scratch.
+
+`IPagerRenderer<T>.SetOptions(T options, string hRefUrl)` receives the options and the url already resolved for the current request. Inside `PagerRenderer`, use `HRefUrl` (or `UrlCreator(pageIndex)`) rather than `PagerOptions.HRefUrl`, which may still be `null`.
 
 ## Display helpers
 

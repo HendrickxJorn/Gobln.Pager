@@ -14,7 +14,6 @@ public  class ExtraTest
             UlTagHtmlAttributes = new { @class = "justify-content-end" },
 
             AllowDisabledPageLink = false,
-            AllowDisabledPageLinkTab = false,
 
             DisplayActive = false,
 

@@ -18,7 +18,7 @@ public interface IPagerOptions
     WhenToShowEnum ShowButtonPreviousLink { get; set; }
 
     /// <summary>
-    /// Show the pager button links
+    /// Show the numbered page links. IfNecessary shows them only when there is more than one page.
     /// </summary>
     WhenToShowEnum ShowPagerButtonLinks { get; set; }
 
@@ -47,8 +47,6 @@ public interface IPagerOptions
     string ButtonPreviousLinkLabel { get; set; }
 
     bool AllowDisabledPageLink { get; set; }
-
-    bool AllowDisabledPageLinkTab { get; set; }
 
     string ButtonNextLinkLabel { get; set; }
 

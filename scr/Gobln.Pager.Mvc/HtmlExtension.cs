@@ -34,10 +34,7 @@ public static class HtmlExtension
         public IHtmlContent Pager(IPage page)
 #endif
         {
-            // Clone, because rendering resolves and writes back HRefUrl on the options
-            // instance. Handing out the shared default would pin the first request's url
-            // into every later one, and race when requests overlap.
-            return Pager(html, page, PagerSettings.DefaultPagerOptions.Clone());
+            return Pager(html, page, PagerSettings.DefaultPagerOptions);
         }
 
         /// <summary>
@@ -62,23 +59,16 @@ public static class HtmlExtension
 #endif
             where T : IPagerOptions
         {
-            if (pagerOptions is not null && pagerOptions.HRefUrl is not "#")
+#if NETFRAMEWORK
+            if (pagerOptions is null)
             {
-                if (string.IsNullOrWhiteSpace(pagerOptions.HRefUrl))
-                {
-                    pagerOptions.HRefUrl = !Infrastructure.UrlHelper.HasCurrentUrlString(html)
-                        ? "#"
-                        : Infrastructure.UrlHelper.GetCurrentUrlString(html);
-                }
-                else
-                {
-                    pagerOptions.HRefUrl = Uri.TryCreate(pagerOptions.HRefUrl, UriKind.Absolute, out Uri? uriResult)
-                        ? uriResult.ToString()
-                        : pagerOptions.HRefUrl;
-                }
+                throw new ArgumentNullException(nameof(pagerOptions));
             }
+#else
+            ArgumentNullException.ThrowIfNull(pagerOptions);
+#endif
 
-            pagerRenderer.SetOptions(pagerOptions);
+            pagerRenderer.SetOptions(pagerOptions, ResolveHRefUrl(html, pagerOptions.HRefUrl));
 
             return Pager(html, page, pagerRenderer);
         }
@@ -97,5 +87,33 @@ public static class HtmlExtension
         {
             return pagerRenderer.Render(page);
         }
+    }
+
+    /// <summary>
+    /// The url the page links are built on for this request. Returned as a new value and
+    /// never written back into the options: those are often shared between views and
+    /// requests, and would pin the first request's url onto every later one.
+    /// </summary>
+#if NETFRAMEWORK
+    private static string ResolveHRefUrl(HtmlHelper html, string? hRefUrl)
+#else
+    private static string ResolveHRefUrl(IHtmlHelper html, string? hRefUrl)
+#endif
+    {
+        if (hRefUrl is null || string.IsNullOrWhiteSpace(hRefUrl))
+        {
+            return Infrastructure.UrlHelper.HasCurrentUrlString(html)
+                ? Infrastructure.UrlHelper.GetCurrentUrlString(html)
+                : "#";
+        }
+
+        if (hRefUrl is "#")
+        {
+            return hRefUrl;
+        }
+
+        return Uri.TryCreate(hRefUrl, UriKind.Absolute, out Uri? uriResult)
+            ? uriResult.ToString()
+            : hRefUrl;
     }
 }

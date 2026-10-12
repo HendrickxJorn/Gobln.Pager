@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Json paging";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Json paging</h1>
+    <p>Every page is fetched as JSON from <code>@Url.Action("JsonPage")</code>. The response holds the page, written by Gobln.Pager.Json.Microsoft, and the pager to show with it. The pager's links carry <code>data-pageindex</code> instead of a url, and the script below loads that page.</p>
+</div>
+
+<p id="page-info" aria-live="polite">Loading...</p>
+
+<div id="pager"></div>
+
+@section Scripts {
+    <script>
+        (() => {
+            const pageUrl = "@Url.Action("JsonPage")";
+            const info = document.getElementById("page-info");
+            const pager = document.getElementById("pager");
+
+            async function load(pageIndex) {
+                const response = await fetch(`${pageUrl}?pageIndex=${encodeURIComponent(pageIndex)}`, {
+                    headers: { Accept: "application/json" }
+                });
+
+                if (!response.ok) {
+                    info.textContent = `Loading page ${pageIndex} failed (HTTP ${response.status}).`;
+                    return;
+                }
+
+                const { page, pager: pagerHtml } = await response.json();
+                const totalPageCount = Math.ceil(page.totalItemCount / page.pageSize);
+
+                info.textContent = `Page ${page.pageIndex} of ${totalPageCount}: ${page.pageItems.join(", ")}`;
+                pager.innerHTML = pagerHtml;
+            }
+
+            // One listener for every pager the responses put here. Disabled items are spans
+            // without data-pageindex, so only links react (the active page reloads itself).
+            pager.addEventListener("click", event => {
+                const link = event.target.closest("[data-pageindex]");
+
+                if (link) {
+                    event.preventDefault();
+                    load(link.dataset.pageindex);
+                }
+            });
+
+            load(1);
+        })();
+    </script>
+}

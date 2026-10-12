@@ -1,3 +1,4 @@
+using Gobln.Pager.Json.Microsoft;
 using Gobln.Pager.Mvc;
 
 namespace WebApplicationMvc
@@ -9,13 +10,11 @@ namespace WebApplicationMvc
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews()
+                // Without it a Page is written as a bare array of its items, losing the paging info
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new PageJsonConverter()));
 
             builder.Services.AddMvcPager();
-            //builder.Services.AddMvcPager(option =>
-            //{
-            //    option.HRefUrl = "/Home/Index";
-            //});
 
             var app = builder.Build();
 

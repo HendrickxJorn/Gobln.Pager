@@ -5,8 +5,6 @@ namespace Gobln.Pager.Mvc;
 
 public static class PagerMvcServiceCollectionExtensions
 {
-    // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-9.0
-
     extension(IServiceCollection services)
     {
         public IServiceCollection AddMvcPager()
@@ -14,11 +12,16 @@ public static class PagerMvcServiceCollectionExtensions
             return services.AddMvcPager(new PagerOptions());
         }
 
+        /// <summary>
+        /// Use <paramref name="pagerOptions"/> as the defaults for <c>Html.Pager(page)</c>.
+        /// The options are copied, so any <see cref="IPagerOptions"/> works and later changes
+        /// to <paramref name="pagerOptions"/> don't affect the defaults.
+        /// </summary>
         public IServiceCollection AddMvcPager(IPagerOptions pagerOptions)
         {
             ArgumentNullException.ThrowIfNull(pagerOptions, nameof(pagerOptions));
 
-            PagerSettings.DefaultPagerOptions = (PagerOptions)pagerOptions;
+            PagerSettings.DefaultPagerOptions = PagerOptions.CopyOf(pagerOptions);
 
             return services;
         }

@@ -7,22 +7,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- jQuery ships version-stamped filenames, so the version is needed twice. -->
     <JQueryVersion>3.7.1</JQueryVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <!--
-      Client libraries come from NuGet rather than being committed. wwwroot/lib
-      is gitignored, so without this a fresh clone had no bootstrap and no
-      jQuery and every script tag in the layout 404'd.
-
-      Neither package shape works on its own: bootstrap only ships contentFiles
-      (registered as static web asset routes but never copied anywhere, so they
-      return 200 with an empty body), and the jQuery packages use the old
-      Content/ layout that PackageReference ignores outright. So all four are
-      referenced for restore only and the files are copied in below.
-    -->
     <PackageReference Include="bootstrap" Version="5.3.8" ExcludeAssets="contentFiles" GeneratePathProperty="true" />
     <PackageReference Include="jQuery" Version="$(JQueryVersion)" ExcludeAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="jQuery.Validation" Version="1.21.0" ExcludeAssets="all" GeneratePathProperty="true" />
@@ -50,6 +38,7 @@
   </Target>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\scr\Gobln.Pager.Json.Microsoft\Gobln.Pager.Json.Microsoft.csproj" />
     <ProjectReference Include="..\..\..\scr\Gobln.Pager.Mvc\Gobln.Pager.Mvc.csproj" />
   </ItemGroup>
 

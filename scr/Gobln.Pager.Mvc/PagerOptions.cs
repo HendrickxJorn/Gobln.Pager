@@ -6,7 +6,7 @@ public class PagerOptions : IPagerOptions
     {
     }
 
-    protected PagerOptions(PagerOptions other)
+    protected PagerOptions(IPagerOptions other)
     {
         this.ShowButtonNextLink = other.ShowButtonNextLink;
         this.ShowButtonLastLink = other.ShowButtonLastLink;
@@ -19,7 +19,6 @@ public class PagerOptions : IPagerOptions
         this.ButtonFirstLinkLabel = other.ButtonFirstLinkLabel;
         this.ButtonPreviousLinkLabel = other.ButtonPreviousLinkLabel;
         this.AllowDisabledPageLink = other.AllowDisabledPageLink;
-        this.AllowDisabledPageLinkTab = other.AllowDisabledPageLinkTab;
         this.ButtonNextLinkLabel = other.ButtonNextLinkLabel;
         this.DisplayActive = other.DisplayActive;
         this.ButtonPreviousLinkIcon = other.ButtonPreviousLinkIcon;
@@ -52,7 +51,7 @@ public class PagerOptions : IPagerOptions
     public WhenToShowEnum ShowButtonPreviousLink { get; set; } = WhenToShowEnum.Always;
 
     /// <summary>
-    /// Show the pager button links
+    /// Show the numbered page links. IfNecessary shows them only when there is more than one page.
     /// </summary>
     public WhenToShowEnum ShowPagerButtonLinks { get; set; } = WhenToShowEnum.Always;
 
@@ -91,8 +90,6 @@ public class PagerOptions : IPagerOptions
     public string? ButtonPreviousLinkIcon { get; set; } = null;
 
     public bool AllowDisabledPageLink { get; set; } = true;
-
-    public bool AllowDisabledPageLinkTab { get; set; } = true;
 
     public string ButtonNextLinkLabel { get; set; } = "Next";
 
@@ -138,5 +135,13 @@ public class PagerOptions : IPagerOptions
     public PagerOptions Clone()
     {
         return new PagerOptions(this);
+    }
+
+    /// <summary>
+    /// Copy any <see cref="IPagerOptions"/> into a new <see cref="PagerOptions"/>
+    /// </summary>
+    internal static PagerOptions CopyOf(IPagerOptions options)
+    {
+        return new PagerOptions(options);
     }
 }

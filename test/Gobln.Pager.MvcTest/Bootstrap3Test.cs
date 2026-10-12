@@ -26,7 +26,7 @@ public class Bootstrap3Test
           <ul class="pagination">
             <li>
               <a aria-label="Previous" href="#">
-                <span aria-hidden="true">&amp;laquo;</span>
+                <span aria-hidden="true">&laquo;</span>
               </a>
             </li>
             <li><a href="#">1</a></li>
@@ -36,7 +36,7 @@ public class Bootstrap3Test
             <li><a href="#">5</a></li>
             <li>
               <a aria-label="Next" href="#">
-                <span aria-hidden="true">&amp;raquo;</span>
+                <span aria-hidden="true">&raquo;</span>
               </a>
             </li>
           </ul>
@@ -50,7 +50,6 @@ public class Bootstrap3Test
             NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
 
             AllowDisabledPageLink = false,
-            AllowDisabledPageLinkTab = false,
 
             DisplayActive = false,
 
@@ -77,11 +76,11 @@ public class Bootstrap3Test
           <ul class="pagination">
             <li class="disabled">
               <span>
-                <span aria-hidden="true">&amp;laquo;</span>
+                <span aria-hidden="true">&laquo;</span>
               </span>
             </li>
             <li class="active">
-              <span>1 <span class="sr-only">(current)</span></span>
+              <a href="#">1 <span class="sr-only">(current)</span></a>
             </li>
             <li><a href="#">2</a></li>
             <li><a href="#">3</a></li>
@@ -89,7 +88,7 @@ public class Bootstrap3Test
             <li><a href="#">5</a></li>
             <li>
               <a aria-label="Next" href="#">
-                <span aria-hidden="true">&amp;raquo;</span>
+                <span aria-hidden="true">&raquo;</span>
               </a>
             </li>
           </ul>
@@ -101,8 +100,6 @@ public class Bootstrap3Test
         var result = mockHtmlHelper.Pager(_page5, new PagerOptions()
         {
             NavTagHtmlAttributes = new { aria_label = "Page navigation" },
-
-            AllowDisabledPageLinkTab = false,
 
             ButtonPreviousLinkIcon = "&laquo;",
             ButtonNextLinkIcon = "&raquo;",
@@ -124,7 +121,7 @@ public class Bootstrap3Test
           <ul class="pagination-lg pagination">
             <li>
               <a aria-label="Previous" href="#">
-                <span aria-hidden="true">&amp;laquo;</span>
+                <span aria-hidden="true">&laquo;</span>
               </a>
             </li>
             <li><a href="#">1</a></li>
@@ -134,7 +131,7 @@ public class Bootstrap3Test
             <li><a href="#">5</a></li>
             <li>
               <a aria-label="Next" href="#">
-                <span aria-hidden="true">&amp;raquo;</span>
+                <span aria-hidden="true">&raquo;</span>
               </a>
             </li>
           </ul>
@@ -149,7 +146,6 @@ public class Bootstrap3Test
             UlTagHtmlAttributes = new { @class = "pagination-lg" },
 
             AllowDisabledPageLink = false,
-            AllowDisabledPageLinkTab = false,
 
             DisplayActive = false,
 
@@ -173,7 +169,7 @@ public class Bootstrap3Test
           <ul class="pagination-sm pagination">
             <li>
               <a aria-label="Previous" href="#">
-                <span aria-hidden="true">&amp;laquo;</span>
+                <span aria-hidden="true">&laquo;</span>
               </a>
             </li>
             <li><a href="#">1</a></li>
@@ -183,7 +179,7 @@ public class Bootstrap3Test
             <li><a href="#">5</a></li>
             <li>
               <a aria-label="Next" href="#">
-                <span aria-hidden="true">&amp;raquo;</span>
+                <span aria-hidden="true">&raquo;</span>
               </a>
             </li>
           </ul>
@@ -198,7 +194,6 @@ public class Bootstrap3Test
             UlTagHtmlAttributes = new { @class = "pagination-sm" },
 
             AllowDisabledPageLink = false,
-            AllowDisabledPageLinkTab = false,
 
             DisplayActive = false,
 

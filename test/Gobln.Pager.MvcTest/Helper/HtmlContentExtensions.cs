@@ -3,7 +3,7 @@ using System.Text.Encodings.Web;
 
 namespace Gobln.Pager.MvcTest.Helper
 {
-    internal static class HtmlContentExtentsions
+    internal static class HtmlContentExtensions
     {
         public static string ToHtmlString(this IHtmlContent content)
         {

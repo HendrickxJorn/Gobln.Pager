@@ -62,6 +62,21 @@ public class PagerServiceCollectionTest : IDisposable
     }
 
     [Fact]
+    public void AddMvcPager_WithCustomOptionsType_AppliesThemToTheParameterlessPager()
+    {
+        // The overload takes any IPagerOptions, not just PagerOptions
+        new ServiceCollection().AddMvcPager(new CustomPagerOptions
+        {
+            HRefUrl = "#",
+            ButtonFirstLinkLabel = "Custom first",
+        });
+
+        var html = _helperHtml.CreateHtmlHelper().Pager(_page3).ToHtmlString();
+
+        Assert.Contains("Custom first", html);
+    }
+
+    [Fact]
     public void AddMvcPager_WithDelegate_AppliesThemToTheParameterlessPager()
     {
         new ServiceCollection().AddMvcPager(options =>

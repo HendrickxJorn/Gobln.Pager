@@ -49,7 +49,6 @@ public class Bootstrap5Test
             UlTagHtmlAttributes = new { @class = "pagination-lg" },
 
             AllowDisabledPageLink = false,
-            AllowDisabledPageLinkTab = false,
 
             DisplayActive = false,
 
@@ -93,7 +92,6 @@ public class Bootstrap5Test
             NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
 
             AllowDisabledPageLink = false,
-            AllowDisabledPageLinkTab = false,
 
             DisplayActive = false,
 
@@ -111,6 +109,52 @@ public class Bootstrap5Test
     }
 
     [Fact]
+    public void WithBootstrapIcons01()
+    {
+        // Icons are markup set by the developer, so an icon font element must come through as-is
+        var target = """
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="page-item">
+              <a aria-label="Previous" class="page-link" href="#">
+                <span aria-hidden="true"><i class="bi bi-chevron-left"></i></span>
+              </a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a aria-label="Next" class="page-link" href="#">
+                <span aria-hidden="true"><i class="bi bi-chevron-right"></i></span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        """;
+
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+        var result = mockHtmlHelper.Pager(_page3, new PagerOptions()
+        {
+            NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+
+            AllowDisabledPageLink = false,
+
+            DisplayActive = false,
+
+            ButtonPreviousLinkIcon = """<i class="bi bi-chevron-left"></i>""",
+            ButtonNextLinkIcon = """<i class="bi bi-chevron-right"></i>""",
+
+            HRefUrl = "#",
+
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
+        });
+
+        Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+    }
+
+    [Fact]
     public void DisabledAndActive01()
     {
         var target = """
@@ -119,8 +163,8 @@ public class Bootstrap5Test
                 <li class="page-item disabled">
                     <span class="page-link">Previous</span>
                 </li>
-                <li aria-current="page" class="page-item active">
-                    <span class="page-link">1</span>
+                <li class="page-item active">
+                    <a aria-current="page" class="page-link" href="#">1</a>
                 </li>
                 <li class="page-item"><a class="page-link" href="#">2</a></li>
                 <li class="page-item"><a class="page-link" href="#">3</a></li>
@@ -136,8 +180,6 @@ public class Bootstrap5Test
         var result = mockHtmlHelper.Pager(_page3, new PagerOptions()
         {
             NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
-
-            AllowDisabledPageLinkTab = false,
 
             HRefUrl = "#",
 
@@ -155,8 +197,8 @@ public class Bootstrap5Test
         var target = """
         <nav aria-label="Page navigation example">
           <ul class="pagination pagination-lg">
-            <li aria-current="page" class="page-item active">
-              <span class="page-link">1</span>
+            <li class="page-item active">
+              <a aria-current="page" class="page-link" href="#">1</a>
             </li>
             <li class="page-item"><a class="page-link" href="#">2</a></li>
             <li class="page-item"><a class="page-link" href="#">3</a></li>
@@ -170,8 +212,6 @@ public class Bootstrap5Test
         {
             NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
             UlTagHtmlAttributes = new { @class = "pagination-lg" },
-
-            AllowDisabledPageLinkTab = false,
 
             HRefUrl = "#",
 
@@ -191,8 +231,8 @@ public class Bootstrap5Test
         var target = """
         <nav aria-label="Page navigation example">
           <ul class="pagination pagination-sm">
-            <li aria-current="page" class="page-item active">
-              <span class="page-link">1</span>
+            <li class="page-item active">
+              <a aria-current="page" class="page-link" href="#">1</a>
             </li>
             <li class="page-item"><a class="page-link" href="#">2</a></li>
             <li class="page-item"><a class="page-link" href="#">3</a></li>
@@ -206,8 +246,6 @@ public class Bootstrap5Test
         {
             NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
             UlTagHtmlAttributes = new { @class = "pagination-sm" },
-
-            AllowDisabledPageLinkTab = false,
 
             HRefUrl = "#",
 
@@ -248,7 +286,6 @@ public class Bootstrap5Test
             UlTagHtmlAttributes = new { @class = "justify-content-center" },
 
             AllowDisabledPageLink = false,
-            AllowDisabledPageLinkTab = false,
 
             DisplayActive = false,
 
@@ -289,7 +326,6 @@ public class Bootstrap5Test
             UlTagHtmlAttributes = new { @class = "justify-content-end" },
 
             AllowDisabledPageLink = false,
-            AllowDisabledPageLinkTab = false,
 
             DisplayActive = false,
 

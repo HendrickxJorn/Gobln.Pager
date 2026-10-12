@@ -28,7 +28,7 @@ internal class Bootstrap3Pager() : PagerRenderer()
         return tagBuilder;
     }
 
-    public override TagBuilder TagCreatorLink(string label, int pageIndex, string? icon = null, bool disableTabing = false, string? dataIndexName = null, Dictionary<string, string?>? attributes = null)
+    public override TagBuilder TagCreatorLink(string label, int pageIndex, string? icon = null, string? dataIndexName = null, bool isActive = false, Dictionary<string, string?>? attributes = null)
     {
         var tagBuilder = new TagBuilder("a");
 
@@ -37,28 +37,19 @@ internal class Bootstrap3Pager() : PagerRenderer()
             tagBuilder.Attributes.Add($"data-{dataIndexName}", pageIndex.ToString());
         }
 
-        if (disableTabing)
-        {
-            tagBuilder.Attributes.Add("tabindex", "-1");
-        }
+        var url = UrlCreator(pageIndex);
 
-        var url = "#";
-
-        if (PagerOptions.HRefUrl is not "#")
-        {
-            var tempUrl = UrlCreator(pageIndex);
-
-            if (!string.IsNullOrWhiteSpace(tempUrl))
-            {
-                url = tempUrl;
-            }
-        }
-
-        tagBuilder.Attributes.Add("href", url);
+        tagBuilder.Attributes.Add("href", string.IsNullOrWhiteSpace(url) ? "#" : url);
 
         if (icon is null || string.IsNullOrWhiteSpace(icon))
         {
             tagBuilder.InnerHtml += label;
+
+            if (isActive)
+            {
+                // Bootstrap 3 marks the current page with screen reader text, not aria-current
+                tagBuilder.InnerHtml += " " + TagCreatorSpan("(current)", attributes: new() { { "class", "sr-only" } });
+            }
         }
         else
         {
@@ -69,7 +60,7 @@ internal class Bootstrap3Pager() : PagerRenderer()
         return tagBuilder;
     }
 
-    public override TagBuilder TagCreatorSpan(string label, string? icon = null, bool disableTabing = false, bool isActive = false, Dictionary<string, string?>? attributes = null)
+    public override TagBuilder TagCreatorSpan(string label, string? icon = null, Dictionary<string, string?>? attributes = null)
     {
         var tagBuilder = new TagBuilder("span");
 
@@ -78,26 +69,10 @@ internal class Bootstrap3Pager() : PagerRenderer()
             tagBuilder.MergeAttributes(attributes);
         }
 
-        if (disableTabing)
-        {
-            tagBuilder.Attributes.Add("tabindex", "-1");
-        }
-
         if (icon is not null && !string.IsNullOrWhiteSpace(icon))
         {
             tagBuilder.InnerHtml += TagCreatorSpanIcon(icon);
         }
-        else if(isActive)
-        {
-            tagBuilder.InnerHtml += label + " ";
-
-            var attributesCurrentSpan = new Dictionary<string, string?>()
-            {
-                { "class", "sr-only" }
-            };
-
-            tagBuilder.InnerHtml += TagCreatorSpan("(current)", attributes: attributesCurrentSpan);
-}
         else
         {
             tagBuilder.InnerHtml += label;

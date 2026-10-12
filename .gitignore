@@ -347,3 +347,6 @@ _Backup/
 .claude/
 
 .doc/
+
+# Local planning notes
+.plan/
