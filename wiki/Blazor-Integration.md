@@ -9,7 +9,7 @@ Targets `net8.0` and `net10.0`. Provides a single `<Pager>` component (namespace
 | `Page` | `IPage` | *(required)* | The page whose `PageIndex`/`TotalPageCount` drive the rendered controls. Throws `ArgumentNullException` if `null`. |
 | `SiblingCount` | `int` | `1` | Number of page links shown on each side of the current page. |
 | `BoundaryCount` | `int` | `0` | Number of page links always shown at the start and end of the range. |
-| `ShowEllipsis` | `bool` | `false` | Whether to render a disabled `"..."` link between the boundary and sibling ranges when they don't touch. |
+| `ShowEllipsis` | `bool` | `false` | Whether to render a disabled `"..."` item between the boundary and sibling ranges when they don't touch. |
 | `PageIndexChanged` | `EventCallback<int>` | — | Raised with the new page index whenever the user clicks a page link. |
 
 > The change event is `PageIndexChanged`, not `PageChanging`.
@@ -94,7 +94,11 @@ else
 </nav>
 ```
 
-Each entry is a `PagerItem` sub-component: the active page renders as `<li><span class="page-link pointer">…</span></li>`, and clickable entries render as `<li><a class="page-link" @onclick:preventDefault>…</a></li>`. Disabled entries (e.g. "First"/"Previous" on page 1) render without a click handler.
+Each entry is a `PagerItem` sub-component and follows Bootstrap 5.3's pagination markup:
+
+- A page you can go to renders as `<li class="page-item"><a class="page-link" href="#">…</a></li>`.
+- The active page is the same link, with `active` on the `<li>` and `aria-current="page"` on the link.
+- A disabled entry ("First"/"Previous" on page 1, "Next"/"Last" on the last page, and the `"..."`) renders as `<li class="page-item disabled"><span class="page-link">…</span></li>`, without a click handler.
 
 ## Testing reference
 

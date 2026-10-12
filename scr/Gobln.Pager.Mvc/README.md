@@ -201,4 +201,4 @@ To render something that isn't Bootstrap-shaped at all, implement `IPagerRendere
 
 ## License
 
-[Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0).
+[MIT](https://github.com/HendrickxJorn/Gobln.Pager/blob/master/LICENSE.md)

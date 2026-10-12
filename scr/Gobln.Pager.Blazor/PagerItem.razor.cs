@@ -40,4 +40,11 @@ public partial class PagerItem
     private string ClassNames => "page-item"
         + (IsDisabled ? " disabled" : "")
         + (IsActive ? " active" : "");
+
+    /// <summary>
+    /// The attributes for the li. A disabled item drops the click handler, so it can't react.
+    /// </summary>
+    private IEnumerable<KeyValuePair<string, object>> ItemAttributes => IsDisabled
+        ? AdditionalAttributes.Where(attribute => !string.Equals(attribute.Key, "onclick", StringComparison.OrdinalIgnoreCase))
+        : AdditionalAttributes;
 }

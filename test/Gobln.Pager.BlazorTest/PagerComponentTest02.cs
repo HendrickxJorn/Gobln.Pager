@@ -80,4 +80,59 @@ public class PagerComponentTests02 : BunitContext
         Assert.Equal("5", current.TextContent.Trim());
         Assert.True(current.ParentElement!.ClassList.Contains("active"));
     }
+
+    [Fact]
+    public void DisabledItems_AreSpans()
+    {
+        // A disabled link is still announced as a working link and can still be focused, so
+        // First/Previous on the first page and the ellipsis are spans (Bootstrap 5.3).
+        var testPage = new TestPage { PageIndex = 1, TotalPageCount = 10, HasPaging = true };
+
+        var cut = Render<Blazor.Pager>(
+          parameters =>
+            parameters
+              .Add(c => c.Page, testPage)
+              .Add(c => c.BoundaryCount, 1)
+              .Add(c => c.ShowEllipsis, true)
+        );
+
+        var disabled = cut.FindAll("li.disabled");
+
+        Assert.Equal(["First", "Previous", "..."], disabled.Select(li => li.TextContent.Trim()));
+
+        Assert.All(disabled, li =>
+        {
+            var content = Assert.Single(li.Children);
+
+            Assert.Equal("SPAN", content.TagName);
+            Assert.True(content.ClassList.Contains("page-link"));
+        });
+
+        // Everything else stays a link
+        Assert.All(cut.FindAll("li:not(.disabled)"), li => Assert.Equal("A", Assert.Single(li.Children).TagName));
+    }
+
+    [Fact]
+    public void DisabledItems_HaveNoClickHandler()
+    {
+        // Next/Last on the last page and the ellipsis must not react to a click at all
+        var testPage = new TestPage { PageIndex = 10, TotalPageCount = 10, HasPaging = true };
+
+        var cut = Render<Blazor.Pager>(
+          parameters =>
+            parameters
+              .Add(c => c.Page, testPage)
+              .Add(c => c.BoundaryCount, 1)
+              .Add(c => c.ShowEllipsis, true)
+        );
+
+        var disabled = cut.FindAll("li.disabled");
+
+        Assert.Equal(["...", "Next", "Last"], disabled.Select(li => li.TextContent.Trim()));
+
+        Assert.All(disabled, li => Assert.False(li.HasAttribute("blazor:onclick")));
+
+        // ... while the items that go somewhere keep theirs
+        Assert.All(cut.FindAll("li:not(.disabled)"), li => Assert.True(li.HasAttribute("blazor:onclick")));
+    }
 }
