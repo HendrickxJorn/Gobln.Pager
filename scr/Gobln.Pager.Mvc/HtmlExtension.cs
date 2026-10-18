@@ -6,6 +6,8 @@ using System.Web.Mvc;
 
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 #endif
 
@@ -34,7 +36,11 @@ public static class HtmlExtension
         public IHtmlContent Pager(IPage page)
 #endif
         {
+#if NETFRAMEWORK
             return Pager(html, page, PagerSettings.DefaultPagerOptions);
+#else
+            return Pager(html, page, DefaultPagerOptions(html));
+#endif
         }
 
         /// <summary>
@@ -86,6 +92,18 @@ public static class HtmlExtension
             return pagerRenderer.Render(page);
         }
     }
+
+#if !NETFRAMEWORK
+    /// <summary>
+    /// The defaults this app registered with AddMvcPager, from the request's services. The
+    /// library defaults when there are none, or no request to get the services from.
+    /// </summary>
+    private static IPagerOptions DefaultPagerOptions(IHtmlHelper html)
+    {
+        return html.ViewContext?.HttpContext?.RequestServices?.GetService<IOptions<PagerOptions>>()?.Value
+            ?? PagerSettings.DefaultPagerOptions;
+    }
+#endif
 
     /// <summary>
     /// The url the page links are built on for this request. Returned as a new value and

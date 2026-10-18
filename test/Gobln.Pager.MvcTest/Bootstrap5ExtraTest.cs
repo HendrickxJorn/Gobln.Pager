@@ -156,16 +156,16 @@ public class Bootstrap5ExtraTest
          			<span class="page-link">Previous</span>
          		</li>
          		<li class="active page-item">
-         			<a aria-current="page" class="page-link" href="http://pager.com/?pageIndex=1">1</a>
+         			<a aria-current="page" class="page-link" href="/?pageIndex=1">1</a>
          		</li>
          		<li class="page-item">
-         			<a class="page-link" href="http://pager.com/?pageIndex=2">2</a>
+         			<a class="page-link" href="/?pageIndex=2">2</a>
          		</li>
          		<li class="page-item">
-         			<a class="page-link" href="http://pager.com/?pageIndex=3">3</a>
+         			<a class="page-link" href="/?pageIndex=3">3</a>
          		</li>
          		<li class="page-item">
-         			<a class="page-link" href="http://pager.com/?pageIndex=2">Next</a>
+         			<a class="page-link" href="/?pageIndex=2">Next</a>
          		</li>
          	</ul>
          </nav>
@@ -197,22 +197,22 @@ public class Bootstrap5ExtraTest
          			<span class="page-link">Previous</span>
          		</li>
          		<li class="active page-item">
-         			<a aria-current="page" class="page-link" href="http://pager.com/search?pageIndex=1">1</a>
+         			<a aria-current="page" class="page-link" href="/search?pageIndex=1">1</a>
          		</li>
          		<li class="page-item">
-         			<a class="page-link" href="http://pager.com/search?pageIndex=2">2</a>
+         			<a class="page-link" href="/search?pageIndex=2">2</a>
          		</li>
          		<li class="page-item">
-         			<a class="page-link" href="http://pager.com/search?pageIndex=3">3</a>
+         			<a class="page-link" href="/search?pageIndex=3">3</a>
          		</li>
          		<li class="page-item">
-         			<a class="page-link" href="http://pager.com/search?pageIndex=4">4</a>
+         			<a class="page-link" href="/search?pageIndex=4">4</a>
          		</li>
          		<li class="page-item">
-         			<a class="page-link" href="http://pager.com/search?pageIndex=5">5</a>
+         			<a class="page-link" href="/search?pageIndex=5">5</a>
          		</li>
          		<li class="page-item">
-         			<a class="page-link" href="http://pager.com/search?pageIndex=2">Next</a>
+         			<a class="page-link" href="/search?pageIndex=2">Next</a>
          		</li>
          	</ul>
          </nav>
@@ -252,9 +252,36 @@ public class Bootstrap5ExtraTest
 
         Assert.Null(shared.HRefUrl);
 
-        Assert.Contains("http://first.test/orders?customer=1", first);
-        Assert.Contains("http://second.test/products?pageIndex=2", second);
-        Assert.DoesNotContain("first.test", second);
+        Assert.Contains("""href="/orders?customer=1&amp;pageIndex=2">2</a>""", first);
+        Assert.Contains("""href="/products?pageIndex=2">2</a>""", second);
+        Assert.DoesNotContain("orders", second);
+    }
+
+    [Fact]
+    public void UrlContextHostHeaderTest01()
+    {
+        // The links are relative. The host of a request comes from its Host header, which the
+        // client controls: in absolute links, a forged host would end up in the page (and in
+        // any cache that stores it).
+        var result = _helperHtml.CreateHtmlHelper(url: "http://evil.test/orders")
+            .Pager(_page3, new PagerOptions())
+            .ToHtmlString();
+
+        Assert.Contains("""href="/orders?pageIndex=2">2</a>""", result);
+        Assert.DoesNotContain("evil.test", result);
+    }
+
+    [Fact]
+    public void UrlContextDoubleSlashPathTest01()
+    {
+        // A path starting with "//" must not come out as "//evil.test/...": a browser reads
+        // that as a link to the host evil.test
+        var result = _helperHtml.CreateHtmlHelper(url: "http://pager.com//evil.test/orders")
+            .Pager(_page3, new PagerOptions())
+            .ToHtmlString();
+
+        Assert.DoesNotContain("evil.test", result);
+        Assert.Contains("""href="/orders?pageIndex=2">2</a>""", result);
     }
 
     [Fact]
@@ -266,20 +293,19 @@ public class Bootstrap5ExtraTest
             .Pager(_page3, new PagerOptions())
             .ToHtmlString();
 
-        Assert.Contains("""href="http://pager.com/shop/orders?pageIndex=2">2</a>""", result);
+        Assert.Contains("""href="/shop/orders?pageIndex=2">2</a>""", result);
     }
 
     [Fact]
     public void UrlContextWithoutHostTest01()
     {
-        // A request without a Host header (HTTP/1.0) has no absolute url to build the links
-        // on. The links are then "#", as they are without a request, instead of throwing.
+        // A request without a Host header (HTTP/1.0) still has a path: relative links need
+        // no host, so it gets the same working links as any other request.
         var result = _helperHtml.CreateHtmlHelper(url: "http://pager.com/orders", hasHost: false)
             .Pager(_page3, new PagerOptions())
             .ToHtmlString();
 
-        Assert.Contains("""href="#">2</a>""", result);
-        Assert.DoesNotContain("pageIndex", result);
+        Assert.Contains("""href="/orders?pageIndex=2">2</a>""", result);
     }
 
     [Fact]

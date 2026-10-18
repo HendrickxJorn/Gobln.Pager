@@ -51,7 +51,7 @@ public class PagerRendererTest
             .Pager(_page3, new PagerOptions { ButtonNextLinkLabel = "Volgende" }, new RecordingRenderer())
             .ToHtmlString();
 
-        Assert.Equal("3|Volgende|http://pager.test/orders", result);
+        Assert.Equal("3|Volgende|/orders", result);
     }
 
     [Fact]

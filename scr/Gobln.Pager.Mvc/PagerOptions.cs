@@ -8,6 +8,14 @@ public class PagerOptions : IPagerOptions
 
     protected PagerOptions(IPagerOptions other)
     {
+        CopyFrom(other);
+    }
+
+    /// <summary>
+    /// Overwrite every option with the one of <paramref name="other"/>
+    /// </summary>
+    internal void CopyFrom(IPagerOptions other)
+    {
         this.ShowButtonNextLink = other.ShowButtonNextLink;
         this.ShowButtonLastLink = other.ShowButtonLastLink;
         this.ShowPagerButtonLinks = other.ShowPagerButtonLinks;

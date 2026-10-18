@@ -14,17 +14,21 @@ namespace Gobln.Pager.Mvc.Infrastructure;
 
 internal static class UrlHelper
 {
+    // The current url is given back relative: its path and query only. The host of a request
+    // comes from its Host header, which the client controls, so it must not end up in the page.
+
 #if NETFRAMEWORK
 
-    public static bool HasCurrentUrlString(HtmlHelper html) => (html.ViewContext.HttpContext.Request.Url?.AbsoluteUri ?? "#") != "#";
+    public static bool HasCurrentUrlString(HtmlHelper html) => html.ViewContext.HttpContext.Request.Url is not null;
 
     public static string GetCurrentUrlString(HtmlHelper html, string[]? excludeParameters = null)
-    { 
-        var uriBuilder = new UriBuilder(html.ViewContext.HttpContext.Request.Url.AbsoluteUri);
+    {
+        // PathAndQuery includes the application path of an app in an IIS virtual directory
+        var currentUrl = html.ViewContext.HttpContext.Request.Url.PathAndQuery;
 
 #else
-    // A request without a Host header (HTTP/1.0) has no absolute url to build on
-    public static bool HasCurrentUrlString(IHtmlHelper html) => html.ViewContext?.HttpContext?.Request is { Host.HasValue: true };
+
+    public static bool HasCurrentUrlString(IHtmlHelper html) => html.ViewContext?.HttpContext?.Request is not null;
 
     public static string GetCurrentUrlString(IHtmlHelper html, string[]? excludeParameters = null)
     {
@@ -32,10 +36,11 @@ internal static class UrlHelper
 
         // PathBase is the path the app is mounted on (an IIS virtual directory, UsePathBase).
         // It is not part of Path, and links without it leave the app.
-        var absoluteUri = new Uri($"{request.Scheme}://{request.Host}{request.PathBase}{request.Path}{request.QueryString}");
-
-        var uriBuilder = new UriBuilder(absoluteUri);
+        var currentUrl = $"{request.PathBase}{request.Path}{request.QueryString}";
 #endif
+
+        // Built on the placeholder, so a path such as "//other.test/x" can't become a link to another host
+        var uriBuilder = new UriBuilder(new Uri(PlaceholderBase, currentUrl));
 
         var parseQueryString = HttpUtility.ParseQueryString(uriBuilder.Query);
 
@@ -57,7 +62,7 @@ internal static class UrlHelper
 
         uriBuilder.Query = parseQueryString.ToString();
 
-        return uriBuilder.Uri.AbsoluteUri;
+        return uriBuilder.Uri.PathAndQuery;
     }
 
     // Only there to give a relative url something to build on; it never ends up in a link

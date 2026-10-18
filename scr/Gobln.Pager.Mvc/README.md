@@ -94,7 +94,7 @@ builder.Services.AddMvcPager(options =>
 });
 ```
 
-`AddMvcPager(new PagerOptions { ... })` works too. It copies the options, so later changes to that object don't affect the defaults.
+`AddMvcPager(new PagerOptions { ... })` works too. It copies the options, so later changes to that object don't affect the defaults. The defaults are registered in the app's services, so two apps in one process (two test hosts, for example) each keep their own.
 
 ASP.NET MVC 5, in `Application_Start`:
 
@@ -120,7 +120,7 @@ An options object can be shared between views and requests (for example a `stati
 | `ButtonFirstLinkIcon`, `ButtonPreviousLinkIcon`, `ButtonNextLinkIcon`, `ButtonLastLinkIcon` | `null` | Shown instead of the label. Inserted as markup, not escaped. The label becomes the button's `aria-label`. |
 | `DisplayActive` | `true` | Mark the current page number: `active` on its `<li>` and `aria-current="page"` on its link. It stays a working link, as in Bootstrap 5.3. |
 | `AllowDisabledPageLink` | `true` | Disable the buttons that point at the current page (First and Previous on the first page, for example), and the current page number when `DisplayActive` is `false`. A disabled item gets the `disabled` class and renders as a `<span>`, so it can't be clicked. When `false`, they stay working links. |
-| `HRefUrl` | `null` | The url the links are built on. `null`: the current request's url. `"#"`: every link is `#`, for pagers driven by JavaScript. |
+| `HRefUrl` | `null` | The url the links are built on. `null`: the current request's path and query, as a relative link (the host isn't used: it comes from the client's `Host` header). `"#"`: every link is `#`, for pagers driven by JavaScript. |
 | `PageIndexUrlName` | `"pageIndex"` | The query-string key for the page index. |
 | `PageIndexDataName` | `null` | When set, links also get a `data-{name}="{page index}"` attribute. |
 | `NavTagHtmlAttributes` | `null` | Attributes for the `<nav>`. Without an `aria-label` or `aria-labelledby`, the pager adds `aria-label="Page navigation"`. |

@@ -26,7 +26,7 @@ With one-off options:
 @Html.Pager(Model, new PagerOptions { SiblingCount = 2, BoundaryCount = 2 })
 ```
 
-When no explicit `HRefUrl` is set on the options, the helper resolves the url from the current request (via an internal `UrlHelper`), so page links point back to the current page/action with an updated page-index query parameter. The rest of the query string is kept, so filters and sorting survive paging, and so is the path base of an app hosted under a virtual directory. On ASP.NET Core, a request without a `Host` header has no url to build on; its links are `#`. The resolved url is passed to the renderer separately and never written back into the options, so one options instance can be shared between views and requests.
+When no explicit `HRefUrl` is set on the options, the helper resolves the url from the current request (via an internal `UrlHelper`), so page links point back to the current page/action with an updated page-index query parameter. The rest of the query string is kept, so filters and sorting survive paging, and so is the path base of an app hosted under a virtual directory. The links are relative (path and query, no scheme or host): a request's host comes from its `Host` header, which the client controls, so it never ends up in the page. The resolved url is passed to the renderer separately and never written back into the options, so one options instance can be shared between views and requests.
 
 ## `PagerOptions`
 
@@ -46,7 +46,7 @@ Implements `IPagerOptions`; construct directly or via `Clone()`. Defaults shown:
 | `ShowIndexAsRange` | `false` | Show the item range (`11 - 20`) instead of the page index. The last range ends at the last item. |
 | `ButtonFirstLinkLabel` / `ButtonPreviousLinkLabel` / `ButtonNextLinkLabel` / `ButtonLastLinkLabel` | `"First"` / `"Previous"` / `"Next"` / `"Last"` | Link text. Escaped on every target. |
 | `ButtonFirstLinkIcon` / `ButtonPreviousLinkIcon` / `ButtonNextLinkIcon` / `ButtonLastLinkIcon` | `null` | Icon markup rendered in place of the link text, not escaped (for example `&laquo;` or `<i class="bi bi-chevron-left"></i>`); the label then becomes the `aria-label`. |
-| `HRefUrl` | `null` | Explicit URL for page links. `null` = current request URL; `"#"` = all links point to `#`. |
+| `HRefUrl` | `null` | Explicit URL for page links. `null` = the current request's path and query, as a relative link; `"#"` = all links point to `#`. |
 | `PageIndexUrlName` | `"pageIndex"` | Query-string key used for the page index in generated links. |
 | `PageIndexDataName` | `null` | When set, links also get a `data-{name}="{page index}"` attribute, for pagers driven by JavaScript. |
 | `DisplayActive` | `true` | Mark the current page number: `active` on its `<li>` and `aria-current="page"` on its link. |
@@ -68,7 +68,7 @@ builder.Services.AddMvcPager(new PagerOptions { SiblingCount = 2 });
 builder.Services.AddMvcPager(options => options.BoundaryCount = 2);
 ```
 
-These set the defaults used whenever `Html.Pager(page)` is called without explicit options. `AddMvcPager(options)` accepts any `IPagerOptions` and stores a copy.
+These set the defaults used whenever `Html.Pager(page)` is called without explicit options. `AddMvcPager(options)` accepts any `IPagerOptions` and stores a copy. The defaults are registered as options in the app's services (`IOptions<PagerOptions>`), not in a process-wide static, so two apps in one process (two test hosts, for example) each keep their own.
 
 `AddMvcPager` is only compiled for the modern .NET targets. On .NET Framework, set the public `PagerSettings.DefaultPagerOptions` instead, for example in `Application_Start`:
 

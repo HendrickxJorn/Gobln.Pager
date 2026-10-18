@@ -13,7 +13,7 @@ public static class PagerMvcServiceCollectionExtensions
         }
 
         /// <summary>
-        /// Use <paramref name="pagerOptions"/> as the defaults for <c>Html.Pager(page)</c>.
+        /// Use <paramref name="pagerOptions"/> as this app's defaults for <c>Html.Pager(page)</c>.
         /// The options are copied, so any <see cref="IPagerOptions"/> works and later changes
         /// to <paramref name="pagerOptions"/> don't affect the defaults.
         /// </summary>
@@ -21,16 +21,22 @@ public static class PagerMvcServiceCollectionExtensions
         {
             ArgumentNullException.ThrowIfNull(pagerOptions, nameof(pagerOptions));
 
-            PagerSettings.DefaultPagerOptions = PagerOptions.CopyOf(pagerOptions);
+            // Copied now, not when the options are first read, so later changes don't reach them
+            var copy = PagerOptions.CopyOf(pagerOptions);
+
+            services.Configure<PagerOptions>(options => options.CopyFrom(copy));
 
             return services;
         }
 
+        /// <summary>
+        /// Change this app's defaults for <c>Html.Pager(page)</c>
+        /// </summary>
         public IServiceCollection AddMvcPager(Action<IPagerOptions> pagerOptions)
         {
             ArgumentNullException.ThrowIfNull(pagerOptions, nameof(pagerOptions));
 
-            pagerOptions.Invoke(PagerSettings.DefaultPagerOptions);
+            services.Configure<PagerOptions>(options => pagerOptions(options));
 
             return services;
         }
