@@ -147,6 +147,37 @@ var page = items.ToPage(filter);
 
 ---
 
+## `PageWindow` — page numbers for a pager
+
+A static helper that works out which page numbers a pager shows. The [Blazor `Pager` component](Blazor-Integration.md) and the [MVC `Html.Pager()` helper](Mvc-Integration.md) both render what it returns, and a pager you render yourself can use it too.
+
+```csharp
+IReadOnlyList<int?> PageWindow.GetPageNumbers(int pageIndex, int totalPageCount, int siblingCount, int boundaryCount, bool showEllipsis);
+```
+
+| Parameter | Description |
+|---|---|
+| `pageIndex` | The current page. |
+| `totalPageCount` | Total number of pages. |
+| `siblingCount` | Page numbers shown on each side of the current page. Below `0` counts as `0`. |
+| `boundaryCount` | Page numbers always shown at the start and at the end. Below `0` counts as `0`. |
+| `showEllipsis` | Mark the places where page numbers are skipped. |
+
+The result holds the page numbers in order, with `null` where an ellipsis goes. With `showEllipsis`, the list has the same number of entries on every page, and an ellipsis that would hide a single page shows that page instead.
+
+```csharp
+PageWindow.GetPageNumbers(pageIndex: 5, totalPageCount: 10, siblingCount: 1, boundaryCount: 1, showEllipsis: true);
+// 1, null, 4, 5, 6, null, 10
+
+PageWindow.GetPageNumbers(pageIndex: 4, totalPageCount: 10, siblingCount: 1, boundaryCount: 1, showEllipsis: true);
+// 1, 2, 3, 4, 5, null, 10
+
+PageWindow.GetPageNumbers(pageIndex: 5, totalPageCount: 10, siblingCount: 1, boundaryCount: 1, showEllipsis: false);
+// 1, 4, 5, 6, 10
+```
+
+---
+
 ## Validation rules
 
 Pagination parameters are validated wherever they're accepted (constructors, extension methods):

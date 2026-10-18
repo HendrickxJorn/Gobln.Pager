@@ -9,7 +9,7 @@ Targets `net8.0` and `net10.0`. Provides a single `<Pager>` component (namespace
 | `Page` | `IPage` | *(required)* | The page whose `PageIndex`/`TotalPageCount` drive the rendered controls. Throws `ArgumentNullException` if `null`. |
 | `SiblingCount` | `int` | `1` | Number of page links shown on each side of the current page. |
 | `BoundaryCount` | `int` | `0` | Number of page links always shown at the start and end of the range. |
-| `ShowEllipsis` | `bool` | `false` | Whether to render a disabled `"..."` item between the boundary and sibling ranges when they don't touch. |
+| `ShowEllipsis` | `bool` | `false` | Whether to render a disabled `"..."` item where page numbers are skipped. An ellipsis that would hide a single page shows that page instead, the same as the MVC pager. |
 | `PageIndexChanged` | `EventCallback<int>` | — | Raised with the new page index whenever the user clicks a page link. |
 
 > The change event is `PageIndexChanged`, not `PageChanging`.

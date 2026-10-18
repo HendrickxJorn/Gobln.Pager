@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Gobln.Pager;
+﻿namespace Gobln.Pager;
 
 internal static class Validator
 {

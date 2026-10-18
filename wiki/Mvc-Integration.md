@@ -68,9 +68,11 @@ These set `PagerSettings.DefaultPagerOptions`, used whenever `Html.Pager(page)` 
 
 ## Custom rendering via `IPagerRenderer`
 
-`Html.Pager(page, pagerRenderer)` / `Html.Pager(page, pagerOptions, pagerRenderer)` let you swap in your own `IPagerRenderer` / `IPagerRenderer<T>` implementation. The built-in `PagerRenderer : IPagerRenderer<IPagerOptions>` builds the `<nav><ul class="pagination">…</ul></nav>` markup via a set of `virtual TagCreator*` methods, so you can subclass it to change individual pieces of the markup instead of writing a renderer from scratch.
+`Html.Pager(page, pagerOptions, pagerRenderer)` lets you swap in your own `IPagerRenderer<T>` implementation. The built-in `PagerRenderer : IPagerRenderer<IPagerOptions>` builds the `<nav><ul class="pagination">…</ul></nav>` markup via a set of `virtual TagCreator*` methods, so you can subclass it to change individual pieces of the markup instead of writing a renderer from scratch.
 
-`IPagerRenderer<T>.SetOptions(T options, string hRefUrl)` receives the options and the url already resolved for the current request. Inside `PagerRenderer`, use `HRefUrl` (or `UrlCreator(pageIndex)`) rather than `PagerOptions.HRefUrl`, which may still be `null`.
+`IPagerRenderer<T>.Render(IPage page, T options, string hRefUrl)` receives the page, the options and the url already resolved for the current request. Inside `PagerRenderer`'s overrides, use `HRefUrl` (or `UrlCreator(pageIndex)`) rather than `PagerOptions.HRefUrl`, which may still be `null`. A `PagerRenderer` keeps nothing of a render on itself, so one instance can be shared between views and requests.
+
+`Html.Pager(page, pagerRenderer)` is for an `IPagerRenderer` that needs nothing but the page: its `Render(IPage page)` gets no options and no url. `PagerRenderer` is not one, so pass it together with options.
 
 ## Display helpers
 

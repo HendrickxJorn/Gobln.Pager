@@ -68,9 +68,7 @@ public static class HtmlExtension
             ArgumentNullException.ThrowIfNull(pagerOptions);
 #endif
 
-            pagerRenderer.SetOptions(pagerOptions, ResolveHRefUrl(html, pagerOptions.HRefUrl));
-
-            return Pager(html, page, pagerRenderer);
+            return pagerRenderer.Render(page, pagerOptions, ResolveHRefUrl(html, pagerOptions.HRefUrl));
         }
 
         /// <summary>

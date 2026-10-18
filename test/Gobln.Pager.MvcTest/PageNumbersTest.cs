@@ -54,6 +54,19 @@ public class PageNumbersTest
     }
 
     [Fact]
+    public void NegativeCounts_AreTreatedAsZero()
+    {
+        var numbers = RenderPageNumbers(10, 5, o =>
+        {
+            o.SiblingCount = -1;
+            o.BoundaryCount = -1;
+            o.ShowEllipsis = false;
+        });
+
+        Assert.Equal(["5"], numbers);
+    }
+
+    [Fact]
     public void ShowIndexAsRange_LastRangeEndsAtTheLastItem()
     {
         var page = Enumerable.Range(1, 12).ToPage(1, 5);

@@ -83,13 +83,9 @@ namespace WebApplicationMvc.Controllers
         /// </summary>
         private static string RenderPager(IPage page)
         {
-            var renderer = new PagerRenderer();
-
-            renderer.SetOptions(JsonPagerOptions, "#");
-
             using var writer = new StringWriter();
 
-            renderer.Render(page).WriteTo(writer, HtmlEncoder.Default);
+            new PagerRenderer().Render(page, JsonPagerOptions, "#").WriteTo(writer, HtmlEncoder.Default);
 
             return writer.ToString();
         }

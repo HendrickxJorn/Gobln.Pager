@@ -12,17 +12,31 @@ namespace Gobln.Pager.Mvc;
 
 public class PagerRenderer() : IPagerRenderer<IPagerOptions>
 {
-    internal IPage InternalPage { get; set; } = default!;
+    // The page, options and url below are those of the render in progress. Outside a render
+    // they are an empty page, the default options and no url.
 
-    public IPagerOptions PagerOptions { get; internal set; } = default!;
+    internal IPage InternalPage { get; private set; } = new Page();
+
+    public IPagerOptions PagerOptions { get; private set; } = PagerSettings.DefaultPagerOptions;
 
     /// <summary>
     /// The url the page links are built on for this render: <see cref="IPagerOptions.HRefUrl"/>,
     /// or the current request's url when that is not set. "#" makes every link "#".
     /// </summary>
-    public string HRefUrl { get; internal set; } = "#";
+    public string HRefUrl { get; private set; } = "#";
 
-    public void SetOptions(IPagerOptions options, string hRefUrl)
+    /// <summary>
+    /// Render the pager for <paramref name="page"/>. Nothing of a render is kept on the
+    /// renderer, so one renderer can be shared between views and requests.
+    /// </summary>
+    /// <param name="page">The page to render the pager for</param>
+    /// <param name="options">The options. Read only, never changed: they may be shared between requests.</param>
+    /// <param name="hRefUrl">The url the page links are built on, already resolved for the current request. "#" makes every link "#".</param>
+#if NETFRAMEWORK
+    public virtual MvcHtmlString Render(IPage page, IPagerOptions options, string hRefUrl)
+#else
+    public virtual IHtmlContent Render(IPage page, IPagerOptions options, string hRefUrl)
+#endif
     {
 #if NETFRAMEWORK
         if (options is null)
@@ -38,19 +52,10 @@ public class PagerRenderer() : IPagerRenderer<IPagerOptions>
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(hRefUrl);
 #endif
-        PagerOptions = options;
-        HRefUrl = hRefUrl;
-    }
 
-#if NETFRAMEWORK
-    public virtual MvcHtmlString Render(IPage page)
-#else
-    public virtual IHtmlContent Render(IPage page)
-#endif
-    {
-        if (PagerOptions.ShowPager != WhenToShowEnum.Always
+        if (options.ShowPager != WhenToShowEnum.Always
             && (page == null
-                || !(page.HasPaging && PagerOptions.ShowPager == WhenToShowEnum.IfNecessary)))
+                || !(page.HasPaging && options.ShowPager == WhenToShowEnum.IfNecessary)))
         {
 #if NETFRAMEWORK
             return MvcHtmlString.Create(string.Empty);
@@ -59,12 +64,18 @@ public class PagerRenderer() : IPagerRenderer<IPagerOptions>
 #endif
         }
 
-        InternalPage = page;
+        // The page, options and url of this render go on a copy of the renderer, never on the
+        // renderer itself. Renders that share a renderer then can't get each other's.
+        var renderer = (PagerRenderer)MemberwiseClone();
+
+        renderer.InternalPage = page;
+        renderer.PagerOptions = options;
+        renderer.HRefUrl = hRefUrl;
 
 #if NETFRAMEWORK
-        return MvcHtmlString.Create(RenderPager().ToString(TagRenderMode.Normal));
+        return MvcHtmlString.Create(renderer.RenderPager().ToString(TagRenderMode.Normal));
 #else
-        return RenderPager();
+        return renderer.RenderPager();
 #endif
     }
 
@@ -314,84 +325,25 @@ public class PagerRenderer() : IPagerRenderer<IPagerOptions>
     public virtual IEnumerable<TagBuilder> PageNumbersCreator()
     {
         var tagBuilderList = new List<TagBuilder>();
-     
-        var elipseModifier = PagerOptions.ShowEllipsis ? 1 : 0;
 
-        var startNumber =
-            Math.Max(
-                Math.Min(
-                    // Original start
-                    InternalPage.PageIndex - PagerOptions.SiblingCount,
-                    // Page boundery +/- elipse
-                    InternalPage.TotalPageCount - PagerOptions.BoundaryCount - PagerOptions.SiblingCount * 2 - elipseModifier
-                ),
-                // After start +/- elipse
-                PagerOptions.BoundaryCount + 1 + elipseModifier
-            );
+        var pageNumbers = PageWindow.GetPageNumbers(
+            InternalPage.PageIndex,
+            InternalPage.TotalPageCount,
+            PagerOptions.SiblingCount,
+            PagerOptions.BoundaryCount,
+            PagerOptions.ShowEllipsis);
 
-        var endNumber = 
-            Math.Min(
-                Math.Max(
-                    // Original end
-                    InternalPage.PageIndex + PagerOptions.SiblingCount,
-                    // Page boundery +/- elipse
-                    PagerOptions.BoundaryCount + PagerOptions.SiblingCount * 2 + 1 + elipseModifier
-
-                ),
-                // Before end +/- elipse
-                InternalPage.TotalPageCount - PagerOptions.BoundaryCount - elipseModifier
-            );
-
-        var firstIndex = Math.Min(PagerOptions.BoundaryCount, InternalPage.TotalPageCount) - 1 + 1;
-        var lastIndex = InternalPage.TotalPageCount - Math.Max(InternalPage.TotalPageCount - PagerOptions.BoundaryCount + 1, PagerOptions.BoundaryCount + 1) + 1;
-
-        if (firstIndex > 0)
+        foreach (var pageNumber in pageNumbers)
         {
-            for (int index = 1; index <= firstIndex; index++)
+            if (pageNumber is int index)
             {
                 tagBuilderList.Add(PrivatePageNumberCreator(index));
             }
-        }
-
-        if (PagerOptions.ShowEllipsis)
-        {
-            if (startNumber > PagerOptions.BoundaryCount + 2)
+            else
             {
                 var li = TagCreatorLi(true);
                 li.InnerHtmlAppend(TagCreatorSpan("..."));
                 tagBuilderList.Add(li);
-            }
-            else if (PagerOptions.BoundaryCount + 1 < InternalPage.TotalPageCount - PagerOptions.BoundaryCount)
-            {
-                tagBuilderList.Add(PrivatePageNumberCreator(PagerOptions.BoundaryCount + 1));
-            }
-        }
-
-        for (int index = startNumber; index <= endNumber; index++)
-        {
-            tagBuilderList.Add(PrivatePageNumberCreator(index));
-        }
-
-        if (PagerOptions.ShowEllipsis)
-        {
-            if (endNumber < InternalPage.TotalPageCount - PagerOptions.BoundaryCount - 1)
-            {
-                var li = TagCreatorLi(true);
-                li.InnerHtmlAppend(TagCreatorSpan("..."));
-                tagBuilderList.Add(li);
-            }
-            else if (InternalPage.TotalPageCount - PagerOptions.BoundaryCount > PagerOptions.BoundaryCount)
-            {
-                tagBuilderList.Add(PrivatePageNumberCreator(InternalPage.TotalPageCount - PagerOptions.BoundaryCount));
-            }
-        }
-
-        if (lastIndex <= InternalPage.TotalPageCount)
-        {
-            // Start after the first boundary, so overlapping boundaries don't render a page twice
-            for (int index = Math.Max(InternalPage.TotalPageCount - PagerOptions.BoundaryCount + 1, firstIndex + 1); index <= InternalPage.TotalPageCount; index++)
-            {
-                tagBuilderList.Add(PrivatePageNumberCreator(index));
             }
         }
 

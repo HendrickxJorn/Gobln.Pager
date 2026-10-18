@@ -188,9 +188,11 @@ To change part of the markup, subclass `PagerRenderer` and override its `virtual
 @Html.Pager(Model, new PagerOptions(), new MyPagerRenderer())
 ```
 
-Inside the renderer, `PagerOptions` holds the options and `HRefUrl` holds the url resolved for the current request. Build links with `UrlCreator(pageIndex)`: it returns `null` when there is no url to link to, and the link should then fall back to `#`.
+Inside the overrides, `PagerOptions` holds the options and `HRefUrl` holds the url resolved for the current request. Build links with `UrlCreator(pageIndex)`: it returns `null` when there is no url to link to, and the link should then fall back to `#`.
 
-To render something that isn't Bootstrap-shaped at all, implement `IPagerRenderer<T>` yourself. `SetOptions(options, hRefUrl)` receives the options and the resolved url before each `Render(page)`.
+A `PagerRenderer` keeps nothing of a render on itself, so one instance (a `static readonly` field, for example) can be shared between views and requests.
+
+To render something that isn't Bootstrap-shaped at all, implement `IPagerRenderer<T>` yourself. Its `Render(page, options, hRefUrl)` receives the page, the options and the url resolved for the current request.
 
 ## Behaviour to know about
 

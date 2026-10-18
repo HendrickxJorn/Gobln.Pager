@@ -19,7 +19,10 @@ namespace Gobln.Pager.MvcTest.Helper
 {
     public class HelperHtml
     {
-        public IHtmlHelper CreateHtmlHelper(string? url = null)
+        /// <param name="url">The url of the request, as the browser sent it. Null: no request at all.</param>
+        /// <param name="pathBase">The path the app is mounted on. It is then left out of the request's Path.</param>
+        /// <param name="hasHost">False for a request without a Host header.</param>
+        public IHtmlHelper CreateHtmlHelper(string? url = null, string? pathBase = null, bool hasHost = true)
         {
             var mockHtmlHelper = new Mock<IHtmlHelper>();
 
@@ -31,7 +34,7 @@ namespace Gobln.Pager.MvcTest.Helper
             {
                 var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary());
 
-                var vc = new ViewContext(CreateMockActionContext(url), 
+                var vc = new ViewContext(CreateMockActionContext(url, pathBase, hasHost),
                     new Mock<Microsoft.AspNetCore.Mvc.ViewEngines.IView>().Object,
                     viewData,
                     new Mock<ITempDataDictionary>().Object,
@@ -44,7 +47,7 @@ namespace Gobln.Pager.MvcTest.Helper
             return mockHtmlHelper.Object;
         }
 
-        public static ActionContext CreateMockActionContext(string? url = null)
+        public static ActionContext CreateMockActionContext(string? url = null, string? pathBase = null, bool hasHost = true)
         {
             var mockHttpContext = new Mock<HttpContext>();
             var mockHttpRequest = new Mock<HttpRequest>();
@@ -56,8 +59,13 @@ namespace Gobln.Pager.MvcTest.Helper
             {
                 var uri = new Uri(url);
                 mockHttpRequest.Setup(r => r.Scheme).Returns(uri.Scheme);
-                mockHttpRequest.Setup(r => r.Host).Returns(new HostString(uri.Host));
-                mockHttpRequest.Setup(r => r.Path).Returns(new PathString(uri.AbsolutePath));
+                mockHttpRequest.Setup(r => r.Host).Returns(hasHost ? new HostString(uri.Host) : default);
+                mockHttpRequest.Setup(r => r.PathBase).Returns(new PathString(pathBase));
+
+                // Like the server does, the app only gets the part of the path after its path base
+                var path = pathBase is null ? uri.AbsolutePath : uri.AbsolutePath.Substring(pathBase.Length);
+
+                mockHttpRequest.Setup(r => r.Path).Returns(new PathString(path));
                 mockHttpRequest.Setup(r => r.QueryString).Returns(new QueryString(uri.Query));
             }
 

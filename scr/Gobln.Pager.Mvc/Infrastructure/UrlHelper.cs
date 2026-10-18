@@ -23,11 +23,16 @@ internal static class UrlHelper
         var uriBuilder = new UriBuilder(html.ViewContext.HttpContext.Request.Url.AbsoluteUri);
 
 #else
-    public static bool HasCurrentUrlString(IHtmlHelper html) => html.ViewContext?.HttpContext?.Request is not null;
+    // A request without a Host header (HTTP/1.0) has no absolute url to build on
+    public static bool HasCurrentUrlString(IHtmlHelper html) => html.ViewContext?.HttpContext?.Request is { Host.HasValue: true };
 
     public static string GetCurrentUrlString(IHtmlHelper html, string[]? excludeParameters = null)
     {
-        var absoluteUri = new Uri($"{html.ViewContext.HttpContext.Request.Scheme}://{html.ViewContext.HttpContext.Request.Host}{html.ViewContext.HttpContext.Request.Path}{html.ViewContext.HttpContext.Request.QueryString}");
+        var request = html.ViewContext.HttpContext.Request;
+
+        // PathBase is the path the app is mounted on (an IIS virtual directory, UsePathBase).
+        // It is not part of Path, and links without it leave the app.
+        var absoluteUri = new Uri($"{request.Scheme}://{request.Host}{request.PathBase}{request.Path}{request.QueryString}");
 
         var uriBuilder = new UriBuilder(absoluteUri);
 #endif

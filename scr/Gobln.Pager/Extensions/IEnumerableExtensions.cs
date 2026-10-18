@@ -10,17 +10,6 @@ namespace Gobln.Pager;
 /// </summary>
 public static class IEnumerableExtensions
 {
-    internal static Page<T> PrivateToPage<T>(IEnumerable<T> source, int pageIndex, int pageSize, int totalItemCount, bool prePaged = false)
-    {
-        var pd = new PageDefinition(pageIndex, pageSize, totalItemCount);
-
-        return new Page<T>(
-            prePaged || pd.TotalItemCount < 1
-                ? source
-                : source.Skip(pd.SkipIndex).Take(pd.PageSize)
-            , pd);
-    }
-
     /// <summary>
     ///
     /// </summary>
@@ -28,6 +17,17 @@ public static class IEnumerableExtensions
     /// <param name="source">The elements of <typeparamref name="T"/></param>
     extension<T>(IEnumerable<T> source)
     {
+        internal Page<T> PrivateToPage(int pageIndex, int pageSize, int totalItemCount, bool prePaged = false)
+        {
+            var pd = new PageDefinition(pageIndex, pageSize, totalItemCount);
+
+            return new Page<T>(
+                prePaged || pd.TotalItemCount < 1
+                    ? source
+                    : source.Skip(pd.SkipIndex).Take(pd.PageSize)
+                , pd);
+        }
+
         #region ToPage
 
         /// <summary>

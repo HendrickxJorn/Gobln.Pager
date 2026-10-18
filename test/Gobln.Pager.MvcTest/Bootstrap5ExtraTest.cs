@@ -244,6 +244,31 @@ public class Bootstrap5ExtraTest
     }
 
     [Fact]
+    public void UrlContextPathBaseTest01()
+    {
+        // An app mounted on a path base (an IIS virtual directory, UsePathBase) only gets the
+        // rest of the path in Request.Path. Links built without the path base leave the app.
+        var result = _helperHtml.CreateHtmlHelper(url: "http://pager.com/shop/orders", pathBase: "/shop")
+            .Pager(_page3, new PagerOptions())
+            .ToHtmlString();
+
+        Assert.Contains("""href="http://pager.com/shop/orders?pageIndex=2">2</a>""", result);
+    }
+
+    [Fact]
+    public void UrlContextWithoutHostTest01()
+    {
+        // A request without a Host header (HTTP/1.0) has no absolute url to build the links
+        // on. The links are then "#", as they are without a request, instead of throwing.
+        var result = _helperHtml.CreateHtmlHelper(url: "http://pager.com/orders", hasHost: false)
+            .Pager(_page3, new PagerOptions())
+            .ToHtmlString();
+
+        Assert.Contains("""href="#">2</a>""", result);
+        Assert.DoesNotContain("pageIndex", result);
+    }
+
+    [Fact]
     public void UrlParameterPagerTest01()
     {
         var target = """

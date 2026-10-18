@@ -56,7 +56,7 @@ dotnet add package Gobln.Pager.Blazor
 - `Page` (required): The `IPage` to show, for example the `Page<T>` returned by `ToPage`. The pager reads its `PageIndex` and `TotalPageCount`. Marked with `[EditorRequired]`.
 - `SiblingCount` (int): Number of sibling pages to show on each side of the current page. Default: `1`.
 - `BoundaryCount` (int): Number of always visible pages at the beginning and end. Default: `0`.
-- `ShowEllipsis` (bool): Whether to show ellipsis (...) between ranges. Default: `false`.
+- `ShowEllipsis` (bool): Whether to show an ellipsis (...) where page numbers are skipped. An ellipsis that would hide a single page shows that page instead. Default: `false`.
 - `ClassName` (string): Additional CSS classes appended to the pagination `<ul>`. Default: `null`.
 - `PageIndexChanged` (EventCallback<int>): Raised when the user selects another page; provides the new page index.
 

@@ -3,160 +3,153 @@
 
 # Gobln.Pager
 
-Gobln.Pager is a .Net easy to use pager library written in C#, to allow you covert IEnumarble/IQueryable to an PagedList or Page object.
-And can be usable in any type of project.
+A paging library for .NET. It turns an `IEnumerable<T>` or `IQueryable<T>` into a `Page<T>`: the items of one page, together with the page index, page size and totals a pager needs. For a list that keeps changing there is `PagedList<T>`, which pages itself. The package has no dependencies.
 
-#Remove
-#If you would like to use Gobln.Pager in Mvc, check the following link [Gobln.Pager.Mvc](https://nuget.org/packages/Gobln.Pager.Mvc).
-#If you would like to use Gobln.Pager in Mvc, check the following link [Gobln.Pager.Mvc](https://nuget.org/packages/Gobln.Pager.Mvc).
-#If you would like to use Gobln.Pager in Mvc, check the following link [Gobln.Pager.Mvc](https://nuget.org/packages/Gobln.Pager.Mvc).
-#If you would like to use Gobln.Pager in Mvc, check the following link [Gobln.Pager.Mvc](https://nuget.org/packages/Gobln.Pager.Mvc).
+Related packages:
+
+- [Gobln.Pager.Mvc](https://www.nuget.org/packages/Gobln.Pager.Mvc/) renders a pager in ASP.NET Core and ASP.NET MVC 5 views.
+- [Gobln.Pager.Blazor](https://www.nuget.org/packages/Gobln.Pager.Blazor/) is a pager component for Blazor.
+- [Gobln.Pager.Json.Microsoft](https://www.nuget.org/packages/Gobln.Pager.Json.Microsoft/) and [Gobln.Pager.Json.Newtonsoft](https://www.nuget.org/packages/Gobln.Pager.Json.Newtonsoft/) read and write pages as JSON.
 
 ## Frameworks
 
-* .Net 4.6.1 and higher
-* .Net Standard 2.0 and higher
-* .Net 8.0 and higher
+- .NET 8.0 and .NET 10.0
+- .NET Standard 2.0 and 2.1
+- .NET Framework 4.6.2 and 4.8
+
+## Installation
+
+```shell
+dotnet add package Gobln.Pager
+```
 
 ## Page
 
-### How to use
-
-Install Gobln.Pager, trough [Nuget](https://nuget.org/) or other means.
-Use the extension .ToPage() on your IEnumarble/IQueryable and you will get the 10 first items from you IEnumarble/IQueryable.
-To Change the page size or the selected page you only need to change the first two value of ToPager({page index}, {page size})
-
-### Examples
+`ToPage(pageIndex, pageSize)` takes one page out of a collection. The first page is page 1.
 
 ```csharp
+using Gobln.Pager;
 
-// Create an List oject
-var list = new List<TestModel1>()
-            {
-                new TestModel1(){ Id = 1, Name = "Tester1", Date = new DateTime( 2015, 5,1 ) },
-                new TestModel1(){ Id = 2, Name = "Tester2", Date = new DateTime( 2015, 5,2 ) },
-                new TestModel1(){ Id = 3, Name = "Tester3", Date = new DateTime( 2015, 5,3 ) },
-                new TestModel1(){ Id = 4, Name = "Tester4", Date = new DateTime( 2015, 5,4 ) },
-                new TestModel1(){ Id = 5, Name = "Tester5", Date = new DateTime( 2015, 5,5 ) },
-                new TestModel1(){ Id = 6, Name = "Tester6", Date = new DateTime( 2015, 5,1 ) },
-                new TestModel1(){ Id = 7, Name = "Tester7", Date = new DateTime( 2015, 5,2 ) },
-                new TestModel1(){ Id = 8, Name = "Tester8", Date = new DateTime( 2015, 5,3 ) },
-                new TestModel1(){ Id = 9, Name = "Tester9", Date = new DateTime( 2015, 5,4 ) },
-                new TestModel1(){ Id = 10, Name = "Tester10", Date = new DateTime( 2015, 5,5 ) },
-            };
+List<Order> orders = GetOrders();   // 95 orders
 
-// Create an Page object
-//  this will get you the first page index with the 10 first items
-var page = list.ToPage();
+var page = orders.ToPage(pageIndex: 2, pageSize: 10);
 
-// Create an Page object with pagesize 2 and pageindex 3
-page = list.ToPage(3, 2);
+foreach (var order in page)
+{
+    // orders 11 to 20
+}
 
-// Create an Page object from a prepaged list where that the pagesize 10, pageindex 10 and the total item count 100
-page = list.ToPage(5, 10, 100, prePaged: true);
-
-// Use PageFilter of IPageFilter
-var pagerFilter = new PagerFilter()
-    {
-        PageIndex = 5,
-        PageSize = 2
-    };
-
-var page = testList.ToPage(pagerFilter);
-
+// page.PageIndex        2
+// page.PageSize         10
+// page.TotalItemCount   95
+// page.TotalPageCount   10
+// page.HasPaging        true: there is more than one page
+// page.IsEmpty          false
 ```
 
-For more examples, check the test project
+On an `IQueryable<T>`, such as an Entity Framework query, the paging is added to the query, so only the items of that page are fetched.
+
+`ToPage()` without arguments puts the whole collection on a single page.
+
+### Page index and size from a request
+
+`PageFilter` carries the page index and the page size as one object, for example as an action parameter that model binding fills:
+
+```csharp
+var page = orders.ToPage(new PageFilter(pageIndex: 2, pageSize: 10));
+```
+
+A class of your own works too, when it implements `IPageFilter`.
+
+### Data that is already paged
+
+When the data source already returned a single page (a stored procedure, another API), pass the total item count along. The collection is then used as it is:
+
+```csharp
+// rows holds only the 10 items of page 3
+var page = rows.ToPage(pageIndex: 3, pageSize: 10, totalItemCount: 95);
+```
+
+### Async
+
+Every `ToPage` and `ToPagedList` has an `Async` version that takes a `CancellationToken`:
+
+```csharp
+var page = await orders.ToPageAsync(2, 10, cancellationToken);
+```
 
 ## PagedList
 
-### How to use
-
-The PagedList object contains information that will go to make up your Page object.
-This will represent the full list of items that from which you can easily add or remove items, and check the content of the page.
-Or even cycle trough the pages.  
-
-### Examples
+A `PagedList<T>` is a list that keeps its own page size and current page. Items can be added and removed, and the page count follows.
 
 ```csharp
-// Create an pagedList object
-var pageList = new PagedList<TestModel1>()
-            {
-                new TestModel1(){ Id = 1, Name = "Tester1", Date = new DateTime( 2016, 5,1 ) },
-                new TestModel1(){ Id = 2, Name = "Tester2", Date = new DateTime( 2016, 5,2 ) },
-                new TestModel1(){ Id = 3, Name = "Tester3", Date = new DateTime( 2016, 5,3 ) },
-                new TestModel1(){ Id = 4, Name = "Tester4", Date = new DateTime( 2016, 5,4 ) },
-                new TestModel1(){ Id = 5, Name = "Tester5", Date = new DateTime( 2016, 5,5 ) },
-                new TestModel1(){ Id = 6, Name = "Tester6", Date = new DateTime( 2016, 5,3 ) },
-                new TestModel1(){ Id = 7, Name = "Tester7", Date = new DateTime( 2016, 5,4 ) },
-                new TestModel1(){ Id = 8, Name = "Tester8", Date = new DateTime( 2016, 5,5 ) },
-                new TestModel1(){ Id = 9, Name = "Tester9", Date = new DateTime( 2016, 5,5 ) },
-                new TestModel1(){ Id = 10, Name = "Tester10", Date = new DateTime( 2016, 5,3 ) },
-                new TestModel1(){ Id = 11, Name = "Tester11", Date = new DateTime( 2016, 5,4 ) },
-                new TestModel1(){ Id = 12, Name = "Tester12", Date = new DateTime( 2016, 5,5 ) },
-            };
+var list = orders.ToPagedList(pageSize: 10);    // or: new PagedList<Order>(pageSize: 10)
 
-// Add extra item
-pageList.Add(new TestModel1() { Id = 16, Name = "Tester16", Date = new DateTime(2015, 5, 5) });
+list.Add(new Order());                          // list.PageCount is recalculated
 
-// Set the page values, if not set default pageidex is 1 and size is 10
-pageList.CurrentPageIndex = 2;
-pageList.PageSize = 3;
+list.PageIndex = 2;
 
-// Get the current page form the pagelist
-var pager = pageList.GetCurrentPage();
+var page = list.GetPage();                      // the current page, as a Page<Order>
+page = list.GetPage(1);                         // any other page; PageIndex stays 2
 
-// Get the next page
-pager = pageList.GetNextPage();
+list.NextPage();                                // PageIndex is now 3
+list.PreviousPage();                            // and 2 again
 
-// Get the page at index X
-pager = pageList.GetPage(1);
+page = list.NextPage().GetPage();               // both return the list, so they chain
 
+foreach (var pageOfOrders in list.GetPages())
+{
+    // every page, in order
+}
 ```
 
-For more examples, check the test project
+`PageIndex` always stays between 1 and `PageCount`: a lower value becomes 1, a higher value becomes the last page. `HasNextPage` and `HasPreviousPage` tell whether there is a page to go to.
 
-## Installing Gobln.Pager
+## Page numbers for your own pager
 
-The project is on [Nuget](https://www.nuget.org/packages/Gobln.Pager/). Install via the NuGet Package Manager.
+`PageWindow.GetPageNumbers` works out which page numbers a pager shows. The MVC and Blazor pagers use it, and so can a pager you render yourself:
 
-PM > Install-Package Gobln.Pager
+```csharp
+var numbers = PageWindow.GetPageNumbers(pageIndex: 5, totalPageCount: 10, siblingCount: 1, boundaryCount: 1, showEllipsis: true);
 
-## Breaking changes in version 2
+// 1, null, 4, 5, 6, null, 10
+```
 
-- Remove support for .Net 4.5 and lower
+`null` marks an ellipsis. `siblingCount` is the number of pages on each side of the current page, `boundaryCount` the number of pages always shown at the start and at the end.
 
-### Page
+## Behaviour to know about
 
-- PageIndex is now default 1, not 0
-- When using the parameter TotalItemCount with the creation of a Page, this will process the given collection as its was Pre-Paged. To regain the functionality of version 1, the prepaged parameter must be set to false.
+- A page index or page size below 1 throws `ArgumentOutOfRangeException`. So does a total item count below 0.
+- `ToPage(pageIndex, pageSize)` with a page index past the last page returns an empty page whose `TotalItemCount` is 0 and whose `TotalPageCount` is 1. When the index comes from a request, keep it within the pages there are before calling `ToPage`.
+- `ToPagedList` on an `IQueryable<T>` runs the whole query and loads the result in memory.
+- The `Async` versions run the same work on a thread-pool thread. They don't use Entity Framework's async queries.
 
-### PagedList
+## Upgrading from version 1
 
-- CurrentPageIndex rename to PageIndex
-- GetCurrentPage() rename to GetPage()
-- Next() rename to NextPage()
-- Previous rename to PreviousPage()
-- Remove SetPageIndex()
-- Remove GetNextPage()
-- Remove GetPreviousPage()
-- Remove PeakNextPage()
-- Remove PeakPreviousPage()
+Support for .NET Framework 4.5 and lower, and for .NET Standard 1.6, is removed.
+
+### Changes to Page
+
+- `CurrentPageIndex` is renamed to `PageIndex`.
+- `PageIndex` is 1 by default, not 0.
+- `ToPage` with a total item count now treats the collection as already paged. To have the collection sliced, as in version 1, pass `prePaged: false` as the last argument.
+- `PagerFilter` and `IPagerFilter` are renamed to `PageFilter` and `IPageFilter`.
+
+### Changes to PagedList
+
+- `CurrentPageIndex` is renamed to `PageIndex`.
+- `GetCurrentPage()` is renamed to `GetPage()`.
+- `Next()` is renamed to `NextPage()`, and `Previous()` to `PreviousPage()`.
+- `SetPageIndex()`, `GetNextPage()`, `GetPreviousPage()`, `PeakNextPage()` and `PeakPreviousPage()` are removed. Use `NextPage()` or `PreviousPage()`, followed by `GetPage()`.
+
+## Documentation
+
+The [wiki](https://github.com/HendrickxJorn/Gobln.Pager/tree/master/wiki) describes every type and extension method.
+
+## Issues and contributions
+
+Found a bug, or something to improve? Open an issue or send a pull request on [GitHub](https://github.com/HendrickxJorn/Gobln.Pager).
 
 ## License
 
-[Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0).
-
-## Documentation and Readme file
-
-I'm going to provide an documentation file, but haven't started on one yet.
-As for the Readme file, if there are any inconsitencies or grammatical errors feel free to let me know by an pull request. This also counts for problems in de code.
-
-## Issues and Contributions
-
-* If something is broken and you know how to fix it, send a pull request.
-* If you have no idea what is wrong, create an issue.
-
-## Any feedback and contributions are welcome
-
-If you have something you'd like to improve do not hesitate to send a Pull Request
+[MIT](https://github.com/HendrickxJorn/Gobln.Pager/blob/master/LICENSE.md)

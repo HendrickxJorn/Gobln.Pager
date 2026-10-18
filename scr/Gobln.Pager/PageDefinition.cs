@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Gobln.Pager;
+﻿namespace Gobln.Pager;
 
 internal class PageDefinition(int pageIndex, int pageSize, int totalItemCount)
 {

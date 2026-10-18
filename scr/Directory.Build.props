@@ -20,8 +20,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- Packaging -->
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <!--
+      Packaging. Packages are made with `dotnet pack`, as the release workflow
+      does. GeneratePackageOnBuild is deliberately off: it packed all five
+      libraries on every build, test run and F5.
+    -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!--
       CS1591 warns for every public member without an XML comment. The four

@@ -14,6 +14,66 @@ namespace Gobln.Pager.BlazorTest;
 
 public class PagerComponentTests02 : BunitContext
 {
+    /// <summary>
+    /// The texts of the numbered items in order, ellipses included, without
+    /// First/Previous/Next/Last.
+    /// </summary>
+    private static string PageNumbers(IRenderedComponent<Blazor.Pager> cut)
+    {
+        return string.Join(" ", cut.FindAll("li").Select(li => li.TextContent.Trim()).Skip(2).SkipLast(2));
+    }
+
+    [Fact]
+    public void PageNumbers_AreTheBoundariesAndThePagesAroundTheCurrentOne()
+    {
+        var testPage = new TestPage { PageIndex = 5, TotalPageCount = 10, HasPaging = true };
+
+        var cut = Render<Blazor.Pager>(
+          parameters =>
+            parameters
+              .Add(c => c.Page, testPage)
+              .Add(c => c.SiblingCount, 1)
+              .Add(c => c.BoundaryCount, 1)
+        );
+
+        Assert.Equal("1 4 5 6 10", PageNumbers(cut));
+    }
+
+    [Fact]
+    public void PageNumbers_WithEllipsis_AreTheSameAsTheMvcPagers()
+    {
+        // Both pagers get their numbers from PageWindow. Between page 1 and the pages around
+        // page 4 only page 2 is skipped, so page 2 is shown instead of an ellipsis.
+        var testPage = new TestPage { PageIndex = 4, TotalPageCount = 10, HasPaging = true };
+
+        var cut = Render<Blazor.Pager>(
+          parameters =>
+            parameters
+              .Add(c => c.Page, testPage)
+              .Add(c => c.SiblingCount, 1)
+              .Add(c => c.BoundaryCount, 1)
+              .Add(c => c.ShowEllipsis, true)
+        );
+
+        Assert.Equal("1 2 3 4 5 ... 10", PageNumbers(cut));
+    }
+
+    [Fact]
+    public void NegativeCounts_AreTreatedAsZero()
+    {
+        var testPage = new TestPage { PageIndex = 5, TotalPageCount = 10, HasPaging = true };
+
+        var cut = Render<Blazor.Pager>(
+          parameters =>
+            parameters
+              .Add(c => c.Page, testPage)
+              .Add(c => c.SiblingCount, -1)
+              .Add(c => c.BoundaryCount, -1)
+        );
+
+        Assert.Equal("5", PageNumbers(cut));
+    }
+
     [Fact]
     public void BasicBunit_Test01()
     {

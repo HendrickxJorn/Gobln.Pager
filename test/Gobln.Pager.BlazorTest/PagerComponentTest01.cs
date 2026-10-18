@@ -39,36 +39,6 @@ public class PagerComponentTests01
     }
 
     [Fact]
-    public void StartAndEndNumbers_AreCalculatedCorrectly()
-    {
-        var pager = new Blazor.Pager
-        {
-            Page = new TestPage { PageIndex = 5, TotalPageCount = 10, HasPaging = true },
-            SiblingCount = 1,
-            BoundaryCount = 1,
-            ShowEllipsis = false
-        };
-
-        // Initialize internal state
-        InvokeOnParametersSet(pager);
-
-        // Access private properties via reflection
-        var startProp = pager.GetType().GetProperty("StartNumber", BindingFlags.Instance | BindingFlags.NonPublic);
-        var endProp = pager.GetType().GetProperty("EndNumber", BindingFlags.Instance | BindingFlags.NonPublic);
-
-        Assert.NotNull(startProp);
-        Assert.NotNull(endProp);
-
-        var startNumber = (int)startProp.GetValue(pager)!;
-        var endNumber = (int)endProp.GetValue(pager)!;
-
-        // Expected values computed from the component logic:
-        // For PageIndex=5, SiblingCount=1, BoundaryCount=1, TotalPageCount=10
-        Assert.Equal(4, startNumber);
-        Assert.Equal(6, endNumber);
-    }
-
-    [Fact]
     public void PageIndex_OfFirstNonEmptyPage_IsAdopted()
     {
         // A pager first rendered while its data is still loading (an empty Page) must

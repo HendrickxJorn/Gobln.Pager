@@ -56,13 +56,6 @@ public partial class Pager
             throw new ArgumentNullException(nameof(Page), "Page parameter is required.");
         }
 
-        // normalize inputs
-        if (SiblingCount < 0) 
-            SiblingCount = 0;
-
-        if (BoundaryCount < 0) 
-            BoundaryCount = 0;
-
         if (Page.TotalPageCount < 1)
         {
             // nothing to render, but keep values safe.
@@ -99,32 +92,8 @@ public partial class Pager
         ? "pagination"
         : $"pagination {ClassName.Trim()}";
 
-    private int StartBoundery => Math.Min(BoundaryCount, TotalPageCount);
-
-    private int EndBoundery => TotalPageCount - Math.Max(TotalPageCount - BoundaryCount + 1, BoundaryCount + 1) + 1;
-
-    private int StartNumber => Math.Max(
-                        Math.Min(
-                            // Original start
-                            PageIndex - SiblingCount,
-                            // Page boundery
-                            TotalPageCount - BoundaryCount - SiblingCount * 2
-                        ),
-                        // After start
-                        BoundaryCount + 1
-                    );
-
-    private int EndNumber => Math.Min(
-                        Math.Max(
-                            // Original end
-                            PageIndex + SiblingCount,
-                            // Page boundery
-                            BoundaryCount + SiblingCount * 2 + 1
-
-                        ),
-                        // Before end
-                        TotalPageCount - BoundaryCount
-                );
+    // The page numbers to show, with null where an ellipsis goes
+    private IReadOnlyList<int?> PageNumbers => PageWindow.GetPageNumbers(PageIndex, TotalPageCount, SiblingCount, BoundaryCount, ShowEllipsis);
 
     private async Task InvokePageChange(int pagenm)
     {
