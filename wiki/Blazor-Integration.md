@@ -5,12 +5,13 @@ Targets `net8.0` and `net10.0`. Provides a single `<Pager>` component (namespace
 ## Parameters
 
 | Parameter | Type | Default | Description |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `Page` | `IPage` | *(required)* | The page whose `PageIndex`/`TotalPageCount` drive the rendered controls. Throws `ArgumentNullException` if `null`. |
 | `SiblingCount` | `int` | `1` | Number of page links shown on each side of the current page. |
 | `BoundaryCount` | `int` | `0` | Number of page links always shown at the start and end of the range. |
 | `ShowEllipsis` | `bool` | `false` | Whether to render a disabled `"..."` item where page numbers are skipped. An ellipsis that would hide a single page shows that page instead, the same as the MVC pager. |
-| `PageIndexChanged` | `EventCallback<int>` | — | Raised with the new page index whenever the user clicks a page link. |
+| `ClassName` | `string?` | `null` | Extra CSS classes for the `<ul>`, added next to `pagination` (for example `pagination-lg justify-content-center`). |
+| `PageIndexChanged` | `EventCallback<int>` | — | Raised with the new page index when the user picks another page. Clicking the current page doesn't raise it. |
 
 > The change event is `PageIndexChanged`, not `PageChanging`.
 
@@ -70,9 +71,24 @@ else
     private async Task LoadData()
     {
         currentPage = await Context.YourEntities
-            .AsQueryable()
+            .OrderBy(e => e.Id)
             .ToPageAsync(pageIndex, PageSize);
     }
+}
+```
+
+The pager reacts to clicks, so the component needs an interactive render mode, for example `@rendermode InteractiveServer`.
+
+A `Page<T>` made from an `IQueryable<T>` runs its query each time it is enumerated, so the component above queries the database on every render. To query once per page change, load the rows yourself and wrap them in a pre-paged page:
+
+```csharp
+private async Task LoadData()
+{
+    var query = Context.YourEntities.OrderBy(e => e.Id);
+    var totalCount = await query.CountAsync();
+    var rows = await query.Skip((pageIndex - 1) * PageSize).Take(PageSize).ToListAsync();
+
+    currentPage = rows.ToPage(pageIndex, PageSize, totalCount);
 }
 ```
 

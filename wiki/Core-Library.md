@@ -2,16 +2,18 @@
 
 All types below live in the `Gobln.Pager` namespace, in the core `Gobln.Pager` package.
 
-## `Page<T>` — single page snapshot
+## `Page<T>` — one page of items
 
-A read-only, strongly-typed snapshot of one page of a larger collection. Implements `IPage<T>` and `IEnumerable<T>`, and is `[Serializable]`.
+One page of a larger collection, with the paging information a pager needs. Implements `IPage<T>` and `IEnumerable<T>`, and is `[Serializable]`.
 
-### Properties
+Its properties don't change after construction, but its items are read from the source each time the page is enumerated. When the source list changes, the page changes with it. On an `IQueryable<T>`, every enumeration of the page (and every `IsEmpty`) runs the query again, so the `DbContext` has to stay open until the page has been shown; see [Troubleshooting](Best-Practices-and-Troubleshooting.md#objectdisposedexception-when-a-page-from-entity-framework-is-shown).
+
+### `Page<T>` properties
 
 | Property | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `PageIndex` | `int` | Current page number (1-based). Default `1`. |
-| `PageSize` | `int` | Number of items in this page. Default `0`. |
+| `PageSize` | `int` | The page size: the most items a page holds. The last page can hold fewer. `0` for an empty page. |
 | `TotalItemCount` | `int` | Total items in the original collection. Default `0`. |
 | `TotalPageCount` | `int` | Total pages in the original collection. Default `1`. |
 | `HasPaging` | `bool` | `TotalPageCount > 1`. |
@@ -19,7 +21,7 @@ A read-only, strongly-typed snapshot of one page of a larger collection. Impleme
 
 All properties are read-only (`{ get; private set; }`) once the page is constructed.
 
-### Constructors
+### `Page<T>` constructors
 
 ```csharp
 Page()                                                                 // empty page
@@ -27,7 +29,7 @@ Page(IEnumerable<T> collection)                                       // whole c
 Page(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)  // pre-paged data
 ```
 
-The three-argument-plus form is for **pre-paged data**: `collection` is assumed to already be exactly the items for `pageIndex`, and is *not* re-sliced. It throws `ArgumentOutOfRangeException` if `pageIndex < 1`, `pageSize < 1`, or `totalItemCount < 0`.
+The four-argument form is for **pre-paged data**: `collection` is assumed to already be exactly the items for `pageIndex`, and is *not* re-sliced. It throws `ArgumentOutOfRangeException` if `pageIndex < 1`, `pageSize < 1`, or `totalItemCount < 0`.
 
 ```csharp
 var prePagedData = new List<string> { "Item 1", "Item 2", "Item 3" };
@@ -52,7 +54,7 @@ In most code you'll use the [`ToPage()` extension methods](Extension-Methods.md)
 
 A mutable collection that maintains its own paging state. Implements `IPagedList<T>`, `IReadOnlyList<T>`, and is `[Serializable]`.
 
-### Constructors
+### `PagedList<T>` constructors
 
 ```csharp
 PagedList()                                    // empty, page size 10
@@ -67,10 +69,10 @@ PagedList(IEnumerable<T> collection, int pageSize)  // seeded, given page size
 var pagedList = new PagedList<int>(Enumerable.Range(1, 50), pageSize: 10);
 ```
 
-### Properties
+### `PagedList<T>` properties
 
 | Property | Type | Description |
-|---|---|---|
+| --- | --- | --- |
 | `PageIndex` | `int` | Current page (get/set). Setting clamps to `[1, PageCount]`. |
 | `PageSize` | `int` | Items per page (get/set). Setting clamps to `>= 1` and recalculates `PageCount`. |
 | `PageCount` | `int` | Total number of pages (read-only). |
@@ -80,22 +82,24 @@ var pagedList = new PagedList<int>(Enumerable.Range(1, 50), pageSize: 10);
 | `IsReadOnly` | `bool` | Always `false`. |
 | `this[int index]` | `T` | Indexer into the full underlying list (not the current page). |
 
-### Methods
+### `PagedList<T>` methods
 
 | Method | Description |
-|---|---|
+| --- | --- |
 | `Add(T item)` | Append an item; recalculates paging. |
 | `AddRange(IEnumerable<T> collection)` | Append many items; recalculates paging. |
 | `Insert(int index, T item)` | Insert at index; recalculates paging. |
 | `Remove(T item)` / `RemoveAt(int index)` | Remove an item; recalculates paging. |
 | `Clear()` | Remove all items. |
 | `Contains(T item)` / `IndexOf(T item)` / `CopyTo(T[], int)` | Standard collection operations. |
-| `GetPage(int pageIndex)` | Returns a `Page<T>` snapshot of the given page. |
-| `GetPage()` | Returns a `Page<T>` snapshot of the *current* page (`PageIndex`). |
+| `GetPage(int pageIndex)` | Returns the given page as a `Page<T>`. Throws `ArgumentOutOfRangeException` below `1`; past the last page it returns an empty page. |
+| `GetPage()` | Returns the *current* page (`PageIndex`) as a `Page<T>`. |
 | `GetPages()` | Yields a `Page<T>` for every page, in order. |
 | `NextPage()` | Advances `PageIndex` by 1 (clamped) and returns `this`, for chaining. |
 | `PreviousPage()` | Moves `PageIndex` back by 1 (clamped) and returns `this`, for chaining. |
-| `AsReadOnly()` | Returns a `ReadOnlyCollection<T>` wrapper over the current items. |
+| `AsReadOnly()` | Returns a read-only copy of all items, as a `ReadOnlyCollection<T>`. Later changes to the list don't show up in it. |
+
+The pages that `GetPage` returns read the list when they are enumerated, so changes made to the list afterwards show up in them.
 
 > The navigation methods are named **`NextPage()`** / **`PreviousPage()`** — not `GoToNextPage()` / `GoToPreviousPage()`.
 
@@ -156,7 +160,7 @@ IReadOnlyList<int?> PageWindow.GetPageNumbers(int pageIndex, int totalPageCount,
 ```
 
 | Parameter | Description |
-|---|---|
+| --- | --- |
 | `pageIndex` | The current page. |
 | `totalPageCount` | Total number of pages. |
 | `siblingCount` | Page numbers shown on each side of the current page. Below `0` counts as `0`. |
@@ -189,7 +193,7 @@ Pagination parameters are validated wherever they're accepted (constructors, ext
 ## Interfaces
 
 | Interface | Implemented by |
-|---|---|
+| --- | --- |
 | `IPage` | `Page` (non-generic), and inherited by `IPage<T>` |
 | `IPage<T>` | `Page<T>` |
 | `IPagedList` | inherited by `IPagedList<T>` |
@@ -200,6 +204,6 @@ Pagination parameters are validated wherever they're accepted (constructors, ext
 
 ## Thread safety
 
-- **`Page<T>`**: thread-safe after construction (read-only).
+- **`Page<T>`**: its properties never change, but enumerating it enumerates its source. It is as thread-safe as that source: fine for an in-memory list that nobody changes, not for a query on a `DbContext`, which doesn't allow two operations at once.
 - **`PagedList<T>`**: **not** thread-safe — use external locking or a concurrent wrapper in multi-threaded scenarios.
 - **Extension methods**: thread-safe (stateless).

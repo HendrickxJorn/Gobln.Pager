@@ -1,7 +1,7 @@
+# Gobln.Pager
+
 [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.svg)](https://www.nuget.org/packages/Gobln.Pager/)
 [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.svg)](https://www.nuget.org/packages/Gobln.Pager/)
-
-# Gobln.Pager
 
 A paging library for .NET. It turns an `IEnumerable<T>` or `IQueryable<T>` into a `Page<T>`: the items of one page, together with the page index, page size and totals a pager needs. For a list that keeps changing there is `PagedList<T>`, which pages itself. The package has no dependencies.
 
@@ -47,7 +47,7 @@ foreach (var order in page)
 // page.IsEmpty          false
 ```
 
-On an `IQueryable<T>`, such as an Entity Framework query, the paging is added to the query, so only the items of that page are fetched.
+On an `IQueryable<T>`, such as an Entity Framework query, the paging is added to the query, so only the items of that page are fetched. Sort the query before paging it: without an `OrderBy` the database picks the order, and one page can repeat items of another.
 
 `ToPage()` without arguments puts the whole collection on a single page.
 
@@ -119,6 +119,7 @@ var numbers = PageWindow.GetPageNumbers(pageIndex: 5, totalPageCount: 10, siblin
 
 ## Behaviour to know about
 
+- A `Page<T>` reads its items from the source each time it is enumerated. On an `IQueryable<T>`, every `foreach` over the page, and `IsEmpty`, runs the query again, so the `DbContext` has to stay open until the page has been shown.
 - A page index or page size below 1 throws `ArgumentOutOfRangeException`. So does a total item count below 0.
 - `ToPage(pageIndex, pageSize)` with a page index past the last page returns an empty page whose `TotalItemCount` is 0 and whose `TotalPageCount` is 1. When the index comes from a request, keep it within the pages there are before calling `ToPage`.
 - `ToPagedList` on an `IQueryable<T>` runs the whole query and loads the result in memory.

@@ -1,7 +1,7 @@
-[![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Blazor.svg)](http://www.nuget.org/packages/Gobln.Pager.Blazor/)
-[![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Blazor.svg)](https://www.nuget.org/packages/Gobln.Pager.Blazor/)
-
 # Gobln.Pager.Blazor
+
+[![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Blazor.svg)](https://www.nuget.org/packages/Gobln.Pager.Blazor/)
+[![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Blazor.svg)](https://www.nuget.org/packages/Gobln.Pager.Blazor/)
 
 Gobln.Pager.Blazor is a lightweight Blazor pagination component designed for Blazor Server and Blazor WebAssembly apps. It renders a configurable pager UI and emits page-change events.
 
@@ -9,47 +9,50 @@ Gobln.Pager.Blazor is a lightweight Blazor pagination component designed for Bla
 
 Install the NuGet package:
 
-```
+```shell
 dotnet add package Gobln.Pager.Blazor
 ```
 
 ## Quick Start (Blazor)
 
 1. Add the usings:
-``` razor
-@using Gobln.Pager
-@using Gobln.Pager.Blazor
-```
+
+   ```razor
+   @using Gobln.Pager
+   @using Gobln.Pager.Blazor
+   ```
+
 2. Get a page of your data. `ToPage(pageIndex, pageSize)` from Gobln.Pager works on any `IEnumerable<T>` or `IQueryable<T>` and returns a `Page<T>`: the items of that page, plus the paging info the pager needs.
 3. Show the items and the `Pager`, and load the new page when `PageIndexChanged` fires:
-``` razor
-<ul>
-    @foreach (var item in currentPage)
-    {
-        <li>@item</li>
-    }
-</ul>
 
-<Pager Page="currentPage"
-       SiblingCount="1"
-       BoundaryCount="1"
-       ShowEllipsis="true"
-       PageIndexChanged="OnPageIndexChanged" />
+   ```razor
+   <ul>
+       @foreach (var item in currentPage)
+       {
+           <li>@item</li>
+       }
+   </ul>
 
-@code {
-    private const int PageSize = 10;
+   <Pager Page="currentPage"
+          SiblingCount="1"
+          BoundaryCount="1"
+          ShowEllipsis="true"
+          PageIndexChanged="OnPageIndexChanged" />
 
-    private readonly IEnumerable<int> items = Enumerable.Range(1, 200);
+   @code {
+       private const int PageSize = 10;
 
-    private Page<int> currentPage = default!;
+       private readonly IEnumerable<int> items = Enumerable.Range(1, 200);
 
-    protected override void OnInitialized() => LoadPage(1);
+       private Page<int> currentPage = default!;
 
-    private void OnPageIndexChanged(int newPageIndex) => LoadPage(newPageIndex);
+       protected override void OnInitialized() => LoadPage(1);
 
-    private void LoadPage(int pageIndex) => currentPage = items.ToPage(pageIndex, PageSize);
-}
-```
+       private void OnPageIndexChanged(int newPageIndex) => LoadPage(newPageIndex);
+
+       private void LoadPage(int pageIndex) => currentPage = items.ToPage(pageIndex, PageSize);
+   }
+   ```
 
 ## Parameters
 
@@ -58,7 +61,7 @@ dotnet add package Gobln.Pager.Blazor
 - `BoundaryCount` (int): Number of always visible pages at the beginning and end. Default: `0`.
 - `ShowEllipsis` (bool): Whether to show an ellipsis (...) where page numbers are skipped. An ellipsis that would hide a single page shows that page instead. Default: `false`.
 - `ClassName` (string): Additional CSS classes appended to the pagination `<ul>`. Default: `null`.
-- `PageIndexChanged` (EventCallback<int>): Raised when the user selects another page; provides the new page index.
+- `PageIndexChanged` (`EventCallback<int>`): Raised when the user selects another page; provides the new page index.
 
 ## Styling
 
@@ -68,13 +71,13 @@ The items follow Bootstrap 5.3's pagination markup. The current page is a link w
 
 Use `ClassName` to add your own classes alongside the built-in `pagination` class, for example Bootstrap sizing or alignment modifiers:
 
-```
+```razor
 <Pager Page="@MyPage" ClassName="pagination-lg justify-content-center" />
 ```
 
 renders:
 
-``` html
+```html
 <nav aria-label="page navigation">
     <ul class="pagination pagination-lg justify-content-center">
         ...
@@ -91,9 +94,9 @@ Add the component to any Razor component or page as shown above. Handle `PageInd
 - The package targets modern .NET and is suitable for .NET 8+ Blazor apps.
 - The pager only reads `PageIndex` and `TotalPageCount`. If your app has its own paging model, wrap it in a class that implements `IPage` from Gobln.Pager.
 
-## Contributing
+## Issues and contributions
 
-Contributions are welcome. Please follow the repository's contribution guidelines and coding conventions.
+Found a bug, or something to improve? Open an issue or send a pull request on [GitHub](https://github.com/HendrickxJorn/Gobln.Pager).
 
 ## License
 

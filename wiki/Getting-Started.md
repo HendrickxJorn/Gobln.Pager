@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - .NET Framework 4.6.2+, .NET Standard 2.0+, or .NET 8+
-- Visual Studio 2015+ or any .NET-compatible IDE
+- A .NET SDK or Visual Studio version that supports your project's target framework
 
 ## Installing packages
 
@@ -35,7 +35,7 @@ Install-Package Gobln.Pager
 ## Verifying installation
 
 - **References:** confirm `Gobln.Pager` (and any extension packages you installed) appear in your project references.
-- **Version:** the core package is currently at `2.0.0`; the JSON packages are at `1.0.0`.
+- **Version:** all five packages are released together under one version number, currently `2.0.0`.
 
 ## Minimal example
 
@@ -54,13 +54,13 @@ foreach (var item in page)
 }
 ```
 
-With `IQueryable<T>` (e.g. Entity Framework), the same extension method skips/takes at the query level so only the requested page is materialized:
+With `IQueryable<T>` (e.g. Entity Framework), the same extension method skips/takes at the query level so only the requested page is materialized. Sort the query first, so every page comes in the same order:
 
 ```csharp
 using var context = new MyDbContext();
 
 var page = context.MyEntities
-    .AsQueryable()
+    .OrderBy(e => e.Id)
     .ToPage(pageIndex: 1, pageSize: 10);
 
 foreach (var item in page)
@@ -68,6 +68,8 @@ foreach (var item in page)
     Console.WriteLine(item.Name);
 }
 ```
+
+The page runs the query when it is enumerated, not when it is created, so enumerate it while the `DbContext` is still open. See [Core Library](Core-Library.md#paget--one-page-of-items).
 
 An async equivalent (`ToPageAsync`) is available on both `IEnumerable<T>` and `IQueryable<T>` — see [Extension Methods](Extension-Methods.md).
 

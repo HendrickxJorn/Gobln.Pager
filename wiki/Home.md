@@ -14,9 +14,9 @@
 ## Pages
 
 | Page | Contents |
-|---|---|
+| --- | --- |
 | [Getting Started](Getting-Started.md) | Package installation, prerequisites, minimal example |
-| [Core Library](Core-Library.md) | `Page<T>`, `PagedList<T>`, `PageFilter`, interfaces |
+| [Core Library](Core-Library.md) | `Page<T>`, `PagedList<T>`, `PageFilter`, `PageWindow`, interfaces |
 | [Extension Methods](Extension-Methods.md) | `ToPage`, `ToPagedList` and their async variants for `IEnumerable<T>` / `IQueryable<T>` |
 | [Blazor Integration](Blazor-Integration.md) | The `Pager` Razor component (`Gobln.Pager.Blazor`) |
 | [MVC / ASP.NET Core Integration](Mvc-Integration.md) | The `Html.Pager()` helper and `PagerOptions` (`Gobln.Pager.Mvc`) |
@@ -26,7 +26,7 @@
 ## Package Overview
 
 | Package | Target Frameworks | Purpose |
-|---|---|---|
+| --- | --- | --- |
 | `Gobln.Pager` | net462, net48, net8.0, net10.0, netstandard2.0, netstandard2.1 | Core paging types and LINQ extension methods |
 | `Gobln.Pager.Blazor` | net8.0, net10.0 | `<Pager>` Razor component |
 | `Gobln.Pager.Mvc` | net462, net48, net8.0, net10.0 | `Html.Pager()` helper for ASP.NET MVC / ASP.NET Core |
