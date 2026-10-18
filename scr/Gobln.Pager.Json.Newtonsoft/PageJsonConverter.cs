@@ -1,6 +1,5 @@
 ﻿using Gobln.Pager;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Reflection;
 
 namespace Gobln.Pager.Json.Newtonsoft;
@@ -61,13 +60,24 @@ internal class IPageJsonConverter<T> : JsonConverter<IPage<T>>
             return null;
         }
 
-        var jsonObj = JToken.ReadFrom(reader);
+        // Read with the caller's serializer, as WriteJson writes with it: its settings and
+        // converters apply to the items too
+        var tempPage = serializer.Deserialize<TempPage<T>>(reader);
 
-        var tempPage = jsonObj.ToObject<TempPage<T>>();
+        if (tempPage is null || tempPage.PageItems is null || tempPage.PageItems.Length == 0)
+        {
+            return new Page<T>();
+        }
 
-        return tempPage is null || tempPage.PageItems is null || tempPage.PageItems.Length == 0
-           ? new Page<T>()
-           : new Page<T>(tempPage.PageItems, tempPage.PageIndex, tempPage.PageSize, tempPage.TotalItemCount);
+        try
+        {
+            return new Page<T>(tempPage.PageItems, tempPage.PageIndex, tempPage.PageSize, tempPage.TotalItemCount);
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            // The JSON is input: values out of range make it invalid JSON, not an argument error
+            throw new JsonSerializationException(ex.Message, ex);
+        }
     }
 
     public override void WriteJson(JsonWriter writer, IPage<T>? value, JsonSerializer serializer)

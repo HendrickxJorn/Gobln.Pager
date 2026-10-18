@@ -53,9 +53,10 @@ public class PagerRenderer() : IPagerRenderer<IPagerOptions>
         ArgumentNullException.ThrowIfNull(hRefUrl);
 #endif
 
-        if (options.ShowPager != WhenToShowEnum.Always
-            && (page == null
-                || !(page.HasPaging && options.ShowPager == WhenToShowEnum.IfNecessary)))
+        // No page renders nothing, even with Always: there is nothing to show a pager for
+        if (page is null
+            || (options.ShowPager != WhenToShowEnum.Always
+                && !(page.HasPaging && options.ShowPager == WhenToShowEnum.IfNecessary)))
         {
 #if NETFRAMEWORK
             return MvcHtmlString.Create(string.Empty);

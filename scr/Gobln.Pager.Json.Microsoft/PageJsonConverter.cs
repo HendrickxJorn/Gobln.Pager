@@ -49,9 +49,20 @@ internal class IPageJsonConverter<T> : JsonConverter<IPage<T>>
         // which is the position a converter is required to return on. Do not Read() past it.
         var temp = JsonSerializer.Deserialize<TempPage<T>>(ref reader, options);
 
-        return temp?.PageItems is null || temp.PageItems.Length == 0
-            ? new Page<T>()
-            : new Page<T>(temp.PageItems, temp.PageIndex, temp.PageSize, temp.TotalItemCount);
+        if (temp?.PageItems is null || temp.PageItems.Length == 0)
+        {
+            return new Page<T>();
+        }
+
+        try
+        {
+            return new Page<T>(temp.PageItems, temp.PageIndex, temp.PageSize, temp.TotalItemCount);
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            // The JSON is input: values out of range make it invalid JSON, not an argument error
+            throw new JsonException(ex.Message, ex);
+        }
     }
 
     public override void Write(

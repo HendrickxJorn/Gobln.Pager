@@ -1,6 +1,5 @@
 ﻿using Gobln.Pager;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Reflection;
 
 namespace Gobln.Pager.Json.Newtonsoft;
@@ -61,9 +60,9 @@ internal class IPagedListJsonConverter<T> : JsonConverter<IPagedList<T>>
             return null;
         }
 
-        var jsonObj = JToken.ReadFrom(reader);
-
-        var tempPage = jsonObj.ToObject<IEnumerable<T>>();
+        // Read with the caller's serializer, as WriteJson writes with it: its settings and
+        // converters apply to the items too
+        var tempPage = serializer.Deserialize<IEnumerable<T>>(reader);
 
         return tempPage is null || tempPage.Count() == 0
            ? new PagedList<T>()

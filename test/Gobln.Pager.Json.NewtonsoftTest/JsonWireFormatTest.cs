@@ -70,6 +70,20 @@ public class JsonWireFormatTest
         Assert.Equal(page, result);
     }
 
+    [Theory]
+    [InlineData("""{"PageItems":[1],"PageIndex":0,"PageSize":10,"TotalItemCount":1}""")]
+    [InlineData("""{"PageItems":[1],"PageIndex":1,"PageSize":0,"TotalItemCount":1}""")]
+    [InlineData("""{"PageItems":[1],"PageIndex":1,"PageSize":10,"TotalItemCount":-1}""")]
+    public void Deserialize_PageWithInvalidValues_IsRejectedAsInvalidJson(string json)
+    {
+        // The JSON is client input: values out of range make it invalid JSON, not an
+        // argument error from inside the converter
+        var exception = Assert.Throws<JsonSerializationException>(
+            () => JsonConvert.DeserializeObject<Page<int>>(json, Options()));
+
+        Assert.IsType<ArgumentOutOfRangeException>(exception.InnerException);
+    }
+
     [Fact]
     public void Serialize_PagedList_WritesPlainArray()
     {

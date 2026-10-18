@@ -82,6 +82,20 @@ public class JsonWireFormatTest
             () => JsonSerializer.Deserialize<Page<int>>(legacyJson, Options()));
     }
 
+    [Theory]
+    [InlineData("""{"PageItems":[1],"PageIndex":0,"PageSize":10,"TotalItemCount":1}""")]
+    [InlineData("""{"PageItems":[1],"PageIndex":1,"PageSize":0,"TotalItemCount":1}""")]
+    [InlineData("""{"PageItems":[1],"PageIndex":1,"PageSize":10,"TotalItemCount":-1}""")]
+    public void Deserialize_PageWithInvalidValues_IsRejectedAsInvalidJson(string json)
+    {
+        // The JSON is client input: values out of range make it invalid JSON (a 400 in
+        // ASP.NET Core), not an argument error from inside the converter (a 500)
+        var exception = Assert.Throws<JsonException>(
+            () => JsonSerializer.Deserialize<Page<int>>(json, Options()));
+
+        Assert.IsType<ArgumentOutOfRangeException>(exception.InnerException);
+    }
+
     [Fact]
     public void Serialize_PagedList_WritesPlainArray()
     {

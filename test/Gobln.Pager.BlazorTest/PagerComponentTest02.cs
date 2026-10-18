@@ -119,6 +119,46 @@ public class PagerComponentTests02 : BunitContext
     }
 
     [Fact]
+    public void NewPage_FromTheParent_IsAdopted_EvenWithTheSameIndex()
+    {
+        // The pager moved to page 2 on a click, then the parent hands over a new Page on
+        // page 1 (for example after resetting a filter). The parent's Page wins.
+        var cut = Render<Blazor.Pager>(
+          parameters =>
+            parameters
+              .Add(c => c.Page, new TestPage { PageIndex = 1, TotalPageCount = 10, HasPaging = true })
+              .Add(c => c.PageIndexChanged, (int _) => { })
+        );
+
+        cut.FindAll("a").First(a => a.TextContent.Trim() == "2").Click();
+
+        cut.Render(parameters => parameters.Add(c => c.Page, new TestPage { PageIndex = 1, TotalPageCount = 10, HasPaging = true }));
+
+        Assert.Equal("1", cut.Find("li.active > a").TextContent.Trim());
+    }
+
+    [Fact]
+    public void SamePage_FromTheParent_KeepsTheClickedPage()
+    {
+        // A parent that loads the new page asynchronously re-renders first with the Page it
+        // already had. The pager keeps the clicked page meanwhile, instead of jumping back.
+        var testPage = new TestPage { PageIndex = 1, TotalPageCount = 10, HasPaging = true };
+
+        var cut = Render<Blazor.Pager>(
+          parameters =>
+            parameters
+              .Add(c => c.Page, testPage)
+              .Add(c => c.PageIndexChanged, (int _) => { })
+        );
+
+        cut.FindAll("a").First(a => a.TextContent.Trim() == "2").Click();
+
+        cut.Render(parameters => parameters.Add(c => c.Page, testPage));
+
+        Assert.Equal("2", cut.Find("li.active > a").TextContent.Trim());
+    }
+
+    [Fact]
     public void AriaCurrent_IsOnlyOnTheActivePagesLink()
     {
         // Bootstrap 5.3 puts aria-current on the current page's link. On every li, a screen

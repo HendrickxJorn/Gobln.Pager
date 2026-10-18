@@ -60,9 +60,32 @@ internal static class UrlHelper
         return uriBuilder.Uri.AbsoluteUri;
     }
 
+    // Only there to give a relative url something to build on; it never ends up in a link
+    private static readonly Uri PlaceholderBase = new("http://placeholder/");
+
+    /// <summary>
+    /// Is <paramref name="url"/> an absolute http(s) url. Scheme checked, because on Linux and
+    /// macOS a path such as "/products" parses as an absolute file:// uri.
+    /// </summary>
+    public static bool IsAbsoluteHttpUrl(string url, out Uri? uri)
+    {
+        if (Uri.TryCreate(url, UriKind.Absolute, out uri)
+            && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+        {
+            return true;
+        }
+
+        uri = null;
+        return false;
+    }
+
     public static string AddQueryValuesToUrlString(string url, Dictionary<string, string> queryValues)
     {
-        var uriBuilder = new UriBuilder(url);
+        // UriBuilder only takes an absolute url. A relative one is built on a placeholder and
+        // given back relative, so its links stay on whatever host serves the page.
+        var isAbsolute = IsAbsoluteHttpUrl(url, out var absoluteUri);
+
+        var uriBuilder = new UriBuilder(isAbsolute ? absoluteUri! : new Uri(PlaceholderBase, url));
 
         var parseQueryString = HttpUtility.ParseQueryString(uriBuilder.Query);
 
@@ -87,6 +110,8 @@ internal static class UrlHelper
 
         uriBuilder.Query = parseQueryString.ToString();
 
-        return uriBuilder.Uri.AbsoluteUri;
+        return isAbsolute
+            ? uriBuilder.Uri.AbsoluteUri
+            : uriBuilder.Uri.PathAndQuery + uriBuilder.Uri.Fragment;
     }
 }

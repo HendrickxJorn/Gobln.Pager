@@ -110,8 +110,10 @@ public static class HtmlExtension
             return hRefUrl;
         }
 
-        return Uri.TryCreate(hRefUrl, UriKind.Absolute, out Uri? uriResult)
-            ? uriResult.ToString()
+        // A relative url stays relative: on Linux and macOS a plain Uri.TryCreate would turn
+        // "/products" into file:///products
+        return Infrastructure.UrlHelper.IsAbsoluteHttpUrl(hRefUrl, out var uriResult)
+            ? uriResult!.ToString()
             : hRefUrl;
     }
 }

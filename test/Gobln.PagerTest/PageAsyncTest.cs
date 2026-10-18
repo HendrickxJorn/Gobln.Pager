@@ -46,21 +46,21 @@ public class PageAsyncTest
     }
 
     /// <summary>
-    /// Create a Page from a PagedList, but overreach
+    /// Create a Page from a List, but overreach
     /// </summary>
     [Fact]
     public async Task Create_Page_From_IEnumerable_Overreach_01()
     {
         var data = UserData.UserList;
 
-        // Take the items that would be on the 5 page
-        // items 60 to 75
-        // This is not possible, because the PagedList only contains 15 items
-        // And will then give back an empty Page
+        // Ask for page 5 at 15 items per page. The list holds 29 items, so 2 pages.
+        // A page past the end gives back the last page: items 16 to 29
         var result = await data.ToPageAsync(5, 15);
 
-        var expected = new List<User>();
+        var expected = data.Skip(15).ToList();
 
+        Assert.Equal(2, result.PageIndex);
+        Assert.Equal(29, result.TotalItemCount);
         Assert.Equal(expected, result, new UserComparer());
     }
 

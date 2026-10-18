@@ -83,6 +83,20 @@ public class Bootstrap5ExtraTest
     }
 
     [Fact]
+    public void NullPageShowPagerAlwaysTest01()
+    {
+        // Always can't show a pager for no page: a null page renders nothing, as with the default options
+        var result = _helperHtml.CreateHtmlHelper().Pager(null!, new PagerOptions()
+        {
+            ShowPager = WhenToShowEnum.Always,
+
+            HRefUrl = "#",
+        });
+
+        Assert.Equal("", result.ToHtmlString());
+    }
+
+    [Fact]
     public void NullOptionsTest01()
     {
         // Null options are refused up front, naming the caller's argument
@@ -348,12 +362,36 @@ public class Bootstrap5ExtraTest
 
             HRefUrl = "http://pagerList.com/search",
 
-            //new 
+            //new
             ShowButtonFirstLink = WhenToShowEnum.Never,
             ShowButtonLastLink = WhenToShowEnum.Never,
         });
 
         Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+    }
+
+    [Fact]
+    public void UrlParameterRelativeTest01()
+    {
+        // A relative HRefUrl gives relative links: its path and query stay, the page index is added
+        var result = _helperHtml.CreateHtmlHelper().Pager(_page3, new PagerOptions()
+        {
+            HRefUrl = "/products?sort=name",
+        }).ToHtmlString();
+
+        Assert.Contains("""href="/products?sort=name&amp;pageIndex=2">2</a>""", result);
+    }
+
+    [Fact]
+    public void UrlParameterRelativeTest02()
+    {
+        var result = _helperHtml.CreateHtmlHelper().Pager(_page3, new PagerOptions()
+        {
+            HRefUrl = "/products",
+        }).ToHtmlString();
+
+        Assert.Contains("""href="/products?pageIndex=2">2</a>""", result);
+        Assert.DoesNotContain("file:", result);
     }
 
     [Fact]

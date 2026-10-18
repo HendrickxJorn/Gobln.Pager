@@ -68,10 +68,12 @@ public partial class Pager
         {
             TotalPageCount = Page.TotalPageCount;
 
-            if (Page.PageIndex != _lastSeenPageIndex)
+            if (!ReferenceEquals(Page, _lastSeenPage) || Page.PageIndex != _lastSeenPageIndex)
             {
-                // Parent deliberately changed PageIndex — adopt it.
+                // Parent handed over a new Page, or deliberately changed PageIndex — adopt it.
+                // A new Page wins even on the same index: the parent may have reset to it.
                 PageIndex = Math.Clamp(Page.PageIndex, 1, TotalPageCount);
+                _lastSeenPage = Page;
                 _lastSeenPageIndex = Page.PageIndex;
             }
             else
@@ -81,6 +83,8 @@ public partial class Pager
             }
         }
     }
+
+    private IPage? _lastSeenPage;
 
     private int _lastSeenPageIndex;
 

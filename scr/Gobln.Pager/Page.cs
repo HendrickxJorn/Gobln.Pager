@@ -105,15 +105,20 @@ public class Page<T> : IPage<T>, IEnumerable
 
     private void FillPageData(IEnumerable<T> collection, PageDefinition pageDefinitions)
     {
-        if (collection != null && pageDefinitions.TotalItemCount > 0 && collection.Any())
+        if (collection is null || pageDefinitions.TotalItemCount < 1)
         {
-            _items = collection.AsEnumerable();
-
-            PageIndex = pageDefinitions.PageIndex;
-            TotalPageCount = pageDefinitions.PageCount;
-            PageSize = pageDefinitions.PageSize;
-            TotalItemCount = pageDefinitions.TotalItemCount;
+            return;
         }
+
+        // Read once: the collection may be a query, and enumerating the page must not run it again
+        _items = collection.ToList();
+
+        // Kept when the items are empty too: a pre-paged page that came back empty still
+        // has to tell a pager how many pages there are
+        PageIndex = pageDefinitions.PageIndex;
+        TotalPageCount = pageDefinitions.PageCount;
+        PageSize = pageDefinitions.PageSize;
+        TotalItemCount = pageDefinitions.TotalItemCount;
     }
 
     #region Implementation of IEnumerable

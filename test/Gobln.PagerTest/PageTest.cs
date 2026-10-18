@@ -84,23 +84,59 @@ public class PageTest
     }
 
     /// <summary>
-    /// Create a Page from a PagedList, but overreach
+    /// Create a Page from a List, but overreach
     /// </summary>
     [Fact]
     public void Create_Page_From_IEnumerable_Overreach_01()
     {
         var data = UserData.UserList;
 
-        // Take the items that would be on the 5 page
-        // items 60 to 75
-        // This is not possible, because the PagedList only contains 15 items
-        // And will then give back an empty Page
+        // Ask for page 5 at 15 items per page. The list holds 29 items, so 2 pages.
+        // A page past the end gives back the last page: items 16 to 29
         var result = data.ToPage(5, 15);
 
-        var expected = new List<User>();
+        var expected = data.Skip(15).ToList();
 
-        Assert.Equal(1, result.PageIndex);
+        Assert.Equal(2, result.PageIndex);
+        Assert.Equal(2, result.TotalPageCount);
+        Assert.Equal(29, result.TotalItemCount);
         Assert.Equal(expected, result, new UserComparer());
+    }
+
+    /// <summary>
+    /// Create a Page from an IQueryable, but overreach
+    /// </summary>
+    [Fact]
+    public void Create_Page_From_IQueryable_Overreach_01()
+    {
+        var data = UserData.UserList.AsQueryable();
+
+        // Same as the IEnumerable case: page 5 of 2 gives back the last page
+        var result = data.ToPage(5, 15);
+
+        var expected = data.Skip(15).ToList();
+
+        Assert.Equal(2, result.PageIndex);
+        Assert.Equal(2, result.TotalPageCount);
+        Assert.Equal(29, result.TotalItemCount);
+        Assert.Equal(expected, result, new UserComparer());
+    }
+
+    /// <summary>
+    /// Create a Page from a pre-paged list that came back empty
+    /// </summary>
+    [Fact]
+    public void Create_Page_From_Prepaged_Empty_01()
+    {
+        // The source holds 30 items, but none came back for page 4 (past the end).
+        // The page keeps the totals, so a pager still knows there are 3 pages.
+        var result = new List<User>().ToPage(4, 10, 30);
+
+        Assert.Equal(3, result.PageIndex);
+        Assert.Equal(10, result.PageSize);
+        Assert.Equal(3, result.TotalPageCount);
+        Assert.Equal(30, result.TotalItemCount);
+        Assert.Empty(result);
     }
 
     /// <summary>
