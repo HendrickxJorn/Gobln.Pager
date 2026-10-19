@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;net48;net8.0;net10.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <Version>2.0.0</Version>
     <Description>A portable paging library for .NET. Converts IEnumerable and IQueryable collections into strongly-typed Page or PagedList objects, with support for pre-paged data, asynchronous paging, and Entity Framework.</Description>
     <PackageTags>Page, Pager, Paging, Pagination, Core</PackageTags>
   </PropertyGroup>
