@@ -47,6 +47,7 @@ jobs:
             'scr/Gobln.Pager/Gobln.Pager.csproj'
             'scr/Gobln.Pager.Mvc/Gobln.Pager.Mvc.csproj'
             'scr/Gobln.Pager.Blazor/Gobln.Pager.Blazor.csproj'
+            'scr/Gobln.Pager.EntityFrameworkCore/Gobln.Pager.EntityFrameworkCore.csproj'
             'scr/Gobln.Pager.Json.Microsoft/Gobln.Pager.Json.Microsoft.csproj'
             'scr/Gobln.Pager.Json.Newtonsoft/Gobln.Pager.Json.Newtonsoft.csproj'
           )

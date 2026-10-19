@@ -9,6 +9,7 @@ Related packages:
 
 - [Gobln.Pager.Mvc](https://www.nuget.org/packages/Gobln.Pager.Mvc/) renders a pager in ASP.NET Core and ASP.NET MVC 5 views.
 - [Gobln.Pager.Blazor](https://www.nuget.org/packages/Gobln.Pager.Blazor/) is a pager component for Blazor.
+- [Gobln.Pager.EntityFrameworkCore](https://www.nuget.org/packages/Gobln.Pager.EntityFrameworkCore/) makes `ToPageAsync` and `ToPagedListAsync` run Entity Framework Core's asynchronous queries.
 - [Gobln.Pager.Json.Microsoft](https://www.nuget.org/packages/Gobln.Pager.Json.Microsoft/) and [Gobln.Pager.Json.Newtonsoft](https://www.nuget.org/packages/Gobln.Pager.Json.Newtonsoft/) read and write pages as JSON.
 
 ## Frameworks
@@ -91,6 +92,8 @@ Every `ToPage` and `ToPagedList` has an `Async` version that takes a `Cancellati
 var page = await orders.ToPageAsync(2, 10, cancellationToken);
 ```
 
+These run the work on a thread-pool thread. On an `IQueryable<T>` the paging still happens in the query. With Entity Framework Core, add [Gobln.Pager.EntityFrameworkCore](https://www.nuget.org/packages/Gobln.Pager.EntityFrameworkCore/): the same calls then run `CountAsync` and `ToListAsync`.
+
 ## PagedList
 
 A `PagedList<T>` is a list that keeps its own page size and current page. Items can be added and removed, and the page count follows.
@@ -136,7 +139,7 @@ var numbers = PageWindow.GetPageNumbers(pageIndex: 5, totalPageCount: 10, siblin
 - A page index or page size below 1 throws `ArgumentOutOfRangeException`. So does a total item count below 0.
 - `ToPage(pageIndex, pageSize)` with a page index past the last page returns the last page. A pre-paged page that came back empty keeps its totals, so a pager still shows the pages there are.
 - `ToPagedList` on an `IQueryable<T>` runs the whole query and loads the result in memory.
-- The `Async` versions run the same work on a thread-pool thread. They don't use Entity Framework's async queries.
+- The `Async` versions run the same work on a thread-pool thread. For Entity Framework Core's asynchronous queries, add Gobln.Pager.EntityFrameworkCore.
 
 ## Upgrading from version 1
 
@@ -150,6 +153,7 @@ Support for .NET Framework 4.5 and lower, and for .NET Standard 1.6, is removed.
 - `PagerFilter` and `IPagerFilter` are renamed to `PageFilter` and `IPageFilter`.
 - `ToPage` reads the items once, when it runs. The page no longer reads its source (or runs its query) again each time it is enumerated.
 - A page index past the last page returns the last page, not an empty page without totals.
+- The `Async` methods are declared on `IEnumerable<T>` only. On an `IQueryable<T>` they still page in the query, and so does `query.AsEnumerable().ToPageAsync(...)`, which used to read the whole query.
 
 ### Changes to PagedList
 

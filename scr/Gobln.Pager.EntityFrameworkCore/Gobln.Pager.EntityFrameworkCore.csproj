@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <Description>Asynchronous paging for Entity Framework Core with Gobln.Pager. Makes ToPageAsync and ToPagedListAsync on an EF Core query run CountAsync and ToListAsync.</Description>
+    <PackageTags>Page, Pager, Paging, Pagination, EntityFrameworkCore, EFCore</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.20" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Shared source: the core's validation and page-index rules, compiled in as
+      internal types of this assembly. No public API is needed for them, and the
+      package keeps working when it and the core are at different versions.
+    -->
+    <Compile Include="..\Gobln.Pager\Validator.cs" Link="Shared\Validator.cs" />
+    <Compile Include="..\Gobln.Pager\PageDefinition.cs" Link="Shared\PageDefinition.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gobln.Pager\Gobln.Pager.csproj" />
+  </ItemGroup>
+
+</Project>

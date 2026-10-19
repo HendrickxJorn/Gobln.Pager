@@ -3,6 +3,7 @@
 ## Best Practices
 
 - **Prefer `IQueryable<T>.ToPage(...)` over `IQueryable<T>.ToPagedList()` for large/database-backed sources.** `ToPage(pageIndex, pageSize)` translates to `Skip`/`Take` in the query provider, fetching only one page. `ToPagedList()` on `IQueryable<T>` executes the *entire* query into memory first — only use it on sources you already know are small, or on `IEnumerable<T>` collections that are already in memory.
+- **With Entity Framework Core, install `Gobln.Pager.EntityFrameworkCore` for async paging.** The core package's `ToPageAsync` runs the queries synchronously on a thread-pool thread. With the EF Core package, the same calls run `CountAsync` and `ToListAsync`.
 - **Use pre-paged overloads (`prePaged: true`, or the `totalItemCount`-only overloads) when you've already paged and counted at the data-access layer** — e.g. you ran your own `Skip`/`Take` plus a separate `Count()` query. This avoids double-paging the data.
 - **Use `PagedList<T>` when the collection needs to be mutated after paging** (add/remove/insert) and you want the page count to stay in sync automatically. Use `Page<T>` for a single page to display or return from an API.
 - **Sort an `IQueryable<T>` before paging it.** Without an `OrderBy` the database picks the order, so pages can repeat or skip items.

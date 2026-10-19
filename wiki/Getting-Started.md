@@ -13,6 +13,9 @@ Install only the packages you need. The core package is required by all others.
 # Core paging library (always required)
 dotnet add package Gobln.Pager
 
+# Optional: ToPageAsync with EF Core's own async queries
+dotnet add package Gobln.Pager.EntityFrameworkCore
+
 # Optional: Blazor <Pager> component
 dotnet add package Gobln.Pager.Blazor
 
@@ -35,7 +38,7 @@ Install-Package Gobln.Pager
 ## Verifying installation
 
 - **References:** confirm `Gobln.Pager` (and any extension packages you installed) appear in your project references.
-- **Version:** all five packages are released together under one version number, currently `2.0.0`.
+- **Version:** all six packages are released together under one version number, currently `2.0.0`.
 
 ## Minimal example
 
@@ -71,7 +74,7 @@ foreach (var item in page)
 
 `ToPage` runs the query (a count, then the page) and the page keeps the rows, so it can be enumerated after the `DbContext` is gone. See [Core Library](Core-Library.md#paget--one-page-of-items).
 
-An async equivalent (`ToPageAsync`) is available on both `IEnumerable<T>` and `IQueryable<T>` — see [Extension Methods](Extension-Methods.md).
+An async equivalent (`ToPageAsync`) works on both `IEnumerable<T>` and `IQueryable<T>`. It runs on a thread-pool thread; with Entity Framework Core, add `Gobln.Pager.EntityFrameworkCore` and it runs `CountAsync` and `ToListAsync` instead. See [Extension Methods](Extension-Methods.md#async-variants).
 
 ## Where to go next
 

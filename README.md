@@ -1,11 +1,11 @@
 # Gobln.Pager
 
-| Gobln.Pager | Gobln.Pager.Mvc | Gobln.Pager.Blazor | Gobln.Pager.Json.Microsoft | Gobln.Pager.Json.Newtonsoft |
-| --- | --- | --- | --- | --- |
-| [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.svg)](https://www.nuget.org/packages/Gobln.Pager/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Mvc.svg)](https://www.nuget.org/packages/Gobln.Pager.Mvc/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Blazor.svg)](https://www.nuget.org/packages/Gobln.Pager.Blazor/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Json.Microsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Microsoft/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Json.Newtonsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Newtonsoft/) |
-| [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.svg)](https://www.nuget.org/packages/Gobln.Pager/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Mvc.svg)](https://www.nuget.org/packages/Gobln.Pager.Mvc/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Blazor.svg)](https://www.nuget.org/packages/Gobln.Pager.Blazor/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Json.Microsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Microsoft/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Json.Newtonsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Newtonsoft/) |
+| Gobln.Pager | Gobln.Pager.EntityFrameworkCore | Gobln.Pager.Mvc | Gobln.Pager.Blazor | Gobln.Pager.Json.Microsoft | Gobln.Pager.Json.Newtonsoft |
+| --- | --- | --- | --- | --- | --- |
+| [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.svg)](https://www.nuget.org/packages/Gobln.Pager/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.EntityFrameworkCore.svg)](https://www.nuget.org/packages/Gobln.Pager.EntityFrameworkCore/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Mvc.svg)](https://www.nuget.org/packages/Gobln.Pager.Mvc/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Blazor.svg)](https://www.nuget.org/packages/Gobln.Pager.Blazor/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Json.Microsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Microsoft/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Json.Newtonsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Newtonsoft/) |
+| [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.svg)](https://www.nuget.org/packages/Gobln.Pager/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.EntityFrameworkCore.svg)](https://www.nuget.org/packages/Gobln.Pager.EntityFrameworkCore/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Mvc.svg)](https://www.nuget.org/packages/Gobln.Pager.Mvc/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Blazor.svg)](https://www.nuget.org/packages/Gobln.Pager.Blazor/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Json.Microsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Microsoft/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Json.Newtonsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Newtonsoft/) |
 
-A portable, zero-dependency paging library for .NET. It turns `IEnumerable<T>` and `IQueryable<T>` collections into strongly-typed paginated results, with optional packages for Blazor, ASP.NET MVC/Core, and JSON serialization.
+A portable, zero-dependency paging library for .NET. It turns `IEnumerable<T>` and `IQueryable<T>` collections into strongly-typed paginated results, with optional packages for Entity Framework Core, Blazor, ASP.NET MVC/Core, and JSON serialization.
 
 ```csharp
 using Gobln.Pager;
@@ -25,7 +25,7 @@ On an `IQueryable<T>` the paging is translated into the query, so only the reque
 ## Why Gobln.Pager?
 
 - **Framework agnostic** — .NET Framework 4.6.2/4.8, .NET Standard 2.0/2.1, and .NET 8/10
-- **LINQ integration** — works on `IEnumerable<T>` and `IQueryable<T>` (including Entity Framework), synchronously or asynchronously
+- **LINQ integration** — works on `IEnumerable<T>` and `IQueryable<T>` (including Entity Framework), synchronously or asynchronously, with EF Core's own async queries through `Gobln.Pager.EntityFrameworkCore`
 - **Pre-paged support** — wrap data you already paged and counted at the database level, without re-slicing it
 - **Ready-made UI** — a Blazor component and an ASP.NET MVC/Core HTML helper
 - **JSON support** — converters for both `System.Text.Json` and `Newtonsoft.Json`, sharing one wire format
@@ -36,6 +36,7 @@ On an `IQueryable<T>` the paging is translated into the query, so only the reque
 | Package | Target Frameworks | Purpose |
 | --- | --- | --- |
 | `Gobln.Pager` | net462, net48, net8.0, net10.0, netstandard2.0, netstandard2.1 | Core paging types and LINQ extension methods |
+| `Gobln.Pager.EntityFrameworkCore` | net8.0, net10.0 | Asynchronous `ToPageAsync` / `ToPagedListAsync` with EF Core's `CountAsync` / `ToListAsync` |
 | `Gobln.Pager.Blazor` | net8.0, net10.0 | `<Pager>` Razor component |
 | `Gobln.Pager.Mvc` | net462, net48, net8.0, net10.0 | `Html.Pager()` helper for ASP.NET MVC / ASP.NET Core |
 | `Gobln.Pager.Json.Microsoft` | net462, net48, net8.0, net10.0, netstandard2.0, netstandard2.1 | `System.Text.Json` converters |

@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="scr/Gobln.Pager.Blazor/Gobln.Pager.Blazor.csproj" />
+    <Project Path="scr/Gobln.Pager.EntityFrameworkCore/Gobln.Pager.EntityFrameworkCore.csproj" />
     <Project Path="scr/Gobln.Pager.Json.Microsoft/Gobln.Pager.Json.Microsoft.csproj" />
     <Project Path="scr/Gobln.Pager.Json.Newtonsoft/Gobln.Pager.Json.Newtonsoft.csproj" />
     <Project Path="scr/Gobln.Pager.Mvc/Gobln.Pager.Mvc.csproj" />
@@ -8,6 +9,7 @@
   </Folder>
   <Folder Name="/test/">
     <Project Path="test/Gobln.Pager.BlazorTest/Gobln.Pager.BlazorTest.csproj" />
+    <Project Path="test/Gobln.Pager.EntityFrameworkCoreTest/Gobln.Pager.EntityFrameworkCoreTest.csproj" />
     <Project Path="test/Gobln.Pager.Json.MicrosoftTest/Gobln.Pager.Json.MicrosoftTest.csproj" />
     <Project Path="test/Gobln.Pager.Json.NewtonsoftTest/Gobln.Pager.Json.NewtonsoftTest.csproj" />
     <Project Path="test/Gobln.Pager.Mvc48Test/Gobln.Pager.Mvc48Test.csproj" />

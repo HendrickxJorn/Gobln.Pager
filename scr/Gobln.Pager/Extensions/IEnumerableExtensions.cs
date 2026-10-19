@@ -171,11 +171,24 @@ public static class IEnumerableExtensions
         /// <param name="pageSize">Size of page</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
+        /// </remarks>
         public async Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pageIndex, pageSize);
 
-            return await Task.Run(() => { var list = source.ToList(); return PrivateToPage(list, pageIndex, pageSize, list.Count); }, cancellationToken)
+            return await Task.Run(() =>
+                {
+                    // The IQueryable overloads moved here, so a query has to be noticed: counting or slicing it in memory would read all of it
+                    if (source is IQueryable<T> query)
+                    {
+                        return query.ToPage(pageIndex, pageSize);
+                    }
+
+                    var list = source.ToList();
+                    return PrivateToPage(list, pageIndex, pageSize, list.Count);
+                }, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -185,11 +198,23 @@ public static class IEnumerableExtensions
         /// <param name="pagerFilter"><see cref="IPageFilter"/></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
+        /// </remarks>
         public async Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pagerFilter);
 
-            return await Task.Run(() => { var list = source.ToList(); return PrivateToPage(list, pagerFilter.PageIndex, pagerFilter.PageSize, list.Count); }, cancellationToken)
+            return await Task.Run(() =>
+                {
+                    if (source is IQueryable<T> query)
+                    {
+                        return query.ToPage(pagerFilter);
+                    }
+
+                    var list = source.ToList();
+                    return PrivateToPage(list, pagerFilter.PageIndex, pagerFilter.PageSize, list.Count);
+                }, cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -233,11 +258,16 @@ public static class IEnumerableExtensions
         /// <param name="prePaged">Is the IEnumerable already pre-paged. If so the IEnumerable will not be paged anymore.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
+        /// </remarks>
         public async Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pageIndex, pageSize, totalItemCount);
 
-            return await Task.Run(() => PrivateToPage(source, pageIndex, pageSize, totalItemCount, prePaged), cancellationToken)
+            return await Task.Run(() => source is IQueryable<T> query
+                    ? query.ToPage(pageIndex, pageSize, totalItemCount, prePaged)
+                    : PrivateToPage(source, pageIndex, pageSize, totalItemCount, prePaged), cancellationToken)
                 .ConfigureAwait(false);
         }
 
@@ -249,11 +279,16 @@ public static class IEnumerableExtensions
         /// <param name="prePaged">Is the IEnumerable already pre-paged. If so the IEnumerable will not be paged anymore.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        /// <remarks>
+        /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
+        /// </remarks>
         public async Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pagerFilter, totalItemCount);
 
-            return await Task.Run(() => PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, prePaged), cancellationToken)
+            return await Task.Run(() => source is IQueryable<T> query
+                    ? query.ToPage(pagerFilter, totalItemCount, prePaged)
+                    : PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, prePaged), cancellationToken)
                 .ConfigureAwait(false);
         }
 

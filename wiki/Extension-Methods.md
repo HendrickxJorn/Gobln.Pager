@@ -68,7 +68,22 @@ Task<PagedList<T>> ToPagedListAsync(CancellationToken cancellationToken = defaul
 Task<PagedList<T>> ToPagedListAsync(int pageSize, CancellationToken cancellationToken = default);
 ```
 
-> There is **no** `ToPagedResultAsync` method — the real names are `ToPageAsync` and `ToPagedListAsync`. Internally these wrap the synchronous logic in `Task.Run(...)`; they do not change how an `IQueryable<T>` executes (EF's own async APIs like `ToListAsync`/`CountAsync` are not used internally).
+> There is **no** `ToPagedResultAsync` method — the real names are `ToPageAsync` and `ToPagedListAsync`.
+
+The core package declares these on `IEnumerable<T>` and runs the synchronous logic on a thread-pool thread (`Task.Run`). On an `IQueryable<T>` they still page in the query: they notice the query at runtime and use the `IQueryable<T>` `ToPage`. `AsEnumerable()` returns the same object, so `query.AsEnumerable().ToPageAsync(...)` pages in the query too.
+
+### Entity Framework Core: `Gobln.Pager.EntityFrameworkCore`
+
+`dotnet add package Gobln.Pager.EntityFrameworkCore` adds the same async overloads on `IQueryable<T>`, in the same `Gobln.Pager` namespace, so existing calls pick them up without code changes. On an EF Core query they run `CountAsync` and `ToListAsync` with your `CancellationToken`, instead of blocking a thread-pool thread:
+
+| Call | Queries |
+| --- | --- |
+| `ToPageAsync(pageIndex, pageSize)`, `ToPageAsync(pageFilter)` | `CountAsync`, then the page with `Skip`/`Take` (no second query when the count is 0) |
+| `ToPageAsync(pageIndex, pageSize, totalItemCount)` (pre-paged) | `ToListAsync` of the query as it is (none when the total is 0) |
+| `ToPageAsync(..., totalItemCount, prePaged: false)` | the page with `Skip`/`Take`, no count |
+| `ToPageAsync()`, `ToPagedListAsync(...)` | one `ToListAsync` |
+
+On a query that isn't from EF Core, such as `list.AsQueryable()`, they do what the core package does. The package targets net8.0 (EF Core 8.0.32 or later) and net10.0 (EF Core 10.0.13 or later).
 
 ```csharp
 var page = await context.MyEntities

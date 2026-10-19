@@ -88,18 +88,7 @@ else
 
 The pager reacts to clicks, so the component needs an interactive render mode, for example `@rendermode InteractiveServer`.
 
-A `Page<T>` holds its items: `ToPageAsync` runs a count query and the query for the page once, and rendering the component doesn't query again. `ToPageAsync` runs those queries synchronously on a thread-pool thread, though. For truly asynchronous queries with Entity Framework, load the rows yourself and wrap them in a pre-paged page:
-
-```csharp
-private async Task LoadData()
-{
-    var query = Context.YourEntities.OrderBy(e => e.Id);
-    var totalCount = await query.CountAsync();
-    var rows = await query.Skip((pageIndex - 1) * PageSize).Take(PageSize).ToListAsync();
-
-    currentPage = rows.ToPage(pageIndex, PageSize, totalCount);
-}
-```
+A `Page<T>` holds its items: `ToPageAsync` runs a count query and the query for the page once, and rendering the component doesn't query again. With [`Gobln.Pager.EntityFrameworkCore`](Extension-Methods.md#entity-framework-core-goblnpagerentityframeworkcore) installed, those queries run asynchronously (`CountAsync`, `ToListAsync`). Without it, `ToPageAsync` runs them synchronously on a thread-pool thread.
 
 ## Rendered markup
 
