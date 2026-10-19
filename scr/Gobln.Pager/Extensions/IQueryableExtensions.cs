@@ -13,9 +13,9 @@ namespace Gobln.Pager;
 public static class IQueryableExtensions
 {
     /// <summary>
-    ///
+    /// Paging for a query: the count and the paging are part of the query
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The type of the items</typeparam>
     /// <param name="source">The elements of <typeparamref name="T"/></param>
     extension<T>(IQueryable<T> source)
     {
@@ -33,9 +33,9 @@ public static class IQueryableExtensions
         #region ToPage
 
         /// <summary>
-        /// Converts IQueryable to an <see cref="Page"/>
+        /// Counts the query and reads all of it onto one <see cref="Page{T}"/>
         /// </summary>
-        /// <returns></returns>
+        /// <returns>One page that holds every item</returns>
         public Page<T> ToPage()
         {
             var c = source.Count();
@@ -43,11 +43,12 @@ public static class IQueryableExtensions
         }
 
         /// <summary>
-        /// Converts IQueryable to an <see cref="Page"/>
+        /// Counts the query and reads one <see cref="Page{T}"/> of it
         /// </summary>
-        /// <param name="pageIndex">Index of page</param>
-        /// <param name="pageSize">Size of page</param>
-        /// <returns></returns>
+        /// <param name="pageIndex">Index of the page, from 1. Past the last page, the last page is returned.</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <returns>The page, with the totals of the whole query</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1</exception>
         public Page<T> ToPage(int pageIndex, int pageSize)
         {
             Validator.Validate(pageIndex, pageSize);
@@ -56,10 +57,12 @@ public static class IQueryableExtensions
         }
 
         /// <summary>
-        /// Converts IQueryable to an <see cref="Page"/>
+        /// Counts the query and reads one <see cref="Page{T}"/> of it
         /// </summary>
-        /// <param name="pagerFilter"><see cref="IPageFilter"/></param>
-        /// <returns></returns>
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <returns>The page, with the totals of the whole query</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1</exception>
         public Page<T> ToPage(IPageFilter pagerFilter)
         {
             Validator.Validate(pagerFilter);
@@ -68,12 +71,13 @@ public static class IQueryableExtensions
         }
 
         /// <summary>
-        /// Converts a pre-paged IQueryable to an <see cref="Page"/>
+        /// Reads a pre-paged query, which returns only the items of page <paramref name="pageIndex"/>, into a <see cref="Page{T}"/>
         /// </summary>
-        /// <param name="pageIndex">Index of page</param>
-        /// <param name="pageSize">Size of page</param>
-        /// <param name="totalItemCount">Total item count of IQueryable</param>
-        /// <returns></returns>
+        /// <param name="pageIndex">Index of the page, from 1</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <returns>The page, holding what the query returns</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
         public Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount)
         {
             Validator.Validate(pageIndex, pageSize, totalItemCount);
@@ -82,11 +86,13 @@ public static class IQueryableExtensions
         }
 
         /// <summary>
-        /// Converts a pre-paged IQueryable to an <see cref="Page"/>
+        /// Reads a pre-paged query, which returns only the items of the page of <paramref name="pagerFilter"/>, into a <see cref="Page{T}"/>
         /// </summary>
-        /// <param name="pagerFilter"><see cref="IPageFilter"/></param>
-        /// <param name="totalItemCount">Total item count of IQueryable</param>
-        /// <returns></returns>
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <returns>The page, holding what the query returns</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
         public Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount)
         {
             Validator.Validate(pagerFilter, totalItemCount);
@@ -95,13 +101,14 @@ public static class IQueryableExtensions
         }
 
         /// <summary>
-        /// Converts IQueryable to an <see cref="Page"/>
+        /// Reads one <see cref="Page{T}"/> of the query, with a total that is already known, so the query isn't counted
         /// </summary>
-        /// <param name="pageIndex">Index of page</param>
-        /// <param name="pageSize">Size of page</param>
-        /// <param name="totalItemCount">Total item count of IQueryable</param>
-        /// <param name="prePaged">Is the IQueryable already pre-paged. If so the IQueryable will not be paged anymore.</param>
-        /// <returns></returns>
+        /// <param name="pageIndex">Index of the page, from 1. Past the last page, the last page is returned.</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <param name="prePaged">Whether the query is already paged. If so, it is read as it is.</param>
+        /// <returns>The page</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
         public Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount, bool prePaged)
         {
             Validator.Validate(pageIndex, pageSize, totalItemCount);
@@ -110,12 +117,14 @@ public static class IQueryableExtensions
         }
 
         /// <summary>
-        /// Converts IQueryable to an <see cref="Page"/>
+        /// Reads one <see cref="Page{T}"/> of the query, with a total that is already known, so the query isn't counted
         /// </summary>
-        /// <param name="pagerFilter"><see cref="IPageFilter"/></param>
-        /// <param name="totalItemCount">Total item count of IQueryable</param>
-        /// <param name="prePaged">Is the IQueryable already pre-paged. If so the IQueryable will not be paged anymore.</param>
-        /// <returns></returns>
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <param name="prePaged">Whether the query is already paged. If so, it is read as it is.</param>
+        /// <returns>The page</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
         public Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount, bool prePaged)
         {
             Validator.Validate(pagerFilter, totalItemCount);
@@ -128,21 +137,22 @@ public static class IQueryableExtensions
         #region ToPagedList
 
         /// <summary>
-        /// Convert IQueryable to an <see cref="PagedList{T}"/>
+        /// Reads the whole query into a <see cref="PagedList{T}"/> of 10 items a page
         /// Warning: This will execute the entire query and load the results in memory!
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The list</returns>
         public PagedList<T> ToPagedList()
         {
             return PagedList.FromEnumerable(source);
         }
 
         /// <summary>
-        /// Convert IQueryable to an <see cref="PagedList{T}"/>
+        /// Reads the whole query into a <see cref="PagedList{T}"/>
         /// Warning: This will execute the entire query and load the results in memory!
         /// </summary>
-        /// <param name="pageSize">The number of elements displayed per page</param>
-        /// <returns></returns>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <returns>The list</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageSize"/> is less than 1</exception>
         public PagedList<T> ToPagedList(int pageSize)
         {
             Validator.ValidatePageSize(pageSize);

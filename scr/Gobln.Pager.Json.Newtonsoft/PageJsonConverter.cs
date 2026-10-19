@@ -1,6 +1,6 @@
 ﻿using Gobln.Pager;
 using Newtonsoft.Json;
-using System.Reflection;
+using System.Collections.Concurrent;
 
 namespace Gobln.Pager.Json.Newtonsoft;
 
@@ -9,42 +9,29 @@ namespace Gobln.Pager.Json.Newtonsoft;
 /// </summary>
 public class PageJsonConverter : JsonConverter
 {
+    // One converter per item type, made by reflection once instead of on every read and write.
+    // They hold no state, so all PageJsonConverter instances share them.
+    private static readonly ConcurrentDictionary<Type, JsonConverter> Converters = new();
+
     public override bool CanConvert(Type objectType) => objectType.IsGenericType
                 && (objectType.GetGenericTypeDefinition() == typeof(Page<>)
                     || objectType.GetGenericTypeDefinition() == typeof(IPage<>));
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
-        Type elementType = objectType.GetGenericArguments()[0];
-
-        JsonConverter converter = (JsonConverter)Activator.CreateInstance(
-            typeof(IPageJsonConverter<>)
-                .MakeGenericType([elementType]),
-            BindingFlags.Instance | BindingFlags.Public,
-            binder: null,
-            args: null,
-            culture: null)!;
-
-        return converter.ReadJson(reader, objectType, existingValue, serializer);
+        return ConverterFor(objectType.GetGenericArguments()[0]).ReadJson(reader, objectType, existingValue, serializer);
     }
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         if (value is not null)
         {
-            Type elementType = value.GetType().GetGenericArguments()[0];
-
-            JsonConverter converter = (JsonConverter)Activator.CreateInstance(
-                typeof(IPageJsonConverter<>)
-                    .MakeGenericType([elementType]),
-                BindingFlags.Instance | BindingFlags.Public,
-                binder: null,
-                args: null,
-                culture: null)!;
-
-            converter.WriteJson(writer, value, serializer);
+            ConverterFor(value.GetType().GetGenericArguments()[0]).WriteJson(writer, value, serializer);
         }
     }
+
+    private static JsonConverter ConverterFor(Type elementType) =>
+        Converters.GetOrAdd(elementType, static type => (JsonConverter)Activator.CreateInstance(typeof(IPageJsonConverter<>).MakeGenericType(type))!);
 }
 
 /// <summary>
@@ -64,14 +51,16 @@ internal class IPageJsonConverter<T> : JsonConverter<IPage<T>>
         // converters apply to the items too
         var tempPage = serializer.Deserialize<TempPage<T>>(reader);
 
-        if (tempPage is null || tempPage.PageItems is null || tempPage.PageItems.Length == 0)
+        // An empty page without totals is what new Page<T>() writes, with a PageSize of 0 that the
+        // constructor below rejects. An empty page with totals goes through it, and keeps them.
+        if (tempPage is null || (tempPage.TotalItemCount == 0 && (tempPage.PageItems is null || tempPage.PageItems.Length == 0)))
         {
             return new Page<T>();
         }
 
         try
         {
-            return new Page<T>(tempPage.PageItems, tempPage.PageIndex, tempPage.PageSize, tempPage.TotalItemCount);
+            return new Page<T>(tempPage.PageItems ?? [], tempPage.PageIndex, tempPage.PageSize, tempPage.TotalItemCount);
         }
         catch (ArgumentOutOfRangeException ex)
         {

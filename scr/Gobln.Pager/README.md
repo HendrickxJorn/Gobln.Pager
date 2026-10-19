@@ -161,6 +161,7 @@ Support for .NET Framework 4.5 and lower, and for .NET Standard 1.6, is removed.
 - `GetCurrentPage()` is renamed to `GetPage()`.
 - `Next()` is renamed to `NextPage()`, and `Previous()` to `PreviousPage()`.
 - `SetPageIndex()`, `GetNextPage()`, `GetPreviousPage()`, `PeakNextPage()` and `PeakPreviousPage()` are removed. Use `NextPage()` or `PreviousPage()`, followed by `GetPage()`.
+- Setting `PageSize` below 1 throws `ArgumentOutOfRangeException`, as the constructor does. It used to become 1.
 
 ## Documentation
 

@@ -49,14 +49,16 @@ internal class IPageJsonConverter<T> : JsonConverter<IPage<T>>
         // which is the position a converter is required to return on. Do not Read() past it.
         var temp = JsonSerializer.Deserialize<TempPage<T>>(ref reader, options);
 
-        if (temp?.PageItems is null || temp.PageItems.Length == 0)
+        // An empty page without totals is what new Page<T>() writes, with a PageSize of 0 that the
+        // constructor below rejects. An empty page with totals goes through it, and keeps them.
+        if (temp is null || (temp.TotalItemCount == 0 && (temp.PageItems is null || temp.PageItems.Length == 0)))
         {
             return new Page<T>();
         }
 
         try
         {
-            return new Page<T>(temp.PageItems, temp.PageIndex, temp.PageSize, temp.TotalItemCount);
+            return new Page<T>(temp.PageItems ?? [], temp.PageIndex, temp.PageSize, temp.TotalItemCount);
         }
         catch (ArgumentOutOfRangeException ex)
         {

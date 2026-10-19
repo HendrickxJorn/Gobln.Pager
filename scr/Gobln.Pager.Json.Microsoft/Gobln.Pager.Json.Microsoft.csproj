@@ -6,7 +6,8 @@
     <PackageTags>Page, Pager, Paging, Pagination, Json</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- net8.0 and net10.0 have System.Text.Json in the framework; the package is only for the others -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'net48' or '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 

@@ -253,8 +253,8 @@ public class PagedList<T> : IPagedList<T>, IReadOnlyList<T>
 
     /// <summary>
     /// The amount of items per page
-    /// This value can not be lower then 1
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">The value is less than 1, as in the constructor</exception>
     public int PageSize
     {
         get
@@ -263,7 +263,9 @@ public class PagedList<T> : IPagedList<T>, IReadOnlyList<T>
         }
         set
         {
-            _pageSize = value < 1 ? 1 : value;
+            Validator.ValidatePageSize(value);
+
+            _pageSize = value;
             RecalculatePageCount();
         }
     }
@@ -372,26 +374,25 @@ public class PagedList<T> : IPagedList<T>, IReadOnlyList<T>
 }
 
 /// <summary>
-/// Represents a strongly typed <see cref="PagedList"/>
+/// Creates instances of <see cref="PagedList{T}"/>
 /// </summary>
 public static class PagedList
 {
     /// <summary>
-    /// 
+    /// Initializes a new instance of the <see cref="PagedList{T}"/> class from the given list with the given page size.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="source">The elements of <typeparamref name="T"/></param>
-    extension<T>(IEnumerable<T> source)
+    /// <remarks>
+    /// A plain static method, not an extension: <c>ToPagedList()</c> is the extension that does the same.
+    /// </remarks>
+    /// <typeparam name="T">The type of the items</typeparam>
+    /// <param name="source">The items</param>
+    /// <param name="pageSize">The number of elements displayed per page</param>
+    /// <returns>A list holding a copy of the items</returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageSize"/> is less than 1</exception>
+    public static PagedList<T> FromEnumerable<T>(IEnumerable<T> source, int pageSize = 10)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PagedList{T}"/> class from the given list with the given page size.
-        /// </summary>
-        /// <param name="pageSize">The number of elements displayed per page</param>
-        public PagedList<T> FromEnumerable(int pageSize = 10)
-        {
-            Validator.ValidatePageSize(pageSize);
+        Validator.ValidatePageSize(pageSize);
 
-            return new PagedList<T>(source, pageSize);
-        }
+        return new PagedList<T>(source, pageSize);
     }
 }

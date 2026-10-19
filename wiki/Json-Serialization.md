@@ -87,4 +87,4 @@ The property names follow the contract resolver of the settings, so with ASP.NET
 
 > Both packages assert this shared format against the same literal JSON in their own test suites (`JsonWireFormatTest`), so the two cannot drift apart unnoticed.
 
-Both `Page<T>` converters reconstruct via `new Page<T>(items, pageIndex, pageSize, totalItemCount)`, and treat an empty/missing `PageItems` array as an empty `Page<T>`. Both `PagedList<T>` converters reconstruct via `new PagedList<T>(items)`: the page size and current page are not written, so a list that is read back has page size 10 and is on page 1.
+Both `Page<T>` converters reconstruct via `new Page<T>(items, pageIndex, pageSize, totalItemCount)`. A page without items keeps its totals too, so a pre-paged page that came back empty still tells a pager how many pages there are. Only an empty page with a `TotalItemCount` of `0`, which is what `new Page<T>()` writes, is read back as `new Page<T>()`. Both `PagedList<T>` converters reconstruct via `new PagedList<T>(items)`: the page size and current page are not written, so a list that is read back has page size 10 and is on page 1.

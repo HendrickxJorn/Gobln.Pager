@@ -8,7 +8,7 @@ namespace Gobln.PagerTest;
 /// <summary>
 /// Paging state and the IList/ICollection surface of <see cref="PagedList{T}"/>.
 ///
-/// PageIndex and PageSize both clamp on assignment, and every mutation recalculates
+/// PageIndex clamps on assignment (a PageSize below 1 throws, see ValidationTest), and every mutation recalculates
 /// the page count -- which can pull PageIndex back when the list shrinks. Plain int
 /// sequences keep the assertions about that state machine rather than about the data.
 /// </summary>
@@ -59,18 +59,6 @@ public class PagedListStateTest
     #endregion PageIndex clamping
 
     #region PageSize
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-5)]
-    public void PageSize_BelowOne_ClampsToOne(int pageSize)
-    {
-        var pagedList = Create();
-
-        pagedList.PageSize = pageSize;
-
-        Assert.Equal(1, pagedList.PageSize);
-    }
 
     [Fact]
     public void PageSize_Change_RecalculatesPageCount()
@@ -294,4 +282,27 @@ public class PagedListStateTest
     }
 
     #endregion Pages
+
+    #region FromEnumerable
+
+    [Fact]
+    public void FromEnumerable_IsAStaticMethod_NotAnExtensionOnEverySequence()
+    {
+        // As an extension it showed up on every IEnumerable, next to ToPagedList, which does the same
+        var method = typeof(PagedList).GetMethod(nameof(PagedList.FromEnumerable));
+
+        Assert.NotNull(method);
+        Assert.False(method.IsDefined(typeof(System.Runtime.CompilerServices.ExtensionAttribute), inherit: false));
+    }
+
+    [Fact]
+    public void FromEnumerable_MakesAPagedList()
+    {
+        var pagedList = PagedList.FromEnumerable(Enumerable.Range(1, 25), pageSize: 5);
+
+        Assert.Equal(25, pagedList.Count);
+        Assert.Equal(5, pagedList.PageCount);
+    }
+
+    #endregion FromEnumerable
 }

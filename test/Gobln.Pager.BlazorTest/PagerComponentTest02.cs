@@ -442,4 +442,17 @@ public class PagerComponentTests02 : BunitContext
         Assert.All(cut.FindAll("a"), a => Assert.True(a.HasAttribute("blazor:onclick")));
         Assert.All(cut.FindAll("li"), li => Assert.False(li.HasAttribute("blazor:onclick")));
     }
+
+    [Fact]
+    public void Markup_HasNoCssScopeAttributes()
+    {
+        // The package ships no styles, so its markup gets no b-xxxxxxxxxx scope attributes
+        // and the app's own CSS applies as it is
+        var testPage = new TestPage { PageIndex = 5, TotalPageCount = 10, HasPaging = true };
+
+        var cut = Render<Blazor.Pager>(parameters => parameters.Add(c => c.Page, testPage));
+
+        Assert.All(cut.FindAll("*"), element =>
+            Assert.DoesNotContain(element.Attributes, attribute => attribute.Name.StartsWith("b-")));
+    }
 }

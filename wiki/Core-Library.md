@@ -93,7 +93,7 @@ var pagedList = new PagedList<int>(Enumerable.Range(1, 50), pageSize: 10);
 | Property | Type | Description |
 | --- | --- | --- |
 | `PageIndex` | `int` | Current page (get/set). Setting clamps to `[1, PageCount]`. |
-| `PageSize` | `int` | Items per page (get/set). Setting clamps to `>= 1` and recalculates `PageCount`. |
+| `PageSize` | `int` | Items per page (get/set). Setting recalculates `PageCount`. A value below `1` throws `ArgumentOutOfRangeException`, as in the constructor. |
 | `PageCount` | `int` | Total number of pages (read-only). |
 | `HasNextPage` | `bool` | `PageIndex < PageCount`. |
 | `HasPreviousPage` | `bool` | `PageIndex > 1`. |
@@ -140,10 +140,10 @@ var nextPage = pagedList.GetPage();
 
 ### `PagedList.FromEnumerable(...)`
 
-The static `PagedList` class exposes an extension member used internally by `ToPagedList()`:
+The static `PagedList` class has a factory method, which `ToPagedList()` uses. It is a plain static method, so it doesn't show up on every `IEnumerable<T>`:
 
 ```csharp
-PagedList<T> PagedList.FromEnumerable<T>(this IEnumerable<T> source, int pageSize = 10);
+PagedList<T> PagedList.FromEnumerable<T>(IEnumerable<T> source, int pageSize = 10);
 ```
 
 Prefer the [`ToPagedList()` extension methods](Extension-Methods.md) in application code.

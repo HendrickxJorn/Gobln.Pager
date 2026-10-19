@@ -1,6 +1,6 @@
 ﻿using Gobln.Pager;
 using Newtonsoft.Json;
-using System.Reflection;
+using System.Collections.Concurrent;
 
 namespace Gobln.Pager.Json.Newtonsoft;
 
@@ -9,42 +9,29 @@ namespace Gobln.Pager.Json.Newtonsoft;
 /// </summary>
 public class PagedListJsonConverter : JsonConverter
 {
+    // One converter per item type, made by reflection once instead of on every read and write.
+    // They hold no state, so all PagedListJsonConverter instances share them.
+    private static readonly ConcurrentDictionary<Type, JsonConverter> Converters = new();
+
     public override bool CanConvert(Type objectType) => objectType.IsGenericType
                 && (objectType.GetGenericTypeDefinition() == typeof(PagedList<>)
                     || objectType.GetGenericTypeDefinition() == typeof(IPagedList<>));
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
-        Type elementType = objectType.GetGenericArguments()[0];
-
-        JsonConverter converter = (JsonConverter)Activator.CreateInstance(
-            typeof(IPagedListJsonConverter<>)
-                .MakeGenericType([elementType]),
-            BindingFlags.Instance | BindingFlags.Public,
-            binder: null,
-            args: null,
-            culture: null)!;
-
-        return converter.ReadJson(reader, objectType, existingValue, serializer);
+        return ConverterFor(objectType.GetGenericArguments()[0]).ReadJson(reader, objectType, existingValue, serializer);
     }
 
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
         if (value is not null)
         {
-            Type elementType = value.GetType().GetGenericArguments()[0];
-
-            JsonConverter converter = (JsonConverter)Activator.CreateInstance(
-                typeof(IPagedListJsonConverter<>)
-                    .MakeGenericType([elementType]),
-                BindingFlags.Instance | BindingFlags.Public,
-                binder: null,
-                args: null,
-                culture: null)!;
-
-            converter.WriteJson(writer, value, serializer);
+            ConverterFor(value.GetType().GetGenericArguments()[0]).WriteJson(writer, value, serializer);
         }
     }
+
+    private static JsonConverter ConverterFor(Type elementType) =>
+        Converters.GetOrAdd(elementType, static type => (JsonConverter)Activator.CreateInstance(typeof(IPagedListJsonConverter<>).MakeGenericType(type))!);
 }
 
 /// <summary>
@@ -62,11 +49,10 @@ internal class IPagedListJsonConverter<T> : JsonConverter<IPagedList<T>>
 
         // Read with the caller's serializer, as WriteJson writes with it: its settings and
         // converters apply to the items too
-        var tempPage = serializer.Deserialize<IEnumerable<T>>(reader);
+        var items = serializer.Deserialize<IEnumerable<T>>(reader);
 
-        return tempPage is null || tempPage.Count() == 0
-           ? new PagedList<T>()
-           : new PagedList<T>(tempPage);
+        // Only the items are in the JSON, so the list gets the default page size and is on page 1
+        return new PagedList<T>(items ?? []);
     }
 
     public override void WriteJson(JsonWriter writer, IPagedList<T>? value, JsonSerializer serializer)

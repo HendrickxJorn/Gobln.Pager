@@ -112,4 +112,34 @@ public class JsonWireFormatTest
         Assert.NotNull(result);
         Assert.Equal([1, 2, 3, 4, 5], result);
     }
+
+    [Fact]
+    public void RoundTrip_PageWithoutItems_KeepsItsTotals()
+    {
+        // A pre-paged page that came back empty still tells a pager how many pages there are
+        var page = Array.Empty<int>().ToPage(3, 10, 25);
+
+        var result = JsonSerializer.Deserialize<Page<int>>(
+            JsonSerializer.Serialize(page, Options()), Options());
+
+        Assert.NotNull(result);
+        Assert.Empty(result);
+        Assert.Equal(3, result.PageIndex);
+        Assert.Equal(10, result.PageSize);
+        Assert.Equal(25, result.TotalItemCount);
+        Assert.Equal(3, result.TotalPageCount);
+    }
+
+    [Fact]
+    public void Deserialize_EmptyPageWithoutTotals_IsAnEmptyPage()
+    {
+        // What new Page<T>() writes. Its PageSize of 0 must not be rejected as invalid.
+        var result = JsonSerializer.Deserialize<Page<int>>(
+            """{"PageItems":[],"PageIndex":1,"PageSize":0,"TotalItemCount":0}""", Options());
+
+        Assert.NotNull(result);
+        Assert.True(result.IsEmpty);
+        Assert.Equal(0, result.TotalItemCount);
+        Assert.Equal(1, result.TotalPageCount);
+    }
 }

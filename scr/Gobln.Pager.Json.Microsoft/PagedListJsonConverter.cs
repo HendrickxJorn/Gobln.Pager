@@ -45,11 +45,10 @@ internal class IPagedListJsonConverter<T> : JsonConverter<IPagedList<T>>
             throw new JsonException();
         }
 
-        var temp = JsonSerializer.Deserialize<IEnumerable<T>>(ref reader, options)!;
+        var items = JsonSerializer.Deserialize<IEnumerable<T>>(ref reader, options);
 
-        return temp.Count() == 0
-             ? new PagedList<T>()
-             : new PagedList<T>(temp);
+        // Only the items are in the JSON, so the list gets the default page size and is on page 1
+        return new PagedList<T>(items ?? []);
     }
 
     public override void Write(

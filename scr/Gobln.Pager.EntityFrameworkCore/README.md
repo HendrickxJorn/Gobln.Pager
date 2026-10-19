@@ -7,8 +7,8 @@ Asynchronous paging for Entity Framework Core with [Gobln.Pager](https://www.nug
 
 ## Frameworks
 
-- .NET 8.0, with Entity Framework Core 8.0.32 or later
-- .NET 10.0, with Entity Framework Core 10.0.13 or later
+- .NET 8.0, with Entity Framework Core 8.0.20 or later
+- .NET 10.0, with Entity Framework Core 10.0.1 or later
 
 ## Installation
 

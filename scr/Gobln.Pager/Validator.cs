@@ -2,14 +2,14 @@
 
 internal static class Validator
 {
-    private const string LESSTHENZEROORZEROEXCEPTIONSTRING = "Can not be less then zero or zero";
-    private const string LESSTHENZEROEXCEPTIONSTRING = "Can not be less then zero";
+    private const string GreaterThanZero = "Must be greater than zero.";
+    private const string NotLessThanZero = "Can't be less than zero.";
 
     internal static void Validate(int pageIndex, int pageSize, int? totalItemCount = null)
     {
         if (pageIndex < 1)
         {
-            throw new ArgumentOutOfRangeException(nameof(pageIndex), LESSTHENZEROORZEROEXCEPTIONSTRING);
+            throw new ArgumentOutOfRangeException(nameof(pageIndex), pageIndex, GreaterThanZero);
         }
 
         ValidatePageSize(pageSize);
@@ -20,16 +20,22 @@ internal static class Validator
         }
     }
 
+    // pagerFilter is the parameter name of every public method that takes an IPageFilter
     internal static void Validate(IPageFilter pagerFilter, int? totalItemCount = null)
     {
+        if (pagerFilter is null)
+        {
+            throw new ArgumentNullException(nameof(pagerFilter));
+        }
+
         if (pagerFilter.PageIndex < 1)
         {
-            throw new ArgumentOutOfRangeException("IPagerFilter.PageIndex", LESSTHENZEROORZEROEXCEPTIONSTRING);
+            throw new ArgumentOutOfRangeException($"{nameof(pagerFilter)}.{nameof(IPageFilter.PageIndex)}", pagerFilter.PageIndex, GreaterThanZero);
         }
 
         if (pagerFilter.PageSize < 1)
         {
-            throw new ArgumentOutOfRangeException("IPagerFilter.PageSize", LESSTHENZEROORZEROEXCEPTIONSTRING);
+            throw new ArgumentOutOfRangeException($"{nameof(pagerFilter)}.{nameof(IPageFilter.PageSize)}", pagerFilter.PageSize, GreaterThanZero);
         }
 
         if (totalItemCount is not null)
@@ -42,7 +48,7 @@ internal static class Validator
     {
         if (pageSize < 1)
         {
-            throw new ArgumentOutOfRangeException(nameof(pageSize), LESSTHENZEROORZEROEXCEPTIONSTRING);
+            throw new ArgumentOutOfRangeException(nameof(pageSize), pageSize, GreaterThanZero);
         }
     }
 
@@ -50,7 +56,7 @@ internal static class Validator
     {
         if (totalItemCount < 0)
         {
-            throw new ArgumentOutOfRangeException(nameof(totalItemCount), LESSTHENZEROEXCEPTIONSTRING);
+            throw new ArgumentOutOfRangeException(nameof(totalItemCount), totalItemCount, NotLessThanZero);
         }
     }
 }

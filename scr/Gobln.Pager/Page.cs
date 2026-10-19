@@ -91,7 +91,7 @@ public class Page<T> : IPage<T>, IReadOnlyList<T>
     /// <param name="pageIndex">The currently selected page in the original collection</param>
     /// <param name="pageSize">Size of an individual page</param>
     /// <param name="totalItemCount">Total item count in the original collection</param>
-    /// <exception cref="ArgumentOutOfRangeException">Can not be less then zero or zero</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
     public Page(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)
     {
         Validator.Validate(pageIndex, pageSize, totalItemCount);
@@ -106,7 +106,6 @@ public class Page<T> : IPage<T>, IReadOnlyList<T>
     /// </summary>
     /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
     /// <param name="pageDefinitions">The definition of the current page and its position in the original collection</param>
-    /// <exception cref="ArgumentOutOfRangeException">Can not be less then zero or zero</exception>
     internal Page(IEnumerable<T> collection, PageDefinition pageDefinitions)
     {
         FillPageData(collection, pageDefinitions);
@@ -197,7 +196,6 @@ public class Page: IPage
     /// <typeparam name="T"></typeparam>
     /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
     /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException">Can not be less then zero or zero</exception>
     public static Page<T> FromEnumerable<T>(IEnumerable<T> source)
     {
         return source == null
@@ -212,7 +210,7 @@ public class Page: IPage
     /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
     /// <param name="pageIndex">The currently selected page in the original collection</param>
     /// <param name="pageSize">Size of an individual page</param>
-    /// <exception cref="ArgumentOutOfRangeException">Can not be less then zero or zero</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1</exception>
     /// <returns></returns>
     public static Page<T> FromEnumerable<T>(IEnumerable<T> source, int pageIndex, int pageSize)
     {

@@ -83,7 +83,7 @@ The core package declares these on `IEnumerable<T>` and runs the synchronous log
 | `ToPageAsync(..., totalItemCount, prePaged: false)` | the page with `Skip`/`Take`, no count |
 | `ToPageAsync()`, `ToPagedListAsync(...)` | one `ToListAsync` |
 
-On a query that isn't from EF Core, such as `list.AsQueryable()`, they do what the core package does. The package targets net8.0 (EF Core 8.0.32 or later) and net10.0 (EF Core 10.0.13 or later).
+On a query that isn't from EF Core, such as `list.AsQueryable()`, they do what the core package does. The package targets net8.0 (EF Core 8.0.20 or later) and net10.0 (EF Core 10.0.1 or later).
 
 ```csharp
 var page = await context.MyEntities

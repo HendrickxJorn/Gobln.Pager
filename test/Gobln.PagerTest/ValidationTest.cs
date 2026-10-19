@@ -202,5 +202,63 @@ public class ValidationTest
         Assert.Throws<ArgumentNullException>(() => pagedList.AddRange(null!));
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public void PagedList_PageSizeSetter_BelowOne_Throws(int pageSize)
+    {
+        // The same rule as the constructor, which throws too
+        var pagedList = new PagedList<int>(Source, 10);
+
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => pagedList.PageSize = pageSize);
+
+        Assert.Equal("pageSize", ex.ParamName);
+        Assert.Equal(10, pagedList.PageSize);
+    }
+
     #endregion PagedList<T>
+
+    #region Exceptions
+
+    [Fact]
+    public void NullPageFilter_ThrowsArgumentNull()
+    {
+        Assert.Equal("pagerFilter", Assert.Throws<ArgumentNullException>(() => Source.ToPage((IPageFilter)null!)).ParamName);
+        Assert.Equal("pagerFilter", Assert.Throws<ArgumentNullException>(() => QuerySource.ToPage((IPageFilter)null!, 100)).ParamName);
+    }
+
+    [Fact]
+    public async Task NullPageFilter_Async_ThrowsArgumentNull()
+    {
+        var ex = await Assert.ThrowsAsync<ArgumentNullException>(() => Source.ToPageAsync((IPageFilter)null!));
+
+        Assert.Equal("pagerFilter", ex.ParamName);
+    }
+
+    [Theory]
+    [InlineData(0, 10, "pagerFilter.PageIndex")]
+    [InlineData(1, 0, "pagerFilter.PageSize")]
+    public void InvalidPageFilter_NamesTheParameterAndItsProperty(int pageIndex, int pageSize, string paramName)
+    {
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => Source.ToPage(new PageFilter(pageIndex, pageSize)));
+
+        Assert.Equal(paramName, ex.ParamName);
+    }
+
+    [Fact]
+    public void OutOfRange_CarriesTheValueThatWasPassed()
+    {
+        Assert.Equal(-3, Assert.Throws<ArgumentOutOfRangeException>(() => Source.ToPage(-3, 10)).ActualValue);
+        Assert.Equal(0, Assert.Throws<ArgumentOutOfRangeException>(() => Source.ToPage(new PageFilter(1, 0))).ActualValue);
+        Assert.Equal(-1, Assert.Throws<ArgumentOutOfRangeException>(() => Source.ToPage(1, 10, -1)).ActualValue);
+    }
+
+    [Fact]
+    public void OutOfRange_SaysWhatIsAllowed()
+    {
+        Assert.StartsWith("Must be greater than zero.", Assert.Throws<ArgumentOutOfRangeException>(() => Source.ToPage(0, 10)).Message);
+        Assert.StartsWith("Can't be less than zero.", Assert.Throws<ArgumentOutOfRangeException>(() => Source.ToPage(1, 10, -1)).Message);
+    }
+
+    #endregion Exceptions
 }
