@@ -61,7 +61,14 @@ dotnet add package Gobln.Pager.Blazor
 - `BoundaryCount` (int): Number of always visible pages at the beginning and end. Default: `0`.
 - `ShowEllipsis` (bool): Whether to show an ellipsis (...) where page numbers are skipped. An ellipsis that would hide a single page shows that page instead. Default: `false`.
 - `ClassName` (string): Additional CSS classes appended to the pagination `<ul>`. Default: `null`.
+- `ShowPager` (`WhenToShowEnum`): When to render the pager at all. `IfNecessary`: only when there is more than one page. `Never`: nothing. Default: `Always`.
+- `ShowFirstButton`, `ShowPreviousButton`, `ShowNextButton`, `ShowLastButton` (`WhenToShowEnum`): When to show each button. `IfNecessary`: First and Previous only when not on the first page, Next and Last only when not on the last page. Default: `Always`, disabled where the button can't go anywhere.
+- `FirstText`, `PreviousText`, `NextText`, `LastText` (string): The button texts. Default: `"First"`, `"Previous"`, `"Next"`, `"Last"`.
+- `FirstIcon`, `PreviousIcon`, `NextIcon`, `LastIcon` (`RenderFragment`): Shown instead of the text, which then becomes the button's `aria-label`. Default: `null`.
+- `AriaLabel` (string): The `aria-label` of the `<nav>`, which tells the pager apart from the site's other navigation. Default: `"Page navigation"`.
 - `PageIndexChanged` (`EventCallback<int>`): Raised when the user selects another page; provides the new page index.
+
+`WhenToShowEnum` is this package's own copy of the Mvc package's enum, with the same values. In a project that imports both `Gobln.Pager.Blazor` and `Gobln.Pager.Mvc`, write it as `Gobln.Pager.Blazor.WhenToShowEnum`.
 
 ## Styling
 
@@ -78,12 +85,23 @@ Use `ClassName` to add your own classes alongside the built-in `pagination` clas
 renders:
 
 ```html
-<nav aria-label="page navigation">
+<nav aria-label="Page navigation">
     <ul class="pagination pagination-lg justify-content-center">
         ...
     </ul>
 </nav>
 ```
+
+For icons instead of texts, as in Bootstrap's own example, set the icon and keep the text for screen readers:
+
+```razor
+<Pager Page="@MyPage" PreviousText="Previous page" NextText="Next page">
+    <PreviousIcon>&laquo;</PreviousIcon>
+    <NextIcon>&raquo;</NextIcon>
+</Pager>
+```
+
+The Previous link then renders as `<a class="page-link" href="#" aria-label="Previous page"><span aria-hidden="true">&laquo;</span></a>`.
 
 ## Example: Blazor Server
 

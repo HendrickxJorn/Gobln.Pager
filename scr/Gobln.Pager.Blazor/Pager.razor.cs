@@ -33,6 +33,118 @@ public partial class Pager
     public bool ShowEllipsis { get; set; } = false;
 
     /// <summary>
+    /// When to show the pager. IfNecessary: only when there is more than one page.
+    /// </summary>
+    [DefaultValue(WhenToShowEnum.Always)]
+    [Description("When to show the pager. IfNecessary: only when there is more than one page.")]
+    [Parameter]
+    public WhenToShowEnum ShowPager { get; set; } = WhenToShowEnum.Always;
+
+    /// <summary>
+    /// When to show the First button. IfNecessary: only when not on the first page.
+    /// </summary>
+    [DefaultValue(WhenToShowEnum.Always)]
+    [Description("When to show the First button. IfNecessary: only when not on the first page.")]
+    [Parameter]
+    public WhenToShowEnum ShowFirstButton { get; set; } = WhenToShowEnum.Always;
+
+    /// <summary>
+    /// When to show the Previous button. IfNecessary: only when not on the first page.
+    /// </summary>
+    [DefaultValue(WhenToShowEnum.Always)]
+    [Description("When to show the Previous button. IfNecessary: only when not on the first page.")]
+    [Parameter]
+    public WhenToShowEnum ShowPreviousButton { get; set; } = WhenToShowEnum.Always;
+
+    /// <summary>
+    /// When to show the Next button. IfNecessary: only when not on the last page.
+    /// </summary>
+    [DefaultValue(WhenToShowEnum.Always)]
+    [Description("When to show the Next button. IfNecessary: only when not on the last page.")]
+    [Parameter]
+    public WhenToShowEnum ShowNextButton { get; set; } = WhenToShowEnum.Always;
+
+    /// <summary>
+    /// When to show the Last button. IfNecessary: only when not on the last page.
+    /// </summary>
+    [DefaultValue(WhenToShowEnum.Always)]
+    [Description("When to show the Last button. IfNecessary: only when not on the last page.")]
+    [Parameter]
+    public WhenToShowEnum ShowLastButton { get; set; } = WhenToShowEnum.Always;
+
+    /// <summary>
+    /// The text of the First button. With <see cref="FirstIcon"/>, its aria-label.
+    /// </summary>
+    [DefaultValue("First")]
+    [Description("The text of the First button. With FirstIcon, its aria-label.")]
+    [Parameter]
+    public string FirstText { get; set; } = "First";
+
+    /// <summary>
+    /// The text of the Previous button. With <see cref="PreviousIcon"/>, its aria-label.
+    /// </summary>
+    [DefaultValue("Previous")]
+    [Description("The text of the Previous button. With PreviousIcon, its aria-label.")]
+    [Parameter]
+    public string PreviousText { get; set; } = "Previous";
+
+    /// <summary>
+    /// The text of the Next button. With <see cref="NextIcon"/>, its aria-label.
+    /// </summary>
+    [DefaultValue("Next")]
+    [Description("The text of the Next button. With NextIcon, its aria-label.")]
+    [Parameter]
+    public string NextText { get; set; } = "Next";
+
+    /// <summary>
+    /// The text of the Last button. With <see cref="LastIcon"/>, its aria-label.
+    /// </summary>
+    [DefaultValue("Last")]
+    [Description("The text of the Last button. With LastIcon, its aria-label.")]
+    [Parameter]
+    public string LastText { get; set; } = "Last";
+
+    /// <summary>
+    /// Shown instead of <see cref="FirstText"/>, which becomes the button's aria-label.
+    /// </summary>
+    [DefaultValue(null)]
+    [Description("Shown instead of FirstText, which becomes the button's aria-label.")]
+    [Parameter]
+    public RenderFragment? FirstIcon { get; set; }
+
+    /// <summary>
+    /// Shown instead of <see cref="PreviousText"/>, which becomes the button's aria-label.
+    /// </summary>
+    [DefaultValue(null)]
+    [Description("Shown instead of PreviousText, which becomes the button's aria-label.")]
+    [Parameter]
+    public RenderFragment? PreviousIcon { get; set; }
+
+    /// <summary>
+    /// Shown instead of <see cref="NextText"/>, which becomes the button's aria-label.
+    /// </summary>
+    [DefaultValue(null)]
+    [Description("Shown instead of NextText, which becomes the button's aria-label.")]
+    [Parameter]
+    public RenderFragment? NextIcon { get; set; }
+
+    /// <summary>
+    /// Shown instead of <see cref="LastText"/>, which becomes the button's aria-label.
+    /// </summary>
+    [DefaultValue(null)]
+    [Description("Shown instead of LastText, which becomes the button's aria-label.")]
+    [Parameter]
+    public RenderFragment? LastIcon { get; set; }
+
+    /// <summary>
+    /// The aria-label of the nav, which tells the pager apart from the site's other navigation.
+    /// </summary>
+    [DefaultValue("Page navigation")]
+    [Description("The aria-label of the nav, which tells the pager apart from the site's other navigation.")]
+    [Parameter]
+    public string AriaLabel { get; set; } = "Page navigation";
+
+    /// <summary>
     /// Additional CSS classes to apply to the pagination list.
     /// </summary>
     [DefaultValue(null)]
@@ -95,6 +207,10 @@ public partial class Pager
     private string ClassNames => string.IsNullOrWhiteSpace(ClassName)
         ? "pagination"
         : $"pagination {ClassName.Trim()}";
+
+    // Always, or IfNecessary when it is necessary
+    private static bool Show(WhenToShowEnum whenToShow, bool isNecessary) =>
+        whenToShow == WhenToShowEnum.Always || (whenToShow == WhenToShowEnum.IfNecessary && isNecessary);
 
     // The page numbers to show, with null where an ellipsis goes
     private IReadOnlyList<int?> PageNumbers => PageWindow.GetPageNumbers(PageIndex, TotalPageCount, SiblingCount, BoundaryCount, ShowEllipsis);

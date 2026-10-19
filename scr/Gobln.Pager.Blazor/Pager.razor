@@ -1,21 +1,36 @@
 ﻿@namespace Gobln.Pager.Blazor
 
-<nav aria-label="page navigation">
-    <ul class="@ClassNames">
-        <PagerItem Text="First" IsDisabled=@(1 == PageIndex) @onclick="_ => InvokePageChange(1)" />
-        <PagerItem Text="Previous" IsDisabled=@(1 == PageIndex) @onclick="_ => InvokePageChange(Math.Max(1, PageIndex - 1))" />
-        @foreach (var pageNumber in PageNumbers)
-        {
-            if (pageNumber is int index)
+@if (Show(ShowPager, TotalPageCount > 1))
+{
+    <nav aria-label="@AriaLabel">
+        <ul class="@ClassNames">
+            @if (Show(ShowFirstButton, PageIndex > 1))
             {
-                <PagerItem Text="@index.ToString()" IsActive=@(index == PageIndex) @onclick="_ => InvokePageChange(index)" />
+                <PagerItem Text="@FirstText" Icon="FirstIcon" IsDisabled=@(1 == PageIndex) OnClick="() => InvokePageChange(1)" />
             }
-            else
+            @if (Show(ShowPreviousButton, PageIndex > 1))
             {
-                <PagerItem Text="..." IsDisabled=true />
+                <PagerItem Text="@PreviousText" Icon="PreviousIcon" IsDisabled=@(1 == PageIndex) OnClick="() => InvokePageChange(Math.Max(1, PageIndex - 1))" />
             }
-        }
-        <PagerItem Text="Next" IsDisabled=@(TotalPageCount == PageIndex) @onclick="_ => InvokePageChange(Math.Min(TotalPageCount, PageIndex + 1))" />
-        <PagerItem Text="Last" IsDisabled=@(TotalPageCount == PageIndex) @onclick="_ => InvokePageChange(TotalPageCount)" />
-    </ul>
-</nav>
+            @foreach (var pageNumber in PageNumbers)
+            {
+                if (pageNumber is int index)
+                {
+                    <PagerItem Text="@index.ToString()" IsActive=@(index == PageIndex) OnClick="() => InvokePageChange(index)" />
+                }
+                else
+                {
+                    <PagerItem Text="..." IsDisabled=true />
+                }
+            }
+            @if (Show(ShowNextButton, PageIndex < TotalPageCount))
+            {
+                <PagerItem Text="@NextText" Icon="NextIcon" IsDisabled=@(TotalPageCount == PageIndex) OnClick="() => InvokePageChange(Math.Min(TotalPageCount, PageIndex + 1))" />
+            }
+            @if (Show(ShowLastButton, PageIndex < TotalPageCount))
+            {
+                <PagerItem Text="@LastText" Icon="LastIcon" IsDisabled=@(TotalPageCount == PageIndex) OnClick="() => InvokePageChange(TotalPageCount)" />
+            }
+        </ul>
+    </nav>
+}

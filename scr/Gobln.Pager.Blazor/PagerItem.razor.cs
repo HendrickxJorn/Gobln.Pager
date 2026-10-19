@@ -30,6 +30,13 @@ public partial class PagerItem
     public bool IsDisabled { get; set; } = false;
 
     /// <summary>
+    /// Raised when the item's link is clicked. A disabled item has no link, so it can't be clicked.
+    /// </summary>
+    [Description("Raised when the item's link is clicked. A disabled item has no link, so it can't be clicked.")]
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    /// <summary>
     /// Gets or sets additional attributes that will be applied to the component.
     /// </summary>
     [DefaultValue(null)]
@@ -37,14 +44,18 @@ public partial class PagerItem
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> AdditionalAttributes { get; set; } = [];
 
+    /// <summary>
+    /// Shown instead of the text, which then becomes the item's aria-label.
+    /// </summary>
+    [DefaultValue(null)]
+    [Description("Shown instead of the text, which then becomes the item's aria-label.")]
+    [Parameter]
+    public RenderFragment? Icon { get; set; }
+
+    // With an icon the text isn't shown, so screen readers get it from the aria-label instead
+    private string? AriaLabel => Icon is null ? null : Text;
+
     private string ClassNames => "page-item"
         + (IsDisabled ? " disabled" : "")
         + (IsActive ? " active" : "");
-
-    /// <summary>
-    /// The attributes for the li. A disabled item drops the click handler, so it can't react.
-    /// </summary>
-    private IEnumerable<KeyValuePair<string, object>> ItemAttributes => IsDisabled
-        ? AdditionalAttributes.Where(attribute => !string.Equals(attribute.Key, "onclick", StringComparison.OrdinalIgnoreCase))
-        : AdditionalAttributes;
 }
