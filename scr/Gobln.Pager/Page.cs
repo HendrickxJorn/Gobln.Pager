@@ -10,11 +10,11 @@ namespace Gobln.Pager;
 /// </summary>
 /// <typeparam name="T"></typeparam>
 [Serializable]
-public class Page<T> : IPage<T>, IEnumerable
+public class Page<T> : IPage<T>, IReadOnlyList<T>
 {
     #region Members
 
-    internal IEnumerable<T> _items = [];
+    internal IReadOnlyList<T> _items = [];
 
     #endregion Members
 
@@ -48,7 +48,18 @@ public class Page<T> : IPage<T>, IEnumerable
     /// <summary>
     /// Does the page contain any elements
     /// </summary>
-    public bool IsEmpty => _items is null ||  !_items.Any();
+    public bool IsEmpty => _items.Count == 0;
+
+    /// <summary>
+    /// The number of items on this page. The last page can hold fewer than <see cref="PageSize"/>.
+    /// </summary>
+    public int Count => _items.Count;
+
+    /// <summary>
+    /// The item at <paramref name="index"/> on this page, counted from 0
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">Not an index of an item on this page</exception>
+    public T this[int index] => _items[index];
 
     #endregion Properties
 
@@ -129,7 +140,7 @@ public class Page<T> : IPage<T>, IEnumerable
     /// <returns>Returns <see cref="IEnumerable{T}"/></returns>
     public IEnumerator<T> GetEnumerator()
     {
-        return ((IEnumerable<T>)_items).GetEnumerator();
+        return _items.GetEnumerator();
     }
 
     /// <summary>

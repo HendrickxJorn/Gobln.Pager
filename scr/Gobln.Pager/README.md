@@ -45,6 +45,19 @@ foreach (var order in page)
 // page.TotalPageCount   10
 // page.HasPaging        true: there is more than one page
 // page.IsEmpty          false
+// page.Count            10: the orders on this page
+// page[0]               order 11
+```
+
+Every `IPage` also has these navigation helpers:
+
+```csharp
+page.HasPreviousPage()   // true
+page.HasNextPage()       // true
+page.FirstItemOnPage()   // 11
+page.LastItemOnPage()    // 20
+
+var summary = $"Showing {page.FirstItemOnPage()}-{page.LastItemOnPage()} of {page.TotalItemCount}";   // Showing 11-20 of 95
 ```
 
 On an `IQueryable<T>`, such as an Entity Framework query, the paging is added to the query, so only the items of that page are fetched. Sort the query before paging it: without an `OrderBy` the database picks the order, and one page can repeat items of another.
@@ -119,9 +132,9 @@ var numbers = PageWindow.GetPageNumbers(pageIndex: 5, totalPageCount: 10, siblin
 
 ## Behaviour to know about
 
-- A `Page<T>` reads its items from the source each time it is enumerated. On an `IQueryable<T>`, every `foreach` over the page, and `IsEmpty`, runs the query again, so the `DbContext` has to stay open until the page has been shown.
+- A `Page<T>` holds its items: `ToPage` reads them once, when it runs. On an `IQueryable<T>` that is one query for the count and one for the page. Enumerating the page afterwards doesn't query again, so the `DbContext` may be gone by the time the page is shown.
 - A page index or page size below 1 throws `ArgumentOutOfRangeException`. So does a total item count below 0.
-- `ToPage(pageIndex, pageSize)` with a page index past the last page returns an empty page whose `TotalItemCount` is 0 and whose `TotalPageCount` is 1. When the index comes from a request, keep it within the pages there are before calling `ToPage`.
+- `ToPage(pageIndex, pageSize)` with a page index past the last page returns the last page. A pre-paged page that came back empty keeps its totals, so a pager still shows the pages there are.
 - `ToPagedList` on an `IQueryable<T>` runs the whole query and loads the result in memory.
 - The `Async` versions run the same work on a thread-pool thread. They don't use Entity Framework's async queries.
 
@@ -135,6 +148,8 @@ Support for .NET Framework 4.5 and lower, and for .NET Standard 1.6, is removed.
 - `PageIndex` is 1 by default, not 0.
 - `ToPage` with a total item count now treats the collection as already paged. To have the collection sliced, as in version 1, pass `prePaged: false` as the last argument.
 - `PagerFilter` and `IPagerFilter` are renamed to `PageFilter` and `IPageFilter`.
+- `ToPage` reads the items once, when it runs. The page no longer reads its source (or runs its query) again each time it is enumerated.
+- A page index past the last page returns the last page, not an empty page without totals.
 
 ### Changes to PagedList
 

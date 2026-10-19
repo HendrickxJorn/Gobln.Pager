@@ -69,7 +69,7 @@ foreach (var item in page)
 }
 ```
 
-The page runs the query when it is enumerated, not when it is created, so enumerate it while the `DbContext` is still open. See [Core Library](Core-Library.md#paget--one-page-of-items).
+`ToPage` runs the query (a count, then the page) and the page keeps the rows, so it can be enumerated after the `DbContext` is gone. See [Core Library](Core-Library.md#paget--one-page-of-items).
 
 An async equivalent (`ToPageAsync`) is available on both `IEnumerable<T>` and `IQueryable<T>` — see [Extension Methods](Extension-Methods.md).
 

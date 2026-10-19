@@ -20,6 +20,8 @@ Simplest usage, using whatever options were registered via `AddMvcPager()` (or t
 @Html.Pager(Model)
 ```
 
+`Pager` takes any `IPage`. A `PagedList<T>` isn't one: pass its current page, `@Html.Pager(Model.GetPage())`.
+
 With one-off options:
 
 ```cshtml

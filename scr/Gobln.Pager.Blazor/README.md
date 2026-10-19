@@ -111,6 +111,7 @@ Add the component to any Razor component or page as shown above. Handle `PageInd
 
 - The package targets modern .NET and is suitable for .NET 8+ Blazor apps.
 - The pager only reads `PageIndex` and `TotalPageCount`. If your app has its own paging model, wrap it in a class that implements `IPage` from Gobln.Pager.
+- A `PagedList<T>` isn't an `IPage` itself; pass its current page, and move the list when the page changes: `<Pager Page="list.GetPage()" PageIndexChanged="i => list.PageIndex = i" />`.
 
 ## Issues and contributions
 

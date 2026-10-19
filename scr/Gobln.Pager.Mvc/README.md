@@ -3,7 +3,7 @@
 [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Mvc.svg)](https://www.nuget.org/packages/Gobln.Pager.Mvc/)
 [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Mvc.svg)](https://www.nuget.org/packages/Gobln.Pager.Mvc/)
 
-HTML helpers that render a [Gobln.Pager](https://www.nuget.org/packages/Gobln.Pager/) `Page` or `PagedList` as pagination markup in a Razor view. The markup follows Bootstrap's pagination component, so it works with Bootstrap 5.3 without any extra CSS. The library ships no CSS of its own.
+HTML helpers that render a [Gobln.Pager](https://www.nuget.org/packages/Gobln.Pager/) `Page`, or any other `IPage`, as pagination markup in a Razor view. For a `PagedList`, pass its current page: `@Html.Pager(Model.GetPage())`. The markup follows Bootstrap's pagination component, so it works with Bootstrap 5.3 without any extra CSS. The library ships no CSS of its own.
 
 ## Frameworks
 
@@ -27,11 +27,9 @@ public IActionResult Index(int pageIndex = 1)
 {
     var orders = _db.Orders.OrderBy(o => o.Id);
 
-    // pageIndex comes from the url, so it can be anything. ToPage throws below page 1
-    // and returns an empty page past the last one, so keep it within the pages there are.
-    var lastPage = Math.Max(1, (int)Math.Ceiling(orders.Count() / 10.0));
-
-    var page = orders.ToPage(Math.Clamp(pageIndex, 1, lastPage), 10);
+    // pageIndex comes from the url, so it can be anything. ToPage throws below page 1;
+    // past the last page it returns the last page.
+    var page = orders.ToPage(Math.Max(pageIndex, 1), 10);
 
     return View(page);
 }

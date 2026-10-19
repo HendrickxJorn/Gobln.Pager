@@ -4,9 +4,9 @@ All types below live in the `Gobln.Pager` namespace, in the core `Gobln.Pager` p
 
 ## `Page<T>` — one page of items
 
-One page of a larger collection, with the paging information a pager needs. Implements `IPage<T>` and `IEnumerable<T>`, and is `[Serializable]`.
+One page of a larger collection, with the paging information a pager needs. Implements `IPage<T>` and `IReadOnlyList<T>`, and is `[Serializable]`.
 
-Its properties don't change after construction, but its items are read from the source each time the page is enumerated. When the source list changes, the page changes with it. On an `IQueryable<T>`, every enumeration of the page (and every `IsEmpty`) runs the query again, so the `DbContext` has to stay open until the page has been shown; see [Troubleshooting](Best-Practices-and-Troubleshooting.md#objectdisposedexception-when-a-page-from-entity-framework-is-shown).
+A page holds its items: they are read once, when the page is made, and nothing about the page changes afterwards. Changes to the source don't show up in it. On an `IQueryable<T>`, `ToPage` runs one query for the count and one for the page; enumerating the page later doesn't query again, so the `DbContext` may be gone by then.
 
 ### `Page<T>` properties
 
@@ -18,8 +18,27 @@ Its properties don't change after construction, but its items are read from the 
 | `TotalPageCount` | `int` | Total pages in the original collection. Default `1`. |
 | `HasPaging` | `bool` | `TotalPageCount > 1`. |
 | `IsEmpty` | `bool` | `true` if the page contains no items. |
+| `Count` | `int` | The number of items on this page. The last page can hold fewer than `PageSize`. |
+| `this[int index]` | `T` | The item at `index` on this page, counted from 0. |
 
 All properties are read-only (`{ get; private set; }`) once the page is constructed.
+
+### Navigation helpers (any `IPage`)
+
+Extension methods on `IPage`, so a custom `IPage` implementation has them too. They are methods, not properties, so they work from every C# version.
+
+| Method | Returns | Description |
+| --- | --- | --- |
+| `HasPreviousPage()` | `bool` | `PageIndex > 1`. |
+| `HasNextPage()` | `bool` | `PageIndex < TotalPageCount`. |
+| `FirstItemOnPage()` | `int` | The number of the page's first item in the whole collection, counted from 1. `0` when there are no items. |
+| `LastItemOnPage()` | `int` | The number of the page's last item in the whole collection, counted from 1. `0` when there are no items. |
+
+```csharp
+var page = Enumerable.Range(1, 95).ToPage(pageIndex: 2, pageSize: 10);
+
+var summary = $"Showing {page.FirstItemOnPage()}-{page.LastItemOnPage()} of {page.TotalItemCount}";   // Showing 11-20 of 95
+```
 
 ### `Page<T>` constructors
 
@@ -92,14 +111,16 @@ var pagedList = new PagedList<int>(Enumerable.Range(1, 50), pageSize: 10);
 | `Remove(T item)` / `RemoveAt(int index)` | Remove an item; recalculates paging. |
 | `Clear()` | Remove all items. |
 | `Contains(T item)` / `IndexOf(T item)` / `CopyTo(T[], int)` | Standard collection operations. |
-| `GetPage(int pageIndex)` | Returns the given page as a `Page<T>`. Throws `ArgumentOutOfRangeException` below `1`; past the last page it returns an empty page. |
+| `GetPage(int pageIndex)` | Returns the given page as a `Page<T>`. Throws `ArgumentOutOfRangeException` below `1`; past the last page it returns the last page. |
 | `GetPage()` | Returns the *current* page (`PageIndex`) as a `Page<T>`. |
 | `GetPages()` | Yields a `Page<T>` for every page, in order. |
 | `NextPage()` | Advances `PageIndex` by 1 (clamped) and returns `this`, for chaining. |
 | `PreviousPage()` | Moves `PageIndex` back by 1 (clamped) and returns `this`, for chaining. |
 | `AsReadOnly()` | Returns a read-only copy of all items, as a `ReadOnlyCollection<T>`. Later changes to the list don't show up in it. |
 
-The pages that `GetPage` returns read the list when they are enumerated, so changes made to the list afterwards show up in them.
+The pages that `GetPage` returns hold a copy of their items, so changes made to the list afterwards don't show up in them. Call `GetPage` again for the current state.
+
+`PagedList<T>` is not an `IPage`. To show it with the Blazor or MVC pager, pass its current page: `list.GetPage()`.
 
 > The navigation methods are named **`NextPage()`** / **`PreviousPage()`** — not `GoToNextPage()` / `GoToPreviousPage()`.
 

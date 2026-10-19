@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net462;net48;net8.0;net10.0</TargetFrameworks>
-    <Description>ASP.NET MVC and ASP.NET Core HTML helpers for Gobln.Pager. Renders a Page or PagedList as ready-to-style pagination markup directly in Razor views.</Description>
+    <Description>ASP.NET MVC and ASP.NET Core HTML helpers for Gobln.Pager. Renders any IPage, such as a Page or the current page of a PagedList, as ready-to-style pagination markup directly in Razor views.</Description>
     <PackageTags>Page, Pager, Paging, Pagination, Mvc</PackageTags>
   </PropertyGroup>
 

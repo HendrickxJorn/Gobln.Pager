@@ -49,7 +49,7 @@ dotnet add package Gobln.Pager
 
 ## The two page types
 
-**`Page<T>`** is one page of items, carrying `PageIndex`, `PageSize`, `TotalItemCount`, `TotalPageCount`, `HasPaging`, and `IsEmpty`. Its items are read from the source each time it is enumerated. Create one with `ToPage(...)`:
+**`Page<T>`** is one page of items, carrying `PageIndex`, `PageSize`, `TotalItemCount`, `TotalPageCount`, `HasPaging`, and `IsEmpty`. It holds its items, read once when the page is made, as an `IReadOnlyList<T>` (`Count`, `page[0]`). Every page also has `HasPreviousPage()`, `HasNextPage()`, `FirstItemOnPage()` and `LastItemOnPage()`. Create one with `ToPage(...)`:
 
 ```csharp
 var page = items.ToPage(pageIndex: 1, pageSize: 10);      // page a collection

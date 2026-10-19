@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
-    <Description>A Blazor pagination component for Gobln.Pager. Renders a Page or PagedList as an interactive pager for Blazor Server and WebAssembly applications.</Description>
+    <Description>A Blazor pagination component for Gobln.Pager. Renders any IPage, such as a Page or the current page of a PagedList, as an interactive pager for Blazor Server and WebAssembly applications.</Description>
     <PackageTags>Page, Pager, Paging, Pagination, Blazor</PackageTags>
   </PropertyGroup>
 

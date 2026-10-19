@@ -395,6 +395,41 @@ public class PagerComponentTests02 : BunitContext
         Assert.Equal("Search results pages", custom.Find("nav").GetAttribute("aria-label"));
     }
 
+    /// <summary>
+    /// A parent showing a PagedList the way the README says: its current page in, the list
+    /// moved when the page changes
+    /// </summary>
+    private sealed class PagedListHost : ComponentBase
+    {
+        public PagedList<int> List { get; } = Enumerable.Range(1, 50).ToPagedList(10);
+
+        protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
+        {
+            builder.OpenComponent<Blazor.Pager>(0);
+            builder.AddAttribute(1, nameof(Blazor.Pager.Page), List.GetPage());
+            builder.AddAttribute(2, nameof(Blazor.Pager.PageIndexChanged), EventCallback.Factory.Create<int>(this, i => List.PageIndex = i));
+            builder.CloseComponent();
+        }
+    }
+
+    [Fact]
+    public void PagedList_ThroughGetPage_FollowsTheList()
+    {
+        var cut = Render<PagedListHost>();
+
+        // A click moves the list ...
+        cut.FindAll("a").First(a => a.TextContent.Trim() == "2").Click();
+
+        Assert.Equal(2, cut.Instance.List.PageIndex);
+        Assert.Equal("2", cut.Find("li.active > a").TextContent.Trim());
+
+        // ... and moving the list moves the pager
+        cut.Instance.List.PageIndex = 5;
+        cut.Render();
+
+        Assert.Equal("5", cut.Find("li.active > a").TextContent.Trim());
+    }
+
     [Fact]
     public void ClickHandler_IsOnTheLink_NotOnTheListItem()
     {

@@ -5,7 +5,7 @@ The core package adds `ToPage(...)` / `ToPagedList(...)` extension methods (plus
 - On **`IEnumerable<T>`**, paging happens in memory (`Skip`/`Take` over the sequence).
 - On **`IQueryable<T>`**, paging is translated into the query provider (e.g. Entity Framework turns `Skip`/`Take` into SQL) — only the requested page is pulled into memory, *except* for `ToPagedList()`, see the warning below. Sort the query before paging it: without an `OrderBy` the database picks the order, and one page can repeat items of another.
 
-Either way the returned page reads its items from the source each time it is enumerated; see [Core Library](Core-Library.md#paget--one-page-of-items).
+Either way the returned page holds its items: the source is read once, by `ToPage`, and not again when the page is enumerated; see [Core Library](Core-Library.md#paget--one-page-of-items).
 
 ## `ToPage(...)` overloads
 
@@ -22,7 +22,7 @@ Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount, bool prePaged);
 - `ToPage()` with no arguments returns the entire sequence as a single page.
 - Overloads that take `totalItemCount` without a `prePaged` flag treat the source as **already paged** (`prePaged: true`) — i.e. they assume `source` is exactly the slice for `pageIndex`, and do not re-slice it. This is the fast path for data you've already paged at the database level.
 - The `prePaged` flag lets you be explicit either way.
-- A `pageIndex` past the last page returns an empty page whose `TotalItemCount` is `0` and `TotalPageCount` is `1`. Keep an index that comes from a request within the pages there are.
+- A `pageIndex` past the last page returns the last page. A pre-paged source that came back empty keeps its `TotalItemCount` and `TotalPageCount`.
 
 ```csharp
 // In-memory paging

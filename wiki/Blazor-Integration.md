@@ -22,6 +22,8 @@ Targets `net8.0` and `net10.0`. Provides a single `<Pager>` component (namespace
 
 `Page` is typed as the non-generic `IPage` interface — pass any `Page<T>` (from the core library) or a custom `IPage` implementation. The component only reads `PageIndex` and `TotalPageCount` from it.
 
+A `PagedList<T>` isn't an `IPage`. Pass its current page, and move the list when the user picks another page: `<Pager Page="list.GetPage()" PageIndexChanged="i => list.PageIndex = i" />`. `GetPage()` returns a new `Page<T>` on every render, which the pager always takes over, so it follows the list.
+
 `WhenToShowEnum` (`Never`, `IfNecessary`, `Always`) is the Blazor package's own copy of the MVC package's enum, not a shared type. In a project that imports both namespaces, write `Gobln.Pager.Blazor.WhenToShowEnum`.
 
 ## Usage

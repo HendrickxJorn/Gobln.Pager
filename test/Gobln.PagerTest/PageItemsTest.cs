@@ -46,6 +46,19 @@ public class PageItemsTest
     }
 
     [Fact]
+    public void Page_IsAReadOnlyListOfItsItems()
+    {
+        // 25 items at 10 per page: the last page holds 5
+        var page = Enumerable.Range(1, 25).ToPage(3, 10);
+
+        var list = Assert.IsAssignableFrom<IReadOnlyList<int>>(page);
+
+        Assert.Equal(5, list.Count);
+        Assert.Equal(21, list[0]);
+        Assert.Equal(25, list[4]);
+    }
+
+    [Fact]
     public void QueryablePage_DoesNotRunTheQueryAgain()
     {
         var source = new CountingSource(30);
