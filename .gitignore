@@ -346,7 +346,8 @@ _Backup/
 # Claude Code local config
 .claude/
 
-.doc/
+# Local docs
+.docs/
 
 # Local planning notes
 .plan/
