@@ -37,7 +37,11 @@
     <RepositoryUrl>https://github.com/HendrickxJorn/Gobln.Pager</RepositoryUrl>
     <PackageIcon>Gobln Pager.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <!--
+      An SPDX expression, not PackageLicenseFile: nuget.org then shows "MIT"
+      and license scanners recognise it. LICENSE.md is still packed below.
+    -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
