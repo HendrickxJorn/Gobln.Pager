@@ -1,0 +1,36 @@
+﻿@namespace Gobln.Pager.Blazor
+
+@if (Show(ShowPager, TotalPageCount > 1))
+{
+    <nav aria-label="@AriaLabel">
+        <ul class="@ClassNames">
+            @if (Show(ShowFirstButton, PageIndex > 1))
+            {
+                <PagerItem Text="@FirstText" Icon="FirstIcon" IsDisabled=@(1 == PageIndex) OnClick="() => InvokePageChange(1)" />
+            }
+            @if (Show(ShowPreviousButton, PageIndex > 1))
+            {
+                <PagerItem Text="@PreviousText" Icon="PreviousIcon" IsDisabled=@(1 == PageIndex) OnClick="() => InvokePageChange(Math.Max(1, PageIndex - 1))" />
+            }
+            @foreach (var pageNumber in PageNumbers)
+            {
+                if (pageNumber is int index)
+                {
+                    <PagerItem Text="@index.ToString()" IsActive=@(index == PageIndex) OnClick="() => InvokePageChange(index)" />
+                }
+                else
+                {
+                    <PagerItem Text="..." IsDisabled=true />
+                }
+            }
+            @if (Show(ShowNextButton, PageIndex < TotalPageCount))
+            {
+                <PagerItem Text="@NextText" Icon="NextIcon" IsDisabled=@(TotalPageCount == PageIndex) OnClick="() => InvokePageChange(Math.Min(TotalPageCount, PageIndex + 1))" />
+            }
+            @if (Show(ShowLastButton, PageIndex < TotalPageCount))
+            {
+                <PagerItem Text="@LastText" Icon="LastIcon" IsDisabled=@(TotalPageCount == PageIndex) OnClick="() => InvokePageChange(TotalPageCount)" />
+            }
+        </ul>
+    </nav>
+}

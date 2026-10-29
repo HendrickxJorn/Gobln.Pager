@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net462;net48;net8.0;net10.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <Version>2.0.0</Version>
+    <Description>System.Text.Json converters for Gobln.Pager. Serializes and deserializes Page and PagedList objects, keeping a Page's index, size, and total item count intact across the wire.</Description>
+    <PackageTags>Page, Pager, Paging, Pagination, Json</PackageTags>
+  </PropertyGroup>
+
+  <!-- net8.0 and net10.0 have System.Text.Json in the framework; the package is only for the others -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462' or '$(TargetFramework)' == 'net48' or '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gobln.Pager\Gobln.Pager.csproj" />
+  </ItemGroup>
+
+</Project>

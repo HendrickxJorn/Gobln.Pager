@@ -1,257 +1,241 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Gobln.Pager
+namespace Gobln.Pager;
+
+/// <summary>
+/// Represents a strongly typed <see cref="Page"/>
+/// </summary>
+/// <typeparam name="T"></typeparam>
+[Serializable]
+public class Page<T> : IPage<T>, IReadOnlyList<T>
+{
+    #region Members
+
+    internal IReadOnlyList<T> _items = [];
+
+    #endregion Members
+
+    #region Properties
+
+    /// <summary>
+    /// The index of the current page in the original collection
+    /// </summary>
+    public int PageIndex { get; private set; } = 1;
+
+    /// <summary>
+    /// The size of the page
+    /// </summary>
+    public int PageSize { get; private set; } = 0;
+
+    /// <summary>
+    /// Total amount of items in the original collection
+    /// </summary>
+    public int TotalItemCount { get; private set; } = 0;
+
+    /// <summary>
+    /// Total amount of pages in the original collection
+    /// </summary>
+    public int TotalPageCount { get; private set; } = 1;
+
+    /// <summary>
+    /// Is paging available (has more than one page in the original collection)
+    /// </summary>
+    public bool HasPaging => TotalPageCount > 1;
+
+    /// <summary>
+    /// Does the page contain any elements
+    /// </summary>
+    public bool IsEmpty => _items.Count == 0;
+
+    /// <summary>
+    /// The number of items on this page. The last page can hold fewer than <see cref="PageSize"/>.
+    /// </summary>
+    public int Count => _items.Count;
+
+    /// <summary>
+    /// The item at <paramref name="index"/> on this page, counted from 0
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">Not an index of an item on this page</exception>
+    public T this[int index] => _items[index];
+
+    #endregion Properties
+
+    #region Initialize
+
+    /// <summary>
+    /// Creates an empty <see cref="Page"/>
+    /// </summary>
+    public Page()
+    {
+    }
+
+    /// <summary>
+    /// Converts a collection of <typeparamref name="T"/> to a single <see cref="Page"/>
+    /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
+    /// </summary>
+    public Page(IEnumerable<T> collection)
+    {
+        var list = collection.ToList();
+        var pageDefinitions = new PageDefinition(1, list.Count, list.Count);
+
+        FillPageData(list, pageDefinitions);
+    }
+
+    /// <summary>
+    /// Converts a pre-paged collection to a specific <see cref="Page"/>
+    /// </summary>
+    /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
+    /// <param name="pageIndex">The currently selected page in the original collection</param>
+    /// <param name="pageSize">Size of an individual page</param>
+    /// <param name="totalItemCount">Total item count in the original collection</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+    public Page(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)
+    {
+        Validator.Validate(pageIndex, pageSize, totalItemCount);
+
+        var pageDefinitions = new PageDefinition(pageIndex, pageSize, totalItemCount);
+
+        FillPageData(collection, pageDefinitions);
+    }
+
+    /// <summary>
+    /// Converts a collection to a specific <see cref="Page"/>
+    /// </summary>
+    /// <param name="collection">The elements of <typeparamref name="T"/> of the current page</param>
+    /// <param name="pageDefinitions">The definition of the current page and its position in the original collection</param>
+    internal Page(IEnumerable<T> collection, PageDefinition pageDefinitions)
+    {
+        FillPageData(collection, pageDefinitions);
+    }
+
+    #endregion Initialize
+
+    private void FillPageData(IEnumerable<T> collection, PageDefinition pageDefinitions)
+    {
+        if (collection is null || pageDefinitions.TotalItemCount < 1)
+        {
+            return;
+        }
+
+        // Read once: the collection may be a query, and enumerating the page must not run it again
+        _items = collection.ToList();
+
+        // Kept when the items are empty too: a pre-paged page that came back empty still
+        // has to tell a pager how many pages there are
+        PageIndex = pageDefinitions.PageIndex;
+        TotalPageCount = pageDefinitions.PageCount;
+        PageSize = pageDefinitions.PageSize;
+        TotalItemCount = pageDefinitions.TotalItemCount;
+    }
+
+    #region Implementation of IEnumerable
+
+    /// <summary>
+    /// Returns an <see cref="IEnumerable{T}"/>
+    /// </summary>
+    /// <returns>Returns <see cref="IEnumerable{T}"/></returns>
+    public IEnumerator<T> GetEnumerator()
+    {
+        return _items.GetEnumerator();
+    }
+
+    /// <summary>
+    /// Returns an <see cref="IEnumerable"/>
+    /// </summary>
+    /// <returns>Returns <see cref="IEnumerable"/></returns>
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    #endregion Implementation of IEnumerable
+}
+
+/// <summary>
+/// Static class to create instances of <see cref="Page{T}"/>
+/// </summary>
+public class Page: IPage
 {
     /// <summary>
-    /// Page Object
+    /// The index of the current page in the original collection
+    /// </summary>
+    public int PageIndex { get; set; }
+
+    /// <summary>
+    /// The size of the page
+    /// </summary>
+    public int PageSize { get; set; }
+
+
+    /// <summary>
+    /// Total amount of items in the original collection
+    /// </summary>
+    public int TotalItemCount { get; set; }
+
+    /// <summary>
+    /// Total amount of pages in the original collection
+    /// </summary>
+    public int TotalPageCount { get; set; }
+
+    /// <summary>
+    /// Is paging available (has more than one page in the original collection)
+    /// </summary>
+    public bool HasPaging { get; set; }
+
+    /// <summary>
+    /// Does the page contain any elements
+    /// </summary>
+    public bool IsEmpty { get; set; }
+
+    /// <summary>
+    /// Converts a collection of <typeparamref name="T"/> to an single <see cref="Page"/>
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Page<T> : IPage<T>, IEnumerable
+    /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
+    /// <returns></returns>
+    public static Page<T> FromEnumerable<T>(IEnumerable<T> source)
     {
-        #region Members
+        return source == null
+            ? new Page<T>()
+            : new Page<T>(source);
+    }
 
-        private List<T> _list;
+    /// <summary>
+    /// Converts collection of <typeparamref name="T"/> to an single <see cref="Page"/>
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
+    /// <param name="pageIndex">The currently selected page in the original collection</param>
+    /// <param name="pageSize">Size of an individual page</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1</exception>
+    /// <returns></returns>
+    public static Page<T> FromEnumerable<T>(IEnumerable<T> source, int pageIndex, int pageSize)
+    {
+        Validator.Validate(pageIndex, pageSize);
 
-        #endregion Members
+        return source == null
+            ? new Page<T>()
+            : new Page<T>(source, new PageDefinition(pageIndex, pageSize, source.Count()));
+    }
 
-        #region Properties
+    /// <summary>
+    /// Converts a pre-paged collection of <typeparamref name="T"/> to an single <see cref="Page"/>
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
+    /// <param name="pageIndex">The currently selected page in the original collection</param>
+    /// <param name="pageSize">Size of an individual page</param>
+    /// <param name="totalItemCount">Total item count in the original collection</param>
+    /// <returns></returns>
+    public static Page<T> FromEnumerable<T>(IEnumerable<T> source, int pageIndex, int pageSize, int totalItemCount)
+    {
+        Validator.Validate(pageIndex, pageSize, totalItemCount);
 
-        /// <summary>
-        /// The index of the current page in the original list
-        /// </summary>
-        public int CurrentPageIndex { get; private set; }
-
-        /// <summary>
-        /// The size of the page
-        /// </summary>
-        public int PageSize { get; private set; }
-
-        /// <summary>
-        /// Total amount of items in the original list
-        /// </summary>
-        public int TotalItemCount { get; private set; }
-
-        /// <summary>
-        /// Total amount of pages in the original list
-        /// </summary>
-        public int TotalPageCount { get; private set; }
-
-        /// <summary>
-        /// Is paging avaible (more than one page in the original list)
-        /// </summary>
-        public bool HasPaging => TotalPageCount > 1;
-
-        /// <summary>
-        /// Does the page contain any elements
-        /// </summary>
-        public bool IsEmpty => this == null ? true : !_list.Any();
-
-        #endregion Properties
-
-        #region Init
-
-        /// <summary>
-        /// Creates an empty page
-        /// </summary>
-        public Page()
-        {
-            _list = new List<T>();
-        }
-
-        /// <summary>
-        /// Converts a collection to a single page.
-        /// <param name="source">the elements of the current page</param>
-        /// </summary>
-        public Page(IEnumerable<T> source)
-        {
-            if (source != null)
-            {
-                var arrSource = source.ToArray();
-
-                if (arrSource.Any())
-                {
-                    _list = new List<T>(arrSource);
-
-                    CurrentPageIndex = 1;
-                    TotalPageCount = 1;
-                    PageSize = _list.Count();
-                    TotalItemCount = _list.Count();
-                }
-                else
-                {
-                    _list = new List<T>();
-                }
-            }
-            else
-            {
-                _list = new List<T>();
-            }
-        }
-
-        /// <summary>
-        /// Converts a collection to a specific Page
-        /// </summary>
-        /// <param name="source">the elements of the current page</param>
-        /// <param name="pageIndex">The currently selected page in the original list</param>
-        /// <param name="pageSize">Size of an individual page</param>
-        /// <param name="itemCount">Total item count in the original list</param>
-        public Page(IEnumerable<T> source, int pageIndex, int pageSize, int itemCount)
-        {
-            Validator.Validate(pageIndex, pageSize);
-
-            var definitions = new PageDefinition(pageIndex, pageSize, itemCount);
-
-            if (source != null && definitions.ItemCount > 0)
-            {
-                var arrSource = source.ToArray();
-
-                _list = arrSource.Any()
-                    ? new List<T>(arrSource)
-                    : new List<T>();
-            }
-            else
-            {
-                _list = new List<T>();
-            }
-
-            CurrentPageIndex = definitions.PageIndex;
-            TotalPageCount = definitions.PageCount;
-            PageSize = definitions.PageSize;
-            TotalItemCount = definitions.ItemCount;
-        }
-
-        /// <summary>
-        /// Converts a collection to a specific Page
-        /// </summary>
-        /// <param name="source">the elements of the current page</param>
-        /// <param name="definitions">the definition of the current page and its position in the original list</param>
-        internal Page(IEnumerable<T> source, PageDefinition definitions)
-        {
-            if (source != null && definitions.ItemCount > 0)
-            {
-                var arrSource = source.ToArray();
-
-                _list = arrSource.Any()
-                    ? new List<T>(arrSource)
-                    : new List<T>();
-            }
-            else
-            {
-                _list = new List<T>();
-            }
-
-            CurrentPageIndex = definitions.PageIndex;
-            TotalPageCount = definitions.PageCount;
-            PageSize = definitions.PageSize;
-            TotalItemCount = definitions.ItemCount;
-        }
-
-        #endregion Init
-
-        #region Factory
-
-        /// <summary>
-        /// Converts a collection to a single page.
-        /// <param name="source">the elements of the current page</param>
-        /// </summary>
-        public static Page<T> FromEnumerable(IEnumerable<T> source)
-        {
-            var page = new Page<T>();
-
-            if (source != null)
-            {
-                var arrSource = source.ToArray();
-
-                if (arrSource.Any())
-                {
-                    page._list = new List<T>(arrSource);
-
-                    page.CurrentPageIndex = 1;
-                    page.TotalPageCount = 1;
-                    page.PageSize = arrSource.Count();
-                    page.TotalItemCount = arrSource.Count();
-                }
-                else
-                {
-                    page._list = new List<T>();
-                }
-            }
-            else
-            {
-                page._list = new List<T>();
-            }
-
-            return page;
-        }
-
-        /// <summary>
-        /// Converts a collection to a specific Page
-        /// </summary>
-        /// <param name="source">the elements of the current page</param>
-        /// <param name="pageIndex">The currently selected page in the original list</param>
-        /// <param name="pageSize">Size of an individual page</param>
-        /// <param name="itemCount">Total item count in the original list</param>
-        public static Page<T> FromEnumerable(IEnumerable<T> source, int pageIndex, int pageSize, int itemCount)
-        {
-            Validator.Validate(pageIndex, pageSize);
-
-            return FromEnumerable(source, new PageDefinition(pageIndex, pageSize, itemCount));
-        }
-
-        /// <summary>
-        /// Converts a collection to a specific Page
-        /// </summary>
-        /// <param name="source">the elements of the current page</param>
-        /// <param name="definitions">the definition of the current page and its position in the original list</param>
-        internal static Page<T> FromEnumerable(IEnumerable<T> source, PageDefinition definitions)
-        {
-            var page = new Page<T>();
-
-            if (source != null && definitions.ItemCount > 0)
-            {
-                var arrSource = source.ToArray();
-
-                page._list = arrSource.Any()
-                    ? new List<T>(arrSource)
-                    : new List<T>();
-            }
-            else
-            {
-                page._list = new List<T>();
-            }
-
-            page.CurrentPageIndex = definitions.PageIndex;
-            page.TotalPageCount = definitions.PageCount;
-            page.PageSize = definitions.PageSize;
-            page.TotalItemCount = definitions.ItemCount;
-
-            return page;
-        }
-
-        #endregion Factory
-
-        #region Implementation of IEnumerable
-
-        /// <summary>
-        /// Returns an enumerator that iterates through the System.Collections.Generic.List.
-        /// </summary>
-        /// <returns>A System.Collections.Generic.List.Enumerator for the Page.</returns>
-        public IEnumerator<T> GetEnumerator()
-        {
-            return _list.GetEnumerator();
-        }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through the System.Collections.Generic.List.
-        /// </summary>
-        /// <returns>A System.Collections.Generic.List.Enumerator for the Page.</returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #endregion Implementation of IEnumerable
+        return source == null
+            ? new Page<T>()
+            : new Page<T>(source, new PageDefinition(pageIndex, pageSize, totalItemCount));
     }
 }

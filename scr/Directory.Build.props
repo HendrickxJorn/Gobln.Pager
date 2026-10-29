@@ -1,0 +1,71 @@
+<Project>
+
+  <!--
+    Shared settings for every packable library under scr/.
+    Anything genuinely specific to one library - its version, target
+    frameworks, description, tags and references - stays in that project's
+    .csproj.
+  -->
+
+  <PropertyGroup>
+    <!-- Identity. PackageId and Product both default to AssemblyName. -->
+    <Authors>Jorn Hendrickx</Authors>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Language -->
+    <LangVersion>14.0</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      Packaging. Packages are made with `dotnet pack`, as the release workflow
+      does. GeneratePackageOnBuild is deliberately off: it packed all five
+      libraries on every build, test run and F5.
+    -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!--
+      CS1591 warns for every public member without an XML comment. The four
+      satellite libraries are largely undocumented, so this would emit ~600
+      warnings and bury real ones. The .xml docs are still generated and
+      packed; documenting those members is separate work.
+    -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <PackageProjectUrl>https://github.com/HendrickxJorn/Gobln.Pager</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/HendrickxJorn/Gobln.Pager</RepositoryUrl>
+    <PackageIcon>Gobln Pager.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!--
+      An SPDX expression, not PackageLicenseFile: nuget.org then shows "MIT"
+      and license scanners recognise it. LICENSE.md is still packed below.
+    -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+  </PropertyGroup>
+
+  <!-- Release builds ship without debug symbols. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Repository-level assets, shared by every package. -->
+    <None Include="$(MSBuildThisFileDirectory)..\images\Gobln Pager.png" Pack="true" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)..\LICENSE.md" Pack="true" PackagePath="\" />
+    <!-- Each project packs the README.md sitting next to its own .csproj. -->
+    <None Include="README.md" Pack="true" PackagePath="\" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!--
+      Resolves .NET Framework reference assemblies from a package instead of
+      from whatever targeting packs the build machine has installed. Inert for
+      projects with no net4x target, so it is declared once here.
+    -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

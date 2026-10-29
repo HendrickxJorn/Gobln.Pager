@@ -1,112 +1,135 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
-#if !FEATURE_TYPE_NET40
+namespace Gobln.Pager;
 
-using System.Threading.Tasks;
-
-#endif
-
-namespace Gobln.Pager
+/// <summary>
+/// Extensions for IQueryable
+/// </summary>
+/// <remarks>
+/// The asynchronous versions are on <see cref="IEnumerable{T}"/> and notice a query, so it is still paged in the query.
+/// Gobln.Pager.EntityFrameworkCore adds truly asynchronous ones for Entity Framework Core.
+/// </remarks>
+public static class IQueryableExtensions
 {
     /// <summary>
-    /// Extensions for IQueryable
+    /// Paging for a query: the count and the paging are part of the query
     /// </summary>
-    public static class IQueryableExtensions
+    /// <typeparam name="T">The type of the items</typeparam>
+    /// <param name="source">The elements of <typeparamref name="T"/></param>
+    extension<T>(IQueryable<T> source)
     {
+        internal Page<T> PrivateToPage(int pageIndex, int pageSize, int totalItemCount, bool prePaged = false)
+        {
+            var pd = new PageDefinition(pageIndex, pageSize, totalItemCount);
+
+            return new Page<T>(
+                prePaged || pd.TotalItemCount < 1
+                    ? source
+                    : source.Skip(pd.SkipIndex).Take(pd.PageSize)
+                , pd);
+        }
+
         #region ToPage
 
         /// <summary>
-        /// Converts IQueryable to a Page
+        /// Counts the query and reads all of it onto one <see cref="Page{T}"/>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static Page<T> ToPage<T>(this IQueryable<T> source)
+        /// <returns>One page that holds every item</returns>
+        public Page<T> ToPage()
         {
-            if (source.Count() == 0)
-            {
-                return new Page<T>();
-            }
-
-            return Page<T>.FromEnumerable(source, new PageDefinition(1, source.Count(), source.Count()));
+            var c = source.Count();
+            return PrivateToPage(source, 1, c, c);
         }
 
         /// <summary>
-        /// Converts IQueryable to a Page
+        /// Counts the query and reads one <see cref="Page{T}"/> of it
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageIndex">Index of page</param>
-        /// <param name="pageSize">Size of page</param>
-        /// <returns></returns>
-        public static Page<T> ToPage<T>(this IQueryable<T> source, int pageIndex, int pageSize)
+        /// <param name="pageIndex">Index of the page, from 1. Past the last page, the last page is returned.</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <returns>The page, with the totals of the whole query</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1</exception>
+        public Page<T> ToPage(int pageIndex, int pageSize)
         {
             Validator.Validate(pageIndex, pageSize);
 
-            var pd = new PageDefinition(pageIndex, pageSize, source.Count());
-
-            return pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+            return PrivateToPage(source, pageIndex, pageSize, source.Count());
         }
 
         /// <summary>
-        /// Converts IQueryable to a Page
+        /// Counts the query and reads one <see cref="Page{T}"/> of it
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
-        /// <returns></returns>
-        public static Page<T> ToPage<T>(this IQueryable<T> source, IPagerFilter pagerFilter)
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <returns>The page, with the totals of the whole query</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1</exception>
+        public Page<T> ToPage(IPageFilter pagerFilter)
         {
             Validator.Validate(pagerFilter);
 
-            var pd = new PageDefinition(pagerFilter, source.Count());
-
-            return pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, source.Count());
         }
 
         /// <summary>
-        /// Converts IQueryable to a Page
+        /// Reads a pre-paged query, which returns only the items of page <paramref name="pageIndex"/>, into a <see cref="Page{T}"/>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageIndex">Index of page</param>
-        /// <param name="pageSize">Size of page</param>
-        /// <param name="itemCount">Total item count of IQueryable</param>
-        /// <param name="prePaged">Is the IQueryable already prepaged. If so the IQueryable will not be paged anymore.</param>
-        /// <returns></returns>
-        public static Page<T> ToPage<T>(this IQueryable<T> source, int pageIndex, int pageSize, int itemCount, bool prePaged = false)
+        /// <param name="pageIndex">Index of the page, from 1</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <returns>The page, holding what the query returns</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        public Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount)
         {
-            Validator.Validate(pageIndex, pageSize);
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
 
-            var pd = new PageDefinition(pageIndex, pageSize, itemCount);
-
-            return prePaged || pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+            return PrivateToPage(source, pageIndex, pageSize, totalItemCount, true);
         }
 
         /// <summary>
-        /// Converts IQueryable to a Page
+        /// Reads a pre-paged query, which returns only the items of the page of <paramref name="pagerFilter"/>, into a <see cref="Page{T}"/>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
-        /// <param name="itemCount">Total item count of IQueryable</param>
-        /// <param name="prePaged">Is the IQueryable already prepaged. If so the IQueryable will not be paged anymore.</param>
-        /// <returns></returns>
-        public static Page<T> ToPage<T>(this IQueryable<T> source, IPagerFilter pagerFilter, int itemCount, bool prePaged = false)
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <returns>The page, holding what the query returns</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        public Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount)
         {
-            Validator.Validate(pagerFilter);
+            Validator.Validate(pagerFilter, totalItemCount);
 
-            var pd = new PageDefinition(pagerFilter, itemCount);
+            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, true);
+        }
 
-            return prePaged || pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+        /// <summary>
+        /// Reads one <see cref="Page{T}"/> of the query, with a total that is already known, so the query isn't counted
+        /// </summary>
+        /// <param name="pageIndex">Index of the page, from 1. Past the last page, the last page is returned.</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <param name="prePaged">Whether the query is already paged. If so, it is read as it is.</param>
+        /// <returns>The page</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        public Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount, bool prePaged)
+        {
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
+
+            return PrivateToPage(source, pageIndex, pageSize, totalItemCount, prePaged);
+        }
+
+        /// <summary>
+        /// Reads one <see cref="Page{T}"/> of the query, with a total that is already known, so the query isn't counted
+        /// </summary>
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <param name="prePaged">Whether the query is already paged. If so, it is read as it is.</param>
+        /// <returns>The page</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        public Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount, bool prePaged)
+        {
+            Validator.Validate(pagerFilter, totalItemCount);
+
+            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, prePaged);
         }
 
         #endregion ToPage
@@ -114,164 +137,29 @@ namespace Gobln.Pager
         #region ToPagedList
 
         /// <summary>
-        /// Convert IQueryable to a PagedList.
+        /// Reads the whole query into a <see cref="PagedList{T}"/> of 10 items a page
         /// Warning: This will execute the entire query and load the results in memory!
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static PagedList<T> ToPagedList<T>(this IQueryable<T> source)
+        /// <returns>The list</returns>
+        public PagedList<T> ToPagedList()
         {
-            return PagedList<T>.FromEnumerable(source);
+            return PagedList.FromEnumerable(source);
         }
 
         /// <summary>
-        /// Convert IQueryable to a PagedList
+        /// Reads the whole query into a <see cref="PagedList{T}"/>
         /// Warning: This will execute the entire query and load the results in memory!
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
-        public static PagedList<T> ToPagedList<T>(this IQueryable<T> source, int pageSize)
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <returns>The list</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageSize"/> is less than 1</exception>
+        public PagedList<T> ToPagedList(int pageSize)
         {
             Validator.ValidatePageSize(pageSize);
 
-            return PagedList<T>.FromEnumerable(source, pageSize);
+            return PagedList.FromEnumerable(source, pageSize);
         }
 
         #endregion ToPagedList
-
-#if !FEATURE_TYPE_NET40
-
-        #region Async
-
-        #region ToPage
-
-        /// <summary>
-        /// Converts asynchronous IQueryable to a Page
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source)
-        {
-            return await Task.Run(() => Page<T>.FromEnumerable(source, new PageDefinition(1, source.Count(), source.Count()))).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Converts asynchronous IQueryable to a Page
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageIndex">Index of page</param>
-        /// <param name="pageSize">Size of page</param>
-        /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source, int pageIndex, int pageSize)
-        {
-            Validator.Validate(pageIndex, pageSize);
-
-            var pd = new PageDefinition(pageIndex, pageSize, source.Count());
-
-            return pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Converts asynchronous IQueryable to a Page
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
-        /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source, IPagerFilter pagerFilter)
-        {
-            Validator.Validate(pagerFilter);
-
-            var pd = new PageDefinition(pagerFilter, source.Count());
-
-            return pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Converts asynchronous IQueryable to a Page
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageIndex">Index of page</param>
-        /// <param name="pageSize">Size of page</param>
-        /// <param name="itemCount">Total item count of IQueryable</param>
-        /// <param name="prePaged">Is the IQueryable already prepaged. If so the IQueryable will not be paged anymore.</param>
-        /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source, int pageIndex, int pageSize, int itemCount, bool prePaged = false)
-        {
-            Validator.Validate(pageIndex, pageSize);
-
-            var pd = new PageDefinition(pageIndex, pageSize, itemCount);
-
-            return prePaged || pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Converts asynchronous IQueryable to a Page
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
-        /// <param name="itemCount">Total item count of IQueryable</param>
-        /// <param name="prePaged">Is the IQueryable already prepaged. If so the IQueryable will not be paged anymore.</param>
-        /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IQueryable<T> source, IPagerFilter pagerFilter, int itemCount, bool prePaged = false)
-        {
-            Validator.Validate(pagerFilter);
-
-            var pd = new PageDefinition(pagerFilter, itemCount);
-
-            return prePaged || pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
-        }
-
-        #endregion ToPage
-
-        #region ToPagedList
-
-        /// <summary>
-        /// Convert asynchronous IQueryable to a PagedList.
-        /// Warning: This will execute the entire query and load the results in memory!
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static async Task<PagedList<T>> ToPagedListAsync<T>(this IQueryable<T> source)
-        {
-            return await Task.Run(() => PagedList<T>.FromEnumerable(source)).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Convert asynchronous IQueryable to a PagedList
-        /// Warning: This will execute the entire query and load the results in memory!
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
-        public static async Task<PagedList<T>> ToPagedListAsync<T>(this IQueryable<T> source, int pageSize)
-        {
-            Validator.ValidatePageSize(pageSize);
-
-            return await Task.Run(() => PagedList<T>.FromEnumerable(source, pageSize)).ConfigureAwait(false);
-        }
-
-        #endregion ToPagedList
-
-        #endregion Async
-
-#endif
     }
 }

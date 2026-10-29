@@ -339,3 +339,15 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database 
 healthchecksdb
+
+# Local backup folder
+_Backup/
+
+# Claude Code local config
+.claude/
+
+# Local docs
+.docs/
+
+# Local planning notes
+.plan/

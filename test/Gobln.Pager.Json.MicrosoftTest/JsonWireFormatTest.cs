@@ -1,0 +1,145 @@
+using Gobln.Pager.Json.Microsoft;
+using System.Text.Json;
+using Xunit;
+
+namespace Gobln.Pager.Json.MicrosoftTest;
+
+/// <summary>
+/// Pins the JSON wire format produced by this package.
+///
+/// The shape asserted here is a contract shared with Gobln.Pager.Json.Newtonsoft:
+/// Gobln.Pager.Json.NewtonsoftTest.JsonWireFormatTest asserts the exact same literals,
+/// so a drift in either package fails that package's own test. Keep the two in sync --
+/// changing them is a breaking change for anything that already stores or exchanges
+/// this format.
+///
+/// These use Page&lt;int&gt;/PagedList&lt;int&gt; deliberately: an element type with no
+/// DateTime or nullable members keeps the assertion about the page envelope rather
+/// than about how each serializer happens to format values.
+/// </summary>
+public class JsonWireFormatTest
+{
+    private const string PageJson =
+        """{"PageItems":[1,2,3],"PageIndex":2,"PageSize":3,"TotalItemCount":42}""";
+
+    private const string PagedListJson = "[1,2,3,4,5]";
+
+    private static JsonSerializerOptions Options() => new()
+    {
+        Converters =
+        {
+            new PageJsonConverter(),
+            new PagedListJsonConverter()
+        }
+    };
+
+    [Fact]
+    public void Serialize_Page_WritesBareObject()
+    {
+        var page = new[] { 1, 2, 3 }.ToPage(2, 3, 42);
+
+        Assert.Equal(PageJson, JsonSerializer.Serialize(page, Options()));
+    }
+
+    [Fact]
+    public void Deserialize_Page_RestoresItemsAndMetadata()
+    {
+        var page = JsonSerializer.Deserialize<Page<int>>(PageJson, Options());
+
+        Assert.NotNull(page);
+        Assert.Equal(2, page.PageIndex);
+        Assert.Equal(3, page.PageSize);
+        Assert.Equal(42, page.TotalItemCount);
+        Assert.Equal(14, page.TotalPageCount);
+        Assert.Equal([1, 2, 3], page);
+    }
+
+    [Fact]
+    public void RoundTrip_Page_PreservesMetadata()
+    {
+        var page = new[] { 1, 2, 3 }.ToPage(2, 3, 42);
+
+        var result = JsonSerializer.Deserialize<Page<int>>(
+            JsonSerializer.Serialize(page, Options()), Options());
+
+        Assert.NotNull(result);
+        Assert.Equal(page.PageIndex, result.PageIndex);
+        Assert.Equal(page.PageSize, result.PageSize);
+        Assert.Equal(page.TotalItemCount, result.TotalItemCount);
+        Assert.Equal(page.TotalPageCount, result.TotalPageCount);
+        Assert.Equal(page, result);
+    }
+
+    [Fact]
+    public void Deserialize_ArrayWrappedPage_IsRejected()
+    {
+        // Before 1.0 this package wrapped the page object in a one-element array, which
+        // Gobln.Pager.Json.Newtonsoft never did. That format is no longer written, and
+        // must fail loudly rather than half-parse.
+        var legacyJson = $"[{PageJson}]";
+
+        Assert.Throws<JsonException>(
+            () => JsonSerializer.Deserialize<Page<int>>(legacyJson, Options()));
+    }
+
+    [Theory]
+    [InlineData("""{"PageItems":[1],"PageIndex":0,"PageSize":10,"TotalItemCount":1}""")]
+    [InlineData("""{"PageItems":[1],"PageIndex":1,"PageSize":0,"TotalItemCount":1}""")]
+    [InlineData("""{"PageItems":[1],"PageIndex":1,"PageSize":10,"TotalItemCount":-1}""")]
+    public void Deserialize_PageWithInvalidValues_IsRejectedAsInvalidJson(string json)
+    {
+        // The JSON is client input: values out of range make it invalid JSON (a 400 in
+        // ASP.NET Core), not an argument error from inside the converter (a 500)
+        var exception = Assert.Throws<JsonException>(
+            () => JsonSerializer.Deserialize<Page<int>>(json, Options()));
+
+        Assert.IsType<ArgumentOutOfRangeException>(exception.InnerException);
+    }
+
+    [Fact]
+    public void Serialize_PagedList_WritesPlainArray()
+    {
+        var pagedList = new[] { 1, 2, 3, 4, 5 }.ToPagedList(2);
+
+        Assert.Equal(PagedListJson, JsonSerializer.Serialize(pagedList, Options()));
+    }
+
+    [Fact]
+    public void RoundTrip_PagedList_PreservesItems()
+    {
+        var result = JsonSerializer.Deserialize<PagedList<int>>(PagedListJson, Options());
+
+        Assert.NotNull(result);
+        Assert.Equal([1, 2, 3, 4, 5], result);
+    }
+
+    [Fact]
+    public void RoundTrip_PageWithoutItems_KeepsItsTotals()
+    {
+        // A pre-paged page that came back empty still tells a pager how many pages there are
+        var page = Array.Empty<int>().ToPage(3, 10, 25);
+
+        var result = JsonSerializer.Deserialize<Page<int>>(
+            JsonSerializer.Serialize(page, Options()), Options());
+
+        Assert.NotNull(result);
+        Assert.Empty(result);
+        Assert.Equal(3, result.PageIndex);
+        Assert.Equal(10, result.PageSize);
+        Assert.Equal(25, result.TotalItemCount);
+        Assert.Equal(3, result.TotalPageCount);
+    }
+
+    [Fact]
+    public void Deserialize_EmptyPageWithoutTotals_IsAnEmptyPage()
+    {
+        // What new Page<T>() writes. Its PageSize of 0 must not be rejected as invalid.
+        var result = JsonSerializer.Deserialize<Page<int>>(
+            """{"PageItems":[],"PageIndex":1,"PageSize":0,"TotalItemCount":0}""", Options());
+
+        Assert.NotNull(result);
+        Assert.True(result.IsEmpty);
+        Assert.Equal(0, result.TotalItemCount);
+        Assert.Equal(1, result.TotalPageCount);
+    }
+}

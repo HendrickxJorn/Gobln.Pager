@@ -1,0 +1,75 @@
+﻿@page "/"
+@using Gobln.Pager
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<br/>
+
+<p>
+    Page content: @string.Join(", ", TestPage)
+</p>
+
+<Gobln.Pager.Blazor.Pager Page="TestPage"
+                          PageIndexChanged="OnPageChangAsync" />
+
+<Gobln.Pager.Blazor.Pager Page="TestPage"
+                          ShowEllipsis=true
+                          PageIndexChanged="OnPageChangAsync" />
+
+<Gobln.Pager.Blazor.Pager Page="TestPage"
+                          BoundaryCount="1"
+                          PageIndexChanged="OnPageChangAsync" />
+
+<Gobln.Pager.Blazor.Pager Page="TestPage"
+                          BoundaryCount="1"
+                          ShowEllipsis=true
+                          PageIndexChanged="OnPageChangAsync" />
+
+<Gobln.Pager.Blazor.Pager Page="TestPage"
+                          BoundaryCount="2"
+                          PageIndexChanged="OnPageChangAsync" />
+
+<Gobln.Pager.Blazor.Pager Page="TestPage"
+                          BoundaryCount="2"
+                          SiblingCount="3"
+                          ShowEllipsis=true
+                          PageIndexChanged="OnPageChangAsync" />
+
+<Gobln.Pager.Blazor.Pager Page="TestPage"
+                          BoundaryCount="2"
+                          SiblingCount="50"
+                          ShowEllipsis=true
+                          PageIndexChanged="OnPageChangAsync" />
+
+@foreach (var item in Items)
+{
+    <Gobln.Pager.Blazor.Pager Page="Items.ToPage(item, 1)" />
+}
+ 
+@code{
+
+    private IEnumerable<int> Items { get; set; } = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ];
+
+    private IPagedList<int> TestTable { get; set; }
+
+    private IPage<int> TestPage { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        TestTable = Items.ToPagedList(1);
+
+        TestPage = TestTable.GetPage();
+    }
+
+    private void OnPageChangAsync(int newPage)
+    {
+        TestTable.PageIndex = newPage;
+        TestPage = TestTable.GetPage();
+    }
+}

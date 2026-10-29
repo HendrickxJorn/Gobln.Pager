@@ -1,136 +1,128 @@
 # Gobln.Pager
 
-Gobln.Pager is a .Net easy to use pager library written in C#, to allow you covert IEnumarble/IQueryable to an PageList or Page object.
-And can be usable in any type of project.
+| Gobln.Pager | Gobln.Pager.EntityFrameworkCore | Gobln.Pager.Mvc | Gobln.Pager.Blazor | Gobln.Pager.Json.Microsoft | Gobln.Pager.Json.Newtonsoft |
+| --- | --- | --- | --- | --- | --- |
+| [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.svg)](https://www.nuget.org/packages/Gobln.Pager/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.EntityFrameworkCore.svg)](https://www.nuget.org/packages/Gobln.Pager.EntityFrameworkCore/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Mvc.svg)](https://www.nuget.org/packages/Gobln.Pager.Mvc/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Blazor.svg)](https://www.nuget.org/packages/Gobln.Pager.Blazor/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Json.Microsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Microsoft/) | [![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Json.Newtonsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Newtonsoft/) |
+| [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.svg)](https://www.nuget.org/packages/Gobln.Pager/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.EntityFrameworkCore.svg)](https://www.nuget.org/packages/Gobln.Pager.EntityFrameworkCore/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Mvc.svg)](https://www.nuget.org/packages/Gobln.Pager.Mvc/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Blazor.svg)](https://www.nuget.org/packages/Gobln.Pager.Blazor/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Json.Microsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Microsoft/) | [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Json.Newtonsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Newtonsoft/) |
 
-If you would like to use Gobln.Pager in Mvc, check the following link [Gobln.Pager.Mvc](https://nuget.org/packages/Gobln.Pager.Mvc).
-
-## Frameworks
-
-* .Net 4.0 and higher
-* .Net Core 1.0 and higher
-* .Net Core 2.0 and higher
-* .Net Core 3.0 and higher
-* .Net Standard 1.6 and higher
-
-## Page
-
-### How to use
-
-Install Gobln.Pager, trough [Nuget](https://nuget.org/) or other means.
-Use the extension .ToPage() on your IEnumarble/IQueryable and you will get the 10 first items from you IEnumarble/IQueryable.
-To Change the page size or the selected page you onlu need to change the first two value of ToPager({page index}, {page size})
-
-### Examples
+A portable, zero-dependency paging library for .NET. It turns `IEnumerable<T>` and `IQueryable<T>` collections into strongly-typed paginated results, with optional packages for Entity Framework Core, Blazor, ASP.NET MVC/Core, and JSON serialization.
 
 ```csharp
+using Gobln.Pager;
 
-// Create an List oject
-var list = new List<TestModel1>()
-            {
-                new TestModel1(){ Id = 1, Name = "Tester1", Date = new DateTime( 2015, 5,1 ) },
-                new TestModel1(){ Id = 2, Name = "Tester2", Date = new DateTime( 2015, 5,2 ) },
-                new TestModel1(){ Id = 3, Name = "Tester3", Date = new DateTime( 2015, 5,3 ) },
-                new TestModel1(){ Id = 4, Name = "Tester4", Date = new DateTime( 2015, 5,4 ) },
-                new TestModel1(){ Id = 5, Name = "Tester5", Date = new DateTime( 2015, 5,5 ) },
-                new TestModel1(){ Id = 6, Name = "Tester6", Date = new DateTime( 2015, 5,1 ) },
-                new TestModel1(){ Id = 7, Name = "Tester7", Date = new DateTime( 2015, 5,2 ) },
-                new TestModel1(){ Id = 8, Name = "Tester8", Date = new DateTime( 2015, 5,3 ) },
-                new TestModel1(){ Id = 9, Name = "Tester9", Date = new DateTime( 2015, 5,4 ) },
-                new TestModel1(){ Id = 10, Name = "Tester10", Date = new DateTime( 2015, 5,5 ) },
-            };
+var page = context.Products.OrderBy(p => p.Name).ToPage(pageIndex: 2, pageSize: 10);
 
-// Create an Page object
-//  this will get you the first page index with the 10 first items
-var page = list.ToPage();
+Console.WriteLine($"Page {page.PageIndex} of {page.TotalPageCount}, {page.TotalItemCount} items total.");
 
-// Create an Page object with pagesize 2 and pageindex 3
-page = list.ToPage(3, 2);
-
-// Create an Page object from a prepaged list where that the pagesize 10, pageindex 10 and the total item count 100
-page = list.ToPage(5, 10, 100, prePaged: true);
-
-// Use PageFilter of IPageFilter
-var pagerFilter = new PagerFilter()
-    {
-        PageIndex = 5,
-        PageSize = 2
-    };
-
-var page = testList.ToPage(pagerFilter);
-
+foreach (var product in page)
+{
+    Console.WriteLine(product.Name);
+}
 ```
 
-For more examples, check the test project
+On an `IQueryable<T>` the paging is translated into the query, so only the requested page is fetched.
 
-## PagedList
+## Why Gobln.Pager?
 
-### How to use
+- **Framework agnostic** — .NET Framework 4.6.2/4.8, .NET Standard 2.0/2.1, and .NET 8/10
+- **LINQ integration** — works on `IEnumerable<T>` and `IQueryable<T>` (including Entity Framework), synchronously or asynchronously, with EF Core's own async queries through `Gobln.Pager.EntityFrameworkCore`
+- **Pre-paged support** — wrap data you already paged and counted at the database level, without re-slicing it
+- **Ready-made UI** — a Blazor component and an ASP.NET MVC/Core HTML helper
+- **JSON support** — converters for both `System.Text.Json` and `Newtonsoft.Json`, sharing one wire format
+- **No external dependencies** in the core package
 
-The PagedList object contains information that will go to make up your Page object.
-This will reprisent the full list of items that from wich you can easly add or remove items, and check the content of the page.
-Or even cycle trought the pages.  
+## Packages
 
-### Examples
+| Package | Target Frameworks | Purpose |
+| --- | --- | --- |
+| `Gobln.Pager` | net462, net48, net8.0, net10.0, netstandard2.0, netstandard2.1 | Core paging types and LINQ extension methods |
+| `Gobln.Pager.EntityFrameworkCore` | net8.0, net10.0 | Asynchronous `ToPageAsync` / `ToPagedListAsync` with EF Core's `CountAsync` / `ToListAsync` |
+| `Gobln.Pager.Blazor` | net8.0, net10.0 | `<Pager>` Razor component |
+| `Gobln.Pager.Mvc` | net462, net48, net8.0, net10.0 | `Html.Pager()` helper for ASP.NET MVC / ASP.NET Core |
+| `Gobln.Pager.Json.Microsoft` | net462, net48, net8.0, net10.0, netstandard2.0, netstandard2.1 | `System.Text.Json` converters |
+| `Gobln.Pager.Json.Newtonsoft` | net462, net48, net8.0, net10.0, netstandard2.0, netstandard2.1 | `Newtonsoft.Json` converters |
+
+Install only what you need — the core package is required by all of the others.
+
+```bash
+dotnet add package Gobln.Pager
+```
+
+## The two page types
+
+**`Page<T>`** is one page of items, carrying `PageIndex`, `PageSize`, `TotalItemCount`, `TotalPageCount`, `HasPaging`, and `IsEmpty`. It holds its items, read once when the page is made, as an `IReadOnlyList<T>` (`Count`, `page[0]`). Every page also has `HasPreviousPage()`, `HasNextPage()`, `FirstItemOnPage()` and `LastItemOnPage()`. Create one with `ToPage(...)`:
 
 ```csharp
-// Create an pagedList object
-var pageList = new PagedList<TestModel1>()
-            {
-                new TestModel1(){ Id = 1, Name = "Tester1", Date = new DateTime( 2016, 5,1 ) },
-                new TestModel1(){ Id = 2, Name = "Tester2", Date = new DateTime( 2016, 5,2 ) },
-                new TestModel1(){ Id = 3, Name = "Tester3", Date = new DateTime( 2016, 5,3 ) },
-                new TestModel1(){ Id = 4, Name = "Tester4", Date = new DateTime( 2016, 5,4 ) },
-                new TestModel1(){ Id = 5, Name = "Tester5", Date = new DateTime( 2016, 5,5 ) },
-                new TestModel1(){ Id = 6, Name = "Tester6", Date = new DateTime( 2016, 5,3 ) },
-                new TestModel1(){ Id = 7, Name = "Tester7", Date = new DateTime( 2016, 5,4 ) },
-                new TestModel1(){ Id = 8, Name = "Tester8", Date = new DateTime( 2016, 5,5 ) },
-                new TestModel1(){ Id = 9, Name = "Tester9", Date = new DateTime( 2016, 5,5 ) },
-                new TestModel1(){ Id = 10, Name = "Tester10", Date = new DateTime( 2016, 5,3 ) },
-                new TestModel1(){ Id = 11, Name = "Tester11", Date = new DateTime( 2016, 5,4 ) },
-                new TestModel1(){ Id = 12, Name = "Tester12", Date = new DateTime( 2016, 5,5 ) },
-            };
-
-// Add extra item
-pageList.Add(new TestModel1() { Id = 16, Name = "Tester16", Date = new DateTime(2015, 5, 5) });
-
-// Set the page values, if not set default pageidex is 1 and size is 10
-pageList.CurrentPageIndex = 2;
-pageList.PageSize = 3;
-
-// Get the current page form the pagelist
-var pager = pageList.GetCurrentPage();
-
-// Get the next page
-pager = pageList.GetNextPage();
-
-// Get the page at index X
-pager = pageList.GetPage(1);
-
+var page = items.ToPage(pageIndex: 1, pageSize: 10);      // page a collection
+page = items.ToPage(new PageFilter(pageIndex, pageSize)); // from bound request parameters
+page = rows.ToPage(pageIndex, pageSize, totalItemCount);  // data already paged in the database
+page = await items.ToPageAsync(1, 10, cancellationToken);
 ```
 
-For more examples, check the test project
+**`PagedList<T>`** is a mutable, navigable collection that keeps its own paging state — use it when the collection changes after paging:
 
-## Installing Gobln.Pager
+```csharp
+var list = items.ToPagedList(pageSize: 10);
 
-The project is on [Nuget](https://www.nuget.org/packages/Gobln.Pager/). Install via the NuGet Package Manager.
+list.Add(newItem);        // page count recalculates as the list changes
+list.NextPage();
 
-PM > Install-Package Gobln.Pager
+var current = list.GetPage();   // Page<T> for list.PageIndex
+```
+
+## Blazor
+
+```razor
+@using Gobln.Pager.Blazor
+
+<Pager Page="currentPage"
+       SiblingCount="1"
+       BoundaryCount="1"
+       ShowEllipsis="true"
+       PageIndexChanged="OnPageIndexChanged" />
+```
+
+The component renders Bootstrap-style pagination markup and raises `PageIndexChanged` with the new index; loading the data stays with your code.
+
+## ASP.NET MVC / ASP.NET Core
+
+```cshtml
+@using Gobln.Pager.Mvc
+@model Page<Product>
+
+@Html.Pager(Model)
+```
+
+Register defaults once at startup, or pass a `PagerOptions` per call:
+
+```csharp
+builder.Services.AddMvcPager(options => options.SiblingCount = 2);
+```
+
+## JSON
+
+```csharp
+var options = new JsonSerializerOptions();
+options.Converters.Add(new Gobln.Pager.Json.Microsoft.PageJsonConverter());
+options.Converters.Add(new Gobln.Pager.Json.Microsoft.PagedListJsonConverter());
+```
+
+Both JSON packages write the same shape, so a `System.Text.Json` API and a `Newtonsoft.Json` client interoperate directly.
+
+## Documentation
+
+Full documentation lives in [`wiki/`](wiki/):
+
+| Page | Contents |
+| --- | --- |
+| [Getting Started](wiki/Getting-Started.md) | Installation, prerequisites, minimal example |
+| [Core Library](wiki/Core-Library.md) | `Page<T>`, `PagedList<T>`, `PageFilter`, `PageWindow`, interfaces |
+| [Extension Methods](wiki/Extension-Methods.md) | Every `ToPage` / `ToPagedList` overload and its async twin |
+| [Blazor Integration](wiki/Blazor-Integration.md) | The `<Pager>` component |
+| [MVC / ASP.NET Core Integration](wiki/Mvc-Integration.md) | `Html.Pager()` and `PagerOptions` |
+| [JSON Serialization](wiki/Json-Serialization.md) | Converters and the shared wire format |
+| [Best Practices & Troubleshooting](wiki/Best-Practices-and-Troubleshooting.md) | Recommendations and common pitfalls |
 
 ## License
 
-[Apache License, Version 2.0](http://opensource.org/licenses/Apache-2.0).
-
-## Documentation and Readme file
-
-I'm going to provide an documentation file, but haven't started on one yet.
-As for the Readme file, if there are any inconsitencies or grammatical errors feel free to let me know by an pull request. This also counts for problems in de code.
-
-## Issues and Contributions
-
-* If something is broken and you know how to fix it, send a pull request.
-* If you have no idea what is wrong, create an issue.
-
-## Any feedback and contributions are welcome
-
-If you have something you'd like to improve do not hesitate to send a Pull Request
+[MIT](LICENSE.md)

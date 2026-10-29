@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      Bootstrap is delivered by NuGet, not committed to the repo. The package
+      only ships contentFiles, which the static web assets pipeline registers
+      as routes but never copies anywhere, so they 404 at runtime. Excluding
+      them and copying the files into wwwroot/lib ourselves is what actually
+      works. wwwroot/lib is already gitignored, so nothing lands in the repo.
+    -->
+    <PackageReference Include="bootstrap" Version="5.3.8" ExcludeAssets="contentFiles" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <Target Name="CopyBootstrapToWwwroot" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <_BootstrapAsset Include="$(Pkgbootstrap)/contentFiles/any/any/wwwroot/**/*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_BootstrapAsset)"
+          DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/lib/bootstrap/%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\scr\Gobln.Pager.Blazor\Gobln.Pager.Blazor.csproj" />
+  </ItemGroup>
+
+</Project>

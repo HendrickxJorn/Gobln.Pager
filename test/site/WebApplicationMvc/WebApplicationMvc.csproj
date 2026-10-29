@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <JQueryVersion>3.7.1</JQueryVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="bootstrap" Version="5.3.8" ExcludeAssets="contentFiles" GeneratePathProperty="true" />
+    <PackageReference Include="jQuery" Version="$(JQueryVersion)" ExcludeAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="jQuery.Validation" Version="1.21.0" ExcludeAssets="all" GeneratePathProperty="true" />
+    <PackageReference Include="Microsoft.jQuery.Unobtrusive.Validation" Version="4.0.0" ExcludeAssets="all" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <!-- Destinations match the paths the views already reference. -->
+  <Target Name="CopyClientLibsToWwwroot" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <_BootstrapAsset Include="$(Pkgbootstrap)/contentFiles/any/any/wwwroot/**/*" />
+      <_ClientLib Include="$(PkgjQuery)/Content/Scripts/jquery-$(JQueryVersion).js" Dest="lib/jquery/dist/jquery.js" />
+      <_ClientLib Include="$(PkgjQuery)/Content/Scripts/jquery-$(JQueryVersion).min.js" Dest="lib/jquery/dist/jquery.min.js" />
+      <_ClientLib Include="$(PkgjQuery)/Content/Scripts/jquery-$(JQueryVersion).min.map" Dest="lib/jquery/dist/jquery.min.map" />
+      <_ClientLib Include="$(PkgjQuery_Validation)/Content/Scripts/jquery.validate.js" Dest="lib/jquery-validation/dist/jquery.validate.js" />
+      <_ClientLib Include="$(PkgjQuery_Validation)/Content/Scripts/jquery.validate.min.js" Dest="lib/jquery-validation/dist/jquery.validate.min.js" />
+      <_ClientLib Include="$(PkgMicrosoft_jQuery_Unobtrusive_Validation)/Content/Scripts/jquery.validate.unobtrusive.js" Dest="lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js" />
+      <_ClientLib Include="$(PkgMicrosoft_jQuery_Unobtrusive_Validation)/Content/Scripts/jquery.validate.unobtrusive.min.js" Dest="lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_BootstrapAsset)"
+          DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/lib/bootstrap/%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_ClientLib)"
+          DestinationFiles="@(_ClientLib->'$(MSBuildProjectDirectory)/wwwroot/%(Dest)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\scr\Gobln.Pager.Json.Microsoft\Gobln.Pager.Json.Microsoft.csproj" />
+    <ProjectReference Include="..\..\..\scr\Gobln.Pager.Mvc\Gobln.Pager.Mvc.csproj" />
+  </ItemGroup>
+
+</Project>

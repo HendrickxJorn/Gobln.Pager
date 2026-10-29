@@ -1,113 +1,133 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
-#if !FEATURE_TYPE_NET40
-
+using System.Threading;
 using System.Threading.Tasks;
 
-#endif
+namespace Gobln.Pager;
 
-namespace Gobln.Pager
+/// <summary>
+/// Extensions for IEnumerable
+/// </summary>
+public static class IEnumerableExtensions
 {
     /// <summary>
-    /// Extensions for IEnumerable
+    /// Paging for a collection, in memory
     /// </summary>
-    public static class IEnumerableExtensions
+    /// <typeparam name="T">The type of the items</typeparam>
+    /// <param name="source">The elements of <typeparamref name="T"/></param>
+    extension<T>(IEnumerable<T> source)
     {
+        internal Page<T> PrivateToPage(int pageIndex, int pageSize, int totalItemCount, bool prePaged = false)
+        {
+            var pd = new PageDefinition(pageIndex, pageSize, totalItemCount);
+
+            return new Page<T>(
+                prePaged || pd.TotalItemCount < 1
+                    ? source
+                    : source.Skip(pd.SkipIndex).Take(pd.PageSize)
+                , pd);
+        }
+
         #region ToPage
 
         /// <summary>
-        /// Converts IEnumerable to a Page
+        /// Puts the whole collection on one <see cref="Page{T}"/>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static Page<T> ToPage<T>(this IEnumerable<T> source)
+        /// <returns>One page that holds every item</returns>
+        public Page<T> ToPage()
         {
-            if (source.Count() == 0)
-            {
-                return new Page<T>();
-            }
-
-            return Page<T>.FromEnumerable(source, new PageDefinition(1, source.Count(), source.Count()));
+            var list = source.ToList();
+            return PrivateToPage(list, 1, list.Count, list.Count, prePaged: true);
         }
 
         /// <summary>
-        /// Converts IEnumerable to a Page
+        /// Counts the collection and takes one <see cref="Page{T}"/> out of it
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageIndex">Index of page</param>
-        /// <param name="pageSize">Size of page</param>
-        /// <returns></returns>
-        public static Page<T> ToPage<T>(this IEnumerable<T> source, int pageIndex, int pageSize)
+        /// <param name="pageIndex">Index of the page, from 1. Past the last page, the last page is returned.</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <returns>The page, with the totals of the whole collection</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1</exception>
+        public Page<T> ToPage(int pageIndex, int pageSize)
         {
             Validator.Validate(pageIndex, pageSize);
 
-            var pd = new PageDefinition(pageIndex, pageSize, source.Count());
-
-            return pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+            return PrivateToPage(source, pageIndex, pageSize, source.Count());
         }
 
         /// <summary>
-        /// Converts IEnumerable to a Page
+        /// Counts the collection and takes one <see cref="Page{T}"/> out of it
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
-        /// <returns></returns>
-        public static Page<T> ToPage<T>(this IEnumerable<T> source, IPagerFilter pagerFilter)
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <returns>The page, with the totals of the whole collection</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1</exception>
+        public Page<T> ToPage(IPageFilter pagerFilter)
         {
             Validator.Validate(pagerFilter);
 
-            var pd = new PageDefinition(pagerFilter, source.Count());
-
-            return pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, source.Count());
         }
 
         /// <summary>
-        /// Converts IEnumerable to a Page
+        /// Converts a pre-paged collection, which holds only the items of page <paramref name="pageIndex"/>, to a <see cref="Page{T}"/>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageIndex">Index of page</param>
-        /// <param name="pageSize">Size of page</param>
-        /// <param name="itemCount">Total item count of IEnumerable</param>
-        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
-        /// <returns></returns>
-        public static Page<T> ToPage<T>(this IEnumerable<T> source, int pageIndex, int pageSize, int itemCount, bool prePaged = false)
+        /// <param name="pageIndex">Index of the page, from 1</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <returns>The page, holding the collection as it is</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        public Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount)
         {
-            Validator.Validate(pageIndex, pageSize);
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
 
-            var pd = new PageDefinition(pageIndex, pageSize, itemCount);
-
-            return prePaged || pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+            return PrivateToPage(source, pageIndex, pageSize, totalItemCount, true);
         }
 
         /// <summary>
-        /// Converts IEnumerable to a Page
+        /// Converts a pre-paged collection, which holds only the items of the page of <paramref name="pagerFilter"/>, to a <see cref="Page{T}"/>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
-        /// <param name="itemCount">Total item count of IEnumerable</param>
-        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
-        /// <returns></returns>
-        public static Page<T> ToPage<T>(this IEnumerable<T> source, IPagerFilter pagerFilter, int itemCount, bool prePaged = false)
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <returns>The page, holding the collection as it is</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        public Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount)
         {
-            Validator.Validate(pagerFilter);
+            Validator.Validate(pagerFilter, totalItemCount);
 
-            var pd = new PageDefinition(pagerFilter, itemCount);
+            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, true);
+        }
 
-            return prePaged || pd.ItemCount < 1
-                  ? Page<T>.FromEnumerable(source, pd)
-                  : Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd);
+        /// <summary>
+        /// Takes one <see cref="Page{T}"/> out of the collection, with a total that is already known, so the collection isn't counted
+        /// </summary>
+        /// <param name="pageIndex">Index of the page, from 1. Past the last page, the last page is returned.</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <param name="prePaged">Whether the collection is already paged. If so, it is used as it is.</param>
+        /// <returns>The page</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        public Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount, bool prePaged)
+        {
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
+
+            return PrivateToPage(source, pageIndex, pageSize, totalItemCount, prePaged);
+        }
+
+        /// <summary>
+        /// Takes one <see cref="Page{T}"/> out of the collection, with a total that is already known, so the collection isn't counted
+        /// </summary>
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <param name="prePaged">Whether the collection is already paged. If so, it is used as it is.</param>
+        /// <returns>The page</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        public Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount, bool prePaged)
+        {
+            Validator.Validate(pagerFilter, totalItemCount);
+
+            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, prePaged);
         }
 
         #endregion ToPage
@@ -115,160 +135,210 @@ namespace Gobln.Pager
         #region ToPagedList
 
         /// <summary>
-        /// Convert IEnumerable to a PagedList
+        /// Copies the collection into a <see cref="PagedList{T}"/> of 10 items a page
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static PagedList<T> ToPagedList<T>(this IEnumerable<T> source)
+        /// <returns>The list</returns>
+        public PagedList<T> ToPagedList()
         {
-            return PagedList<T>.FromEnumerable(source);
+            return PagedList.FromEnumerable(source);
         }
 
         /// <summary>
-        /// Convert IEnumerable to a PagedList
+        /// Copies the collection into a <see cref="PagedList{T}"/>
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
-        public static PagedList<T> ToPagedList<T>(this IEnumerable<T> source, int pageSize)
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <returns>The list</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageSize"/> is less than 1</exception>
+        public PagedList<T> ToPagedList(int pageSize)
         {
             Validator.ValidatePageSize(pageSize);
 
-            return PagedList<T>.FromEnumerable(source, pageSize);
+            return PagedList.FromEnumerable(source, pageSize);
         }
 
         #endregion ToPagedList
 
-#if !FEATURE_TYPE_NET40
-
-        #region Async
-
-        #region ToPage
+        #region ToPage Async
 
         /// <summary>
-        /// Converts asynchronous IEnumerable to a Page
+        /// Puts the whole collection on one <see cref="Page{T}"/>, on the thread pool
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source)
+        /// <param name="cancellationToken">Cancels the work before it starts</param>
+        /// <returns>One page that holds every item</returns>
+        public async Task<Page<T>> ToPageAsync(CancellationToken cancellationToken = default)
         {
-            return await Task.Run(() => Page<T>.FromEnumerable(source, new PageDefinition(1, source.Count(), source.Count()))).ConfigureAwait(false);
+            return await Task.Run(() => {
+                    var list = source.ToList();
+                    return PrivateToPage(list, 1, list.Count, list.Count, prePaged: true);
+                }, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Converts asynchronous IEnumerable to a Page
+        /// Counts the collection and takes one <see cref="Page{T}"/> out of it, on the thread pool
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageIndex">Index of page</param>
-        /// <param name="pageSize">Size of page</param>
-        /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, int pageIndex, int pageSize)
-        {
-            Validator.Validate(pageIndex, pageSize);
-
-            var pd = new PageDefinition(pageIndex, pageSize, source.Count());
-
-            return pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Converts asynchronous IEnumerable to a Page
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
-        /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, IPagerFilter pagerFilter)
-        {
-            Validator.Validate(pagerFilter);
-
-            var pd = new PageDefinition(pagerFilter, source.Count());
-
-            return pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// Converts asynchronous IEnumerable to a Page
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageIndex">Index of page</param>
-        /// <param name="pageSize">Size of page</param>
-        /// <param name="itemCount">Total item count of IEnumerable</param>
-        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
-        /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, int pageIndex, int pageSize, int itemCount, bool prePaged = false)
+        /// <param name="pageIndex">Index of the page, from 1. Past the last page, the last page is returned.</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <param name="cancellationToken">Cancels the work before it starts</param>
+        /// <returns>The page, with the totals of the whole collection</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1</exception>
+        /// <remarks>
+        /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
+        /// </remarks>
+        public async Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pageIndex, pageSize);
 
-            var pd = new PageDefinition(pageIndex, pageSize, itemCount);
+            return await Task.Run(() =>
+                {
+                    // The IQueryable overloads moved here, so a query has to be noticed: counting or slicing it in memory would read all of it
+                    if (source is IQueryable<T> query)
+                    {
+                        return query.ToPage(pageIndex, pageSize);
+                    }
 
-            return prePaged || pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
+                    var list = source.ToList();
+                    return PrivateToPage(list, pageIndex, pageSize, list.Count);
+                }, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Converts asynchronous IEnumerable to a Page
+        /// Counts the collection and takes one <see cref="Page{T}"/> out of it, on the thread pool
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pagerFilter"><see cref="IPagerFilter"/></param>
-        /// <param name="itemCount">Total item count of IEnumerable</param>
-        /// <param name="prePaged">Is the IEnumerable already prepaged. If so the IEnumerable will not be paged anymore.</param>
-        /// <returns></returns>
-        public static async Task<Page<T>> ToPageAsync<T>(this IEnumerable<T> source, IPagerFilter pagerFilter, int itemCount, bool prePaged = false)
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <param name="cancellationToken">Cancels the work before it starts</param>
+        /// <returns>The page, with the totals of the whole collection</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1</exception>
+        /// <remarks>
+        /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
+        /// </remarks>
+        public async Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pagerFilter);
 
-            var pd = new PageDefinition(pagerFilter, itemCount);
+            return await Task.Run(() =>
+                {
+                    if (source is IQueryable<T> query)
+                    {
+                        return query.ToPage(pagerFilter);
+                    }
 
-            return prePaged || pd.ItemCount < 1
-                  ? await Task.Run(() => Page<T>.FromEnumerable(source, pd)).ConfigureAwait(false)
-                  : await Task.Run(() => Page<T>.FromEnumerable(source.Skip(pd.SkipIndex).Take(pd.PageSize), pd)).ConfigureAwait(false);
+                    var list = source.ToList();
+                    return PrivateToPage(list, pagerFilter.PageIndex, pagerFilter.PageSize, list.Count);
+                }, cancellationToken)
+                .ConfigureAwait(false);
         }
 
-        #endregion ToPage
-
-        #region ToPagedList
-
         /// <summary>
-        /// Convert asynchronous IEnumerable to a PagedList
+        /// Converts a pre-paged collection, which holds only the items of page <paramref name="pageIndex"/>, to a <see cref="Page{T}"/>, on the thread pool
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static async Task<PagedList<T>> ToPagedListAsync<T>(this IEnumerable<T> source)
+        /// <param name="pageIndex">Index of the page, from 1</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <param name="cancellationToken">Cancels the work before it starts</param>
+        /// <returns>The page, holding the collection as it is</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        public async Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, int totalItemCount, CancellationToken cancellationToken = default)
         {
-            return await Task.Run(() => PagedList<T>.FromEnumerable(source)).ConfigureAwait(false);
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
+
+            return await Task.Run(() => PrivateToPage(source, pageIndex, pageSize, totalItemCount, true), cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
-        /// Convert asynchronous IEnumerable to a PagedList
+        /// Converts a pre-paged collection, which holds only the items of the page of <paramref name="pagerFilter"/>, to a <see cref="Page{T}"/>, on the thread pool
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="source"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
-        public static async Task<PagedList<T>> ToPagedListAsync<T>(this IEnumerable<T> source, int pageSize)
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <param name="cancellationToken">Cancels the work before it starts</param>
+        /// <returns>The page, holding the collection as it is</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        public async Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, int totalItemCount, CancellationToken cancellationToken = default)
+        {
+            Validator.Validate(pagerFilter, totalItemCount);
+
+            return await Task.Run(() => PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, true), cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Takes one <see cref="Page{T}"/> out of the collection, with a total that is already known, so the collection isn't counted, on the thread pool
+        /// </summary>
+        /// <param name="pageIndex">Index of the page, from 1. Past the last page, the last page is returned.</param>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <param name="prePaged">Whether the collection is already paged. If so, it is used as it is.</param>
+        /// <param name="cancellationToken">Cancels the work before it starts</param>
+        /// <returns>The page</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <remarks>
+        /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
+        /// </remarks>
+        public async Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default)
+        {
+            Validator.Validate(pageIndex, pageSize, totalItemCount);
+
+            return await Task.Run(() => source is IQueryable<T> query
+                    ? query.ToPage(pageIndex, pageSize, totalItemCount, prePaged)
+                    : PrivateToPage(source, pageIndex, pageSize, totalItemCount, prePaged), cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Takes one <see cref="Page{T}"/> out of the collection, with a total that is already known, so the collection isn't counted, on the thread pool
+        /// </summary>
+        /// <param name="pagerFilter">The page index and page size</param>
+        /// <param name="totalItemCount">Number of items on all pages together</param>
+        /// <param name="prePaged">Whether the collection is already paged. If so, it is used as it is.</param>
+        /// <param name="cancellationToken">Cancels the work before it starts</param>
+        /// <returns>The page</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <remarks>
+        /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
+        /// </remarks>
+        public async Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default)
+        {
+            Validator.Validate(pagerFilter, totalItemCount);
+
+            return await Task.Run(() => source is IQueryable<T> query
+                    ? query.ToPage(pagerFilter, totalItemCount, prePaged)
+                    : PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, totalItemCount, prePaged), cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        #endregion ToPage Async
+
+        #region ToPagedList Async
+
+        /// <summary>
+        /// Copies the collection into a <see cref="PagedList{T}"/> of 10 items a page, on the thread pool
+        /// </summary>
+        /// <param name="cancellationToken">Cancels the work before it starts</param>
+        /// <returns>The list</returns>
+        public async Task<PagedList<T>> ToPagedListAsync(CancellationToken cancellationToken = default)
+        {
+            return await Task.Run(() => PagedList.FromEnumerable(source), cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Copies the collection into a <see cref="PagedList{T}"/>, on the thread pool
+        /// </summary>
+        /// <param name="pageSize">Number of items on a page</param>
+        /// <param name="cancellationToken">Cancels the work before it starts</param>
+        /// <returns>The list</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageSize"/> is less than 1</exception>
+        public async Task<PagedList<T>> ToPagedListAsync(int pageSize, CancellationToken cancellationToken = default)
         {
             Validator.ValidatePageSize(pageSize);
 
-            return await Task.Run(() => PagedList<T>.FromEnumerable(source, pageSize)).ConfigureAwait(false);
+            return await Task.Run(() => PagedList.FromEnumerable(source, pageSize), cancellationToken).ConfigureAwait(false);
         }
 
-        #endregion ToPagedList
-
-        #endregion Async
-
-#endif
+        #endregion ToPagedList Async
     }
 }

@@ -1,0 +1,107 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore Gobln.Pager.slnx
+
+      - name: Build
+        run: dotnet build Gobln.Pager.slnx -c Release --no-restore
+
+      - name: Test
+        run: dotnet test Gobln.Pager.slnx -c Release --no-build
+
+      # Packed in a loop with an explicit exit-code check: GitHub wraps a
+      # multi-line pwsh block so that only the LAST command's exit code is
+      # checked. Five bare `dotnet pack` lines would let failures in packages
+      # 1-4 pass unnoticed. Do not flatten this back into a list of commands.
+      - name: Pack
+        shell: pwsh
+        run: |
+          $projects = @(
+            'scr/Gobln.Pager/Gobln.Pager.csproj'
+            'scr/Gobln.Pager.Mvc/Gobln.Pager.Mvc.csproj'
+            'scr/Gobln.Pager.Blazor/Gobln.Pager.Blazor.csproj'
+            'scr/Gobln.Pager.EntityFrameworkCore/Gobln.Pager.EntityFrameworkCore.csproj'
+            'scr/Gobln.Pager.Json.Microsoft/Gobln.Pager.Json.Microsoft.csproj'
+            'scr/Gobln.Pager.Json.Newtonsoft/Gobln.Pager.Json.Newtonsoft.csproj'
+          )
+          foreach ($p in $projects) {
+            dotnet pack $p -c Release --no-build -o artifacts
+            if ($LASTEXITCODE -ne 0) { throw "pack failed: $p" }
+          }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: artifacts/*.nupkg
+          if-no-files-found: error
+
+      # Trusted Publishing: exchanges the GitHub OIDC token for a short-lived
+      # nuget.org API key. Requires a matching policy on nuget.org.
+      - name: NuGet login
+        uses: NuGet/login@v1
+        id: nuget
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push to NuGet
+        run: >
+          dotnet nuget push "artifacts/*.nupkg"
+          --api-key ${{ steps.nuget.outputs.NUGET_API_KEY }}
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+
+      - name: Resolve version
+        id: ver
+        shell: pwsh
+        run: |
+          $xml = [xml](Get-Content scr/Gobln.Pager/Gobln.Pager.csproj)
+          $v = ($xml.Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1).Trim()
+          if (-not $v) { throw "No <Version> found in Gobln.Pager.csproj" }
+          "version=$v" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          $tag = git ls-remote --tags origin "refs/tags/v$v"
+          if ($tag) {
+            Write-Host "Tag v$v already exists - skipping GitHub Release."
+            "release=false" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          } else {
+            Write-Host "Tag v$v is new - a GitHub Release will be created."
+            "release=true" | Out-File $env:GITHUB_OUTPUT -Append -Encoding utf8
+          }
+
+      - name: Create GitHub Release
+        if: steps.ver.outputs.release == 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = "v${{ steps.ver.outputs.version }}"
+          $files = (Get-ChildItem artifacts/*.nupkg).FullName
+          gh release create $tag @files --title $tag --generate-notes
+          if ($LASTEXITCODE -ne 0) { throw "gh release create failed" }
