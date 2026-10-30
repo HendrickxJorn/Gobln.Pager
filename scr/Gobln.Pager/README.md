@@ -1,6 +1,5 @@
 # Gobln.Pager
 
-[![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.svg)](https://www.nuget.org/packages/Gobln.Pager/)
 [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.svg)](https://www.nuget.org/packages/Gobln.Pager/)
 
 A paging library for .NET. It turns an `IEnumerable<T>` or `IQueryable<T>` into a `Page<T>`: the items of one page, together with the page index, page size and totals a pager needs. For a list that keeps changing there is `PagedList<T>`, which pages itself. The package has no dependencies.

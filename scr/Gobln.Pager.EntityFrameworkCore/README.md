@@ -1,6 +1,5 @@
 # Gobln.Pager.EntityFrameworkCore
 
-[![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.EntityFrameworkCore.svg)](https://www.nuget.org/packages/Gobln.Pager.EntityFrameworkCore/)
 [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.EntityFrameworkCore.svg)](https://www.nuget.org/packages/Gobln.Pager.EntityFrameworkCore/)
 
 Asynchronous paging for Entity Framework Core with [Gobln.Pager](https://www.nuget.org/packages/Gobln.Pager/). On an EF Core query, `ToPageAsync` and `ToPagedListAsync` run `CountAsync` and `ToListAsync`. Without this package they run the same queries synchronously, on a thread-pool thread.

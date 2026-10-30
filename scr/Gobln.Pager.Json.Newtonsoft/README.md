@@ -1,6 +1,5 @@
 # Gobln.Pager.Json.Newtonsoft
 
-[![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Json.Newtonsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Newtonsoft/)
 [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Json.Newtonsoft.svg)](https://www.nuget.org/packages/Gobln.Pager.Json.Newtonsoft/)
 
 `Newtonsoft.Json` converters for [Gobln.Pager](https://www.nuget.org/packages/Gobln.Pager/). Without them a `Page<T>` is written as a plain array of its items, and its page index, page size and total item count are lost. With them a page arrives the way it was sent.

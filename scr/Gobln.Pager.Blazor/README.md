@@ -1,6 +1,5 @@
 # Gobln.Pager.Blazor
 
-[![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Blazor.svg)](https://www.nuget.org/packages/Gobln.Pager.Blazor/)
 [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Blazor.svg)](https://www.nuget.org/packages/Gobln.Pager.Blazor/)
 
 Gobln.Pager.Blazor is a lightweight Blazor pagination component designed for Blazor Server and Blazor WebAssembly apps. It renders a configurable pager UI and emits page-change events.

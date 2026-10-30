@@ -1,6 +1,5 @@
 # Gobln.Pager.Mvc
 
-[![NuGet](https://img.shields.io/nuget/dt/Gobln.Pager.Mvc.svg)](https://www.nuget.org/packages/Gobln.Pager.Mvc/)
 [![NuGet](https://img.shields.io/nuget/v/Gobln.Pager.Mvc.svg)](https://www.nuget.org/packages/Gobln.Pager.Mvc/)
 
 HTML helpers that render a [Gobln.Pager](https://www.nuget.org/packages/Gobln.Pager/) `Page`, or any other `IPage`, as pagination markup in a Razor view. For a `PagedList`, pass its current page: `@Html.Pager(Model.GetPage())`. The markup follows Bootstrap's pagination component, so it works with Bootstrap 5.3 without any extra CSS. The library ships no CSS of its own.
