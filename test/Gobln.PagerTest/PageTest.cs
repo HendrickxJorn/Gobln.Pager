@@ -211,7 +211,90 @@ public class PageTest
         var expected = new List<User>().ToArray();
 
         Assert.Equal(1, result.PageIndex);
+        // Not asked for a page size, so there is none to keep
+        Assert.Equal(0, result.PageSize);
         Assert.Equal(expected, result, new UserComparer());
+    }
+
+    /// <summary>
+    /// Create a Page from a empty List
+    /// </summary>
+    [Fact]
+    public async Task Create_Empty_Page_02()
+    {
+        var result = new List<User>().ToPage(1, 10);
+
+        var expected = new List<User>().ToArray();
+
+        Assert.Equal(expected, result, new UserComparer());
+        Assert.Equal(1, result.PageIndex);
+        Assert.Equal(10, result.PageSize);
+    }
+
+    /// <summary>
+    /// Create a Page without a page size from a empty List
+    /// </summary>
+    [Fact]
+    public void Create_Empty_Page_03()
+    {
+        // A page size of 0 makes an empty page, as with a total item count of 0
+        var result = new List<User>().ToPage(1, 0);
+
+        var expected = new List<User>().ToArray();
+
+        Assert.Equal(expected, result, new UserComparer());
+        Assert.Equal(1, result.PageIndex);
+        Assert.Equal(0, result.PageSize);
+        Assert.Equal(0, result.TotalItemCount);
+        Assert.Equal(1, result.TotalPageCount);
+    }
+
+    /// <summary>
+    /// Create a Page without a page size from an empty pre-paged List
+    /// </summary>
+    [Fact]
+    public void Create_Empty_Page_04()
+    {
+        // A page size of 0 is allowed when the total item count is 0
+        var result = new List<User>().ToPage(1, 0, 0);
+
+        var expected = new List<User>().ToArray();
+
+        Assert.Equal(expected, result, new UserComparer());
+        Assert.Equal(1, result.PageIndex);
+        Assert.Equal(0, result.PageSize);
+        Assert.Equal(0, result.TotalItemCount);
+        Assert.Equal(1, result.TotalPageCount);
+    }
+
+    /// <summary>
+    /// A page size of 0 throws when the pre-paged List has items in total
+    /// </summary>
+    [Fact]
+    public void Create_Empty_Page_05()
+    {
+        // 20 items can't be put on pages of 0 items
+        var ex = Assert.Throws<ArgumentOutOfRangeException>(() => UserData.UserList.ToPage(1, 0, 20));
+
+        Assert.Equal("pageSize", ex.ParamName);
+    }
+
+    /// <summary>
+    /// Create a Page without a page size from a List with items
+    /// </summary>
+    [Fact]
+    public void Create_Empty_Page_06()
+    {
+        // A page size of 0 makes an empty page whatever the List holds: the total item count is set to 0
+        var result = UserData.UserList.ToPage(1, 0);
+
+        var expected = new List<User>().ToArray();
+
+        Assert.Equal(expected, result, new UserComparer());
+        Assert.Equal(1, result.PageIndex);
+        Assert.Equal(0, result.PageSize);
+        Assert.Equal(0, result.TotalItemCount);
+        Assert.Equal(1, result.TotalPageCount);
     }
 
     /// <summary>
@@ -229,7 +312,7 @@ public class PageTest
         var expected = new List<User>();
 
         Assert.Equal(1, result.PageIndex);
-        Assert.Equal(0, result.PageSize);
+        Assert.Equal(15, result.PageSize);
         Assert.Equal(1, result.TotalPageCount);
         Assert.Equal(0, result.TotalItemCount);
         Assert.Equal(expected, result, new UserComparer());
@@ -250,7 +333,7 @@ public class PageTest
         var expected = new List<User>();
 
         Assert.Equal(1, result.PageIndex);
-        Assert.Equal(0, result.PageSize);
+        Assert.Equal(15, result.PageSize);
         Assert.Equal(1, result.TotalPageCount);
         Assert.Equal(0, result.TotalItemCount);
         Assert.Equal(expected, result, new UserComparer());

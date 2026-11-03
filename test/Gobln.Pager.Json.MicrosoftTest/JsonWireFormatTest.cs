@@ -131,6 +131,22 @@ public class JsonWireFormatTest
     }
 
     [Fact]
+    public void RoundTrip_EmptyPage_KeepsItsPageSize()
+    {
+        var page = Array.Empty<int>().ToPage(1, 10);
+
+        var result = JsonSerializer.Deserialize<Page<int>>(
+            JsonSerializer.Serialize(page, Options()), Options());
+
+        Assert.NotNull(result);
+        Assert.Empty(result);
+        Assert.Equal(1, result.PageIndex);
+        Assert.Equal(10, result.PageSize);
+        Assert.Equal(0, result.TotalItemCount);
+        Assert.Equal(1, result.TotalPageCount);
+    }
+
+    [Fact]
     public void Deserialize_EmptyPageWithoutTotals_IsAnEmptyPage()
     {
         // What new Page<T>() writes. Its PageSize of 0 must not be rejected as invalid.

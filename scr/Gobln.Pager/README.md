@@ -135,8 +135,10 @@ var numbers = PageWindow.GetPageNumbers(pageIndex: 5, totalPageCount: 10, siblin
 ## Behaviour to know about
 
 - A `Page<T>` holds its items: `ToPage` reads them once, when it runs. On an `IQueryable<T>` that is one query for the count and one for the page. Enumerating the page afterwards doesn't query again, so the `DbContext` may be gone by the time the page is shown.
-- A page index or page size below 1 throws `ArgumentOutOfRangeException`. So does a total item count below 0.
+- A page index below 1 throws `ArgumentOutOfRangeException`. So do a page size below 0 and a total item count below 0.
+- A page size of 0 gives an empty page with a total item count of 0, whatever the collection holds: `ToPage(pageIndex, 0)` works as `ToPage(pageIndex, 0, 0)`, and doesn't count or read the collection. With a total item count above 0, a page size of 0 throws. A `PageFilter` bound from a request without a page size has a page size of 0, so check for that if it should be an error.
 - `ToPage(pageIndex, pageSize)` with a page index past the last page returns the last page. A pre-paged page that came back empty keeps its totals, so a pager still shows the pages there are.
+- An empty page keeps the page size it was asked for. Only a page made without one, such as `new Page<T>()`, `ToPage()` of an empty collection or `ToPage(pageIndex, 0)`, has a `PageSize` of 0.
 - `ToPagedList` on an `IQueryable<T>` runs the whole query and loads the result in memory.
 - The `Async` versions run the same work on a thread-pool thread. For Entity Framework Core's asynchronous queries, add Gobln.Pager.EntityFrameworkCore.
 

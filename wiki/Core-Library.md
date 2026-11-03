@@ -13,7 +13,7 @@ A page holds its items: they are read once, when the page is made, and nothing a
 | Property | Type | Description |
 | --- | --- | --- |
 | `PageIndex` | `int` | Current page number (1-based). Default `1`. |
-| `PageSize` | `int` | The page size: the most items a page holds. The last page can hold fewer. `0` for an empty page. |
+| `PageSize` | `int` | The page size: the most items a page holds. The last page can hold fewer. An empty page keeps the size it was asked for. `0` for a page made without one, such as `new Page<T>()`, `ToPage()` of an empty collection or `ToPage(pageIndex, 0)`. |
 | `TotalItemCount` | `int` | Total items in the original collection. Default `0`. |
 | `TotalPageCount` | `int` | Total pages in the original collection. Default `1`. |
 | `HasPaging` | `bool` | `TotalPageCount > 1`. |
@@ -48,7 +48,7 @@ Page(IEnumerable<T> collection)                                       // whole c
 Page(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)  // pre-paged data
 ```
 
-The four-argument form is for **pre-paged data**: `collection` is assumed to already be exactly the items for `pageIndex`, and is *not* re-sliced. It throws `ArgumentOutOfRangeException` if `pageIndex < 1`, `pageSize < 1`, or `totalItemCount < 0`.
+The four-argument form is for **pre-paged data**: `collection` is assumed to already be exactly the items for `pageIndex`, and is *not* re-sliced. It throws `ArgumentOutOfRangeException` if `pageIndex < 1`, `pageSize < 1`, or `totalItemCount < 0`. A `pageSize` of `0` is allowed when `totalItemCount` is `0`, so a page without a page size can be made again from its own values.
 
 ```csharp
 var prePagedData = new List<string> { "Item 1", "Item 2", "Item 3" };
@@ -208,7 +208,8 @@ PageWindow.GetPageNumbers(pageIndex: 5, totalPageCount: 10, siblingCount: 1, bou
 Pagination parameters are validated wherever they're accepted (constructors, extension methods):
 
 - `pageIndex < 1` → throws `ArgumentOutOfRangeException`
-- `pageSize < 1` → throws `ArgumentOutOfRangeException`
+- `pageSize < 0` → throws `ArgumentOutOfRangeException`
+- `pageSize` of `0` → an empty page with a `TotalItemCount` of `0`, without counting or reading the source. It throws only with a `totalItemCount` above `0`.
 - `totalItemCount < 0` → throws `ArgumentOutOfRangeException`
 
 ## Interfaces

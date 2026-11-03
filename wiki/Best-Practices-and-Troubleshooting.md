@@ -7,7 +7,7 @@
 - **Use pre-paged overloads (`prePaged: true`, or the `totalItemCount`-only overloads) when you've already paged and counted at the data-access layer** — e.g. you ran your own `Skip`/`Take` plus a separate `Count()` query. This avoids double-paging the data.
 - **Use `PagedList<T>` when the collection needs to be mutated after paging** (add/remove/insert) and you want the page count to stay in sync automatically. Use `Page<T>` for a single page to display or return from an API.
 - **Sort an `IQueryable<T>` before paging it.** Without an `OrderBy` the database picks the order, so pages can repeat or skip items.
-- **Validate pagination input at your application boundary** (controller/API parameters) before calling into the library — the library will throw `ArgumentOutOfRangeException` for `pageIndex < 1`, `pageSize < 1`, or `totalItemCount < 0`, but a friendlier validation message at the boundary is usually better UX than an unhandled exception. A `pageIndex` past the last page doesn't throw: it returns the last page.
+- **Validate pagination input at your application boundary** (controller/API parameters) before calling into the library — the library will throw `ArgumentOutOfRangeException` for `pageIndex < 1`, `pageSize < 0`, or `totalItemCount < 0`, but a friendlier validation message at the boundary is usually better UX than an unhandled exception. A `pageIndex` past the last page doesn't throw: it returns the last page. A `pageSize` of `0` doesn't throw either: it returns an empty page with a `TotalItemCount` of `0`. A `PageFilter` bound from a request without a `pageSize` has a `PageSize` of `0`, so check for it if a missing page size should be an error.
 - **`PagedList<T>` is not thread-safe.** Guard concurrent access yourself if a `PagedList<T>` instance is shared across requests/threads.
 - **Pick one JSON package's wire format and stick to it end-to-end** if `Page<T>` payloads cross a service boundary — see the interop note in [JSON Serialization](Json-Serialization.md).
 
@@ -25,7 +25,7 @@ Since 2.0 a `Page<T>` reads its rows when `ToPage` runs and keeps them, so enume
 
 ### `ArgumentOutOfRangeException` when creating a `Page<T>` or calling `ToPage(...)`
 
-Check that `pageIndex >= 1`, `pageSize >= 1`, and (where applicable) `totalItemCount >= 0`. These are validated on every entry point (constructors and extension methods).
+Check that `pageIndex >= 1`, `pageSize >= 0`, and (where applicable) `totalItemCount >= 0`. A `pageSize` of `0` throws only together with a `totalItemCount` above `0`. These are validated on every entry point (constructors and extension methods).
 
 ### `ArgumentNullException: Page parameter is required` in the Blazor `<Pager>` component
 

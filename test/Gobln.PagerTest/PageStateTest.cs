@@ -36,6 +36,14 @@ public class PageStateTest
     }
 
     [Fact]
+    public void EmptySource_KeepsThePageSize()
+    {
+        var page = new List<int>().ToPage(1, 10);
+
+        Assert.Equal(10, page.PageSize);
+    }
+
+    [Fact]
     public void PageWithItems_IsNotEmpty()
     {
         var page = Enumerable.Range(1, 5).ToPage(1, 10);

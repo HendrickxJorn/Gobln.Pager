@@ -53,6 +53,7 @@ public class ToPageAsyncTest
 
         Assert.True(page.IsEmpty);
         Assert.Equal(1, page.PageIndex);
+        Assert.Equal(10, page.PageSize);
         Assert.Equal(0, page.TotalItemCount);
         Assert.Equal(1, page.TotalPageCount);
         Assert.Single(db.Recorder.Commands);
@@ -82,7 +83,37 @@ public class ToPageAsyncTest
         var page = await db.Items.ToPageAsync(1, 10, 0);
 
         Assert.True(page.IsEmpty);
+        Assert.Equal(10, page.PageSize);
         Assert.Equal(0, page.TotalItemCount);
+        Assert.Empty(db.Recorder.Commands);
+    }
+
+    [Fact]
+    public async Task ToPageAsync_PageSizeZero_RunsNoQuery()
+    {
+        using var db = new TestDatabase();
+
+        // As with a total of 0: nothing is counted or read
+        var page = await db.Items.ToPageAsync(1, 0);
+        var filterPage = await db.Items.ToPageAsync(new PageFilter(1, 0));
+
+        Assert.True(page.IsEmpty);
+        Assert.Equal(0, page.PageSize);
+        Assert.Equal(0, page.TotalItemCount);
+        Assert.True(filterPage.IsEmpty);
+        Assert.Equal(0, filterPage.TotalItemCount);
+        Assert.Empty(db.Recorder.Commands);
+    }
+
+    [Fact]
+    public async Task ToPageAsync_PrePaged_WithoutAPageSizeOrItems_RunsNoQuery()
+    {
+        using var db = new TestDatabase();
+
+        var page = await db.Items.ToPageAsync(1, 0, 0);
+
+        Assert.True(page.IsEmpty);
+        Assert.Equal(0, page.PageSize);
         Assert.Empty(db.Recorder.Commands);
     }
 
@@ -176,8 +207,9 @@ public class ToPageAsyncTest
         using var db = new TestDatabase();
 
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => db.Items.ToPageAsync(0, 10));
-        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => db.Items.ToPageAsync(1, 0));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => db.Items.ToPageAsync(1, -1));
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => db.Items.ToPageAsync(1, 10, -1));
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => db.Items.ToPageAsync(1, 0, 25));
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => db.Items.ToPagedListAsync(0));
         Assert.Empty(db.Recorder.Commands);
     }
