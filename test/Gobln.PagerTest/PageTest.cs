@@ -372,29 +372,38 @@ public class PageTest
     }
 
     /// <summary>
-    /// Page.FromEnumerable and the constructor of null make an empty Page
+    /// Page.FromEnumerable and the constructor count null as an empty collection
     /// </summary>
     [Fact]
     public void Create_Page_From_Null_01()
     {
         IEnumerable<User>? data = null;
 
-        var pages = new[]
-        {
-            Page.FromEnumerable(data!),
-            Page.FromEnumerable(data!, 2, 10),
-            Page.FromEnumerable(data!, 2, 10, 25),
-            // There is no collection to read: the totals that were given aren't kept either
-            new Page<User>(data!, 2, 10, 25),
-        };
+        // Without a page size, as the whole of an empty collection
+        var whole = Page.FromEnumerable(data!);
 
-        Assert.All(pages, page =>
+        Assert.Empty(whole);
+        Assert.Equal(0, whole.PageSize);
+        Assert.Equal(0, whole.TotalItemCount);
+
+        // Without a total, as an empty collection that is counted: it keeps its page size
+        var counted = Page.FromEnumerable(data!, 2, 10);
+
+        Assert.Empty(counted);
+        Assert.Equal(1, counted.PageIndex);
+        Assert.Equal(10, counted.PageSize);
+        Assert.Equal(0, counted.TotalItemCount);
+
+        // With a total, as a pre-paged page that came back empty: it keeps its totals
+        var prePaged = new[] { Page.FromEnumerable(data!, 2, 10, 25), new Page<User>(data!, 2, 10, 25) };
+
+        Assert.All(prePaged, page =>
         {
             Assert.Empty(page);
-            Assert.Equal(1, page.PageIndex);
-            Assert.Equal(0, page.PageSize);
-            Assert.Equal(0, page.TotalItemCount);
-            Assert.Equal(1, page.TotalPageCount);
+            Assert.Equal(2, page.PageIndex);
+            Assert.Equal(10, page.PageSize);
+            Assert.Equal(25, page.TotalItemCount);
+            Assert.Equal(3, page.TotalPageCount);
         });
     }
 

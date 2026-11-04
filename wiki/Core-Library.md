@@ -48,7 +48,7 @@ Page(IEnumerable<T> collection)                                       // whole c
 Page(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)  // pre-paged data
 ```
 
-The four-argument form is for **pre-paged data**: `collection` is assumed to already be exactly the items for `pageIndex`, and is *not* re-sliced. It throws `ArgumentOutOfRangeException` if `pageIndex < 1`, `pageSize < 1`, or `totalItemCount < 0`. A `pageSize` of `0` is allowed when `totalItemCount` is `0`, so a page without a page size can be made again from its own values.
+The four-argument form is for **pre-paged data**: `collection` is assumed to already be exactly the items for `pageIndex`, and is *not* re-sliced. It throws `ArgumentOutOfRangeException` if `pageIndex < 1`, `pageSize < 1`, or `totalItemCount < 0`. A `pageSize` of `0` is allowed when `totalItemCount` is `0`, so a page without a page size can be made again from its own values. A `null` collection counts as an empty one: the page has no items and keeps the values it was given. The `Page.FromEnumerable` factories below do the same.
 
 ```csharp
 var prePagedData = new List<string> { "Item 1", "Item 2", "Item 3" };
