@@ -2,7 +2,8 @@
 
 internal class PageDefinition(int pageIndex, int pageSize, int totalItemCount)
 {
-    public int PageSize => totalItemCount == 0 ? 0 : (pageSize <= 0 ? int.MaxValue : pageSize);
+    // An empty source keeps the size it was asked for. Only a page made without one, such as ToPage() of nothing, has 0
+    public int PageSize => pageSize > 0 ? pageSize : (totalItemCount == 0 ? 0 : int.MaxValue);
 
     public int PageIndex
     {

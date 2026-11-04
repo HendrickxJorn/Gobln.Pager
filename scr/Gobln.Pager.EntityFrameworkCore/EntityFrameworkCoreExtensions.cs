@@ -44,7 +44,7 @@ public static class EntityFrameworkCoreExtensions
         /// <param name="pageSize">Number of items on a page</param>
         /// <param name="cancellationToken">Cancels the queries</param>
         /// <returns>The page, with the totals of the whole query</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> is less than 1, or <paramref name="pageSize"/> less than 0. A <paramref name="pageSize"/> of 0 gives an empty page with a total of 0, without running a query.</exception>
         public async Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pageIndex, pageSize);
@@ -54,7 +54,8 @@ public static class EntityFrameworkCoreExtensions
                 return await IEnumerableExtensions.ToPageAsync(source, pageIndex, pageSize, cancellationToken).ConfigureAwait(false);
             }
 
-            var totalItemCount = await source.CountAsync(cancellationToken).ConfigureAwait(false);
+            // A page size of 0 makes an empty page, as with a total of 0, so no query runs
+            var totalItemCount = pageSize == 0 ? 0 : await source.CountAsync(cancellationToken).ConfigureAwait(false);
 
             return await PageAsync(source, pageIndex, pageSize, totalItemCount, prePaged: false, cancellationToken).ConfigureAwait(false);
         }
@@ -65,7 +66,7 @@ public static class EntityFrameworkCoreExtensions
         /// <param name="pagerFilter">The page index and page size</param>
         /// <param name="cancellationToken">Cancels the queries</param>
         /// <returns>The page, with the totals of the whole query</returns>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index is less than 1, or the page size less than 0. A page size of 0 gives an empty page with a total of 0, without running a query.</exception>
         public async Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pagerFilter);
@@ -81,7 +82,7 @@ public static class EntityFrameworkCoreExtensions
         /// <param name="totalItemCount">Number of items on all pages together</param>
         /// <param name="cancellationToken">Cancels the query</param>
         /// <returns>The page</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0. A <paramref name="pageSize"/> of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, int totalItemCount, CancellationToken cancellationToken = default)
         {
             return source.ToPageAsync(pageIndex, pageSize, totalItemCount, prePaged: true, cancellationToken);
@@ -94,7 +95,7 @@ public static class EntityFrameworkCoreExtensions
         /// <param name="totalItemCount">Number of items on all pages together</param>
         /// <param name="cancellationToken">Cancels the query</param>
         /// <returns>The page</returns>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0. A page size of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, int totalItemCount, CancellationToken cancellationToken = default)
         {
             return source.ToPageAsync(pagerFilter, totalItemCount, prePaged: true, cancellationToken);
@@ -109,7 +110,7 @@ public static class EntityFrameworkCoreExtensions
         /// <param name="prePaged">Whether the query is already paged. If so, it is read as it is.</param>
         /// <param name="cancellationToken">Cancels the query</param>
         /// <returns>The page</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0. A <paramref name="pageSize"/> of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public async Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pageIndex, pageSize, totalItemCount);
@@ -130,7 +131,7 @@ public static class EntityFrameworkCoreExtensions
         /// <param name="prePaged">Whether the query is already paged. If so, it is read as it is.</param>
         /// <param name="cancellationToken">Cancels the query</param>
         /// <returns>The page</returns>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0. A page size of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public async Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, int totalItemCount, bool prePaged, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pagerFilter, totalItemCount);
@@ -187,7 +188,7 @@ public static class EntityFrameworkCoreExtensions
         // Nothing to read: the core doesn't query for the items either
         if (totalItemCount == 0)
         {
-            return new Page<T>();
+            return new Page<T>([], pageIndex, pageSize, totalItemCount);
         }
 
         var definition = new PageDefinition(pageIndex, pageSize, totalItemCount);

@@ -51,9 +51,9 @@ internal class IPageJsonConverter<T> : JsonConverter<IPage<T>>
         // converters apply to the items too
         var tempPage = serializer.Deserialize<TempPage<T>>(reader);
 
-        // An empty page without totals is what new Page<T>() writes, with a PageSize of 0 that the
-        // constructor below rejects. An empty page with totals goes through it, and keeps them.
-        if (tempPage is null || (tempPage.TotalItemCount == 0 && (tempPage.PageItems is null || tempPage.PageItems.Length == 0)))
+        // An empty page without totals or a page size, which is what new Page<T>() writes, is read as new Page<T>(),
+        // also without a PageIndex, as in {}. Any other page goes through the constructor below, and keeps its values.
+        if (tempPage is null || (tempPage.PageSize == 0 && tempPage.TotalItemCount == 0 && (tempPage.PageItems is null || tempPage.PageItems.Length == 0)))
         {
             return new Page<T>();
         }

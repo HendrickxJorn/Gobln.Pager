@@ -29,7 +29,7 @@ var page = await context.Orders
 
 | Call | Queries |
 | --- | --- |
-| `ToPageAsync(pageIndex, pageSize)`, `ToPageAsync(pageFilter)` | `CountAsync`, then the page with `Skip`/`Take`. No second query when the count is 0. |
+| `ToPageAsync(pageIndex, pageSize)`, `ToPageAsync(pageFilter)` | `CountAsync`, then the page with `Skip`/`Take`. No second query when the count is 0, and none at all for a page size of 0. |
 | `ToPageAsync(pageIndex, pageSize, totalItemCount)` (pre-paged) | `ToListAsync` of the query as it is. None when the total is 0. |
 | `ToPageAsync(pageIndex, pageSize, totalItemCount, prePaged: false)` | The page with `Skip`/`Take`, no count |
 | `ToPageAsync()`, `ToPagedListAsync()`, `ToPagedListAsync(pageSize)` | One `ToListAsync` |

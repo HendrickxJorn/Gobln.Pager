@@ -248,4 +248,19 @@ public class PageListTest
 
         Assert.Equal(expected, result, new UserComparer());
     }
+
+    /// <summary>
+    /// Read a whole query into a PagedList with a page size
+    /// </summary>
+    [Fact]
+    public void Create_PagedList_From_IQueryable_01()
+    {
+        var data = UserData.UserList.AsQueryable();
+
+        var result = data.ToPagedList(10);
+
+        Assert.Equal(data, result, new UserComparer());
+        Assert.Equal(10, result.PageSize);
+        Assert.Equal(3, result.PageCount);
+    }
 }

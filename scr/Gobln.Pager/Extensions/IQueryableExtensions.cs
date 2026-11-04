@@ -48,12 +48,13 @@ public static class IQueryableExtensions
         /// <param name="pageIndex">Index of the page, from 1. Past the last page, the last page is returned.</param>
         /// <param name="pageSize">Number of items on a page</param>
         /// <returns>The page, with the totals of the whole query</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> is less than 1, or <paramref name="pageSize"/> less than 0. A <paramref name="pageSize"/> of 0 gives an empty page with a total of 0, without running a query.</exception>
         public Page<T> ToPage(int pageIndex, int pageSize)
         {
             Validator.Validate(pageIndex, pageSize);
 
-            return PrivateToPage(source, pageIndex, pageSize, source.Count());
+            // A page size of 0 makes an empty page, as with a total of 0, so no query runs
+            return PrivateToPage(source, pageIndex, pageSize, pageSize == 0 ? 0 : source.Count());
         }
 
         /// <summary>
@@ -62,12 +63,12 @@ public static class IQueryableExtensions
         /// <param name="pagerFilter">The page index and page size</param>
         /// <returns>The page, with the totals of the whole query</returns>
         /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index is less than 1, or the page size less than 0. A page size of 0 gives an empty page with a total of 0, without running a query.</exception>
         public Page<T> ToPage(IPageFilter pagerFilter)
         {
             Validator.Validate(pagerFilter);
 
-            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, source.Count());
+            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, pagerFilter.PageSize == 0 ? 0 : source.Count());
         }
 
         /// <summary>
@@ -77,7 +78,7 @@ public static class IQueryableExtensions
         /// <param name="pageSize">Number of items on a page</param>
         /// <param name="totalItemCount">Number of items on all pages together</param>
         /// <returns>The page, holding what the query returns</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0. A <paramref name="pageSize"/> of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount)
         {
             Validator.Validate(pageIndex, pageSize, totalItemCount);
@@ -92,7 +93,7 @@ public static class IQueryableExtensions
         /// <param name="totalItemCount">Number of items on all pages together</param>
         /// <returns>The page, holding what the query returns</returns>
         /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0. A page size of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount)
         {
             Validator.Validate(pagerFilter, totalItemCount);
@@ -108,7 +109,7 @@ public static class IQueryableExtensions
         /// <param name="totalItemCount">Number of items on all pages together</param>
         /// <param name="prePaged">Whether the query is already paged. If so, it is read as it is.</param>
         /// <returns>The page</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0. A <paramref name="pageSize"/> of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount, bool prePaged)
         {
             Validator.Validate(pageIndex, pageSize, totalItemCount);
@@ -124,7 +125,7 @@ public static class IQueryableExtensions
         /// <param name="prePaged">Whether the query is already paged. If so, it is read as it is.</param>
         /// <returns>The page</returns>
         /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0. A page size of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount, bool prePaged)
         {
             Validator.Validate(pagerFilter, totalItemCount);

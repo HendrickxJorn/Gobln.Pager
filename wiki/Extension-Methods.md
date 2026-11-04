@@ -22,7 +22,7 @@ Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount, bool prePaged);
 - `ToPage()` with no arguments returns the entire sequence as a single page.
 - Overloads that take `totalItemCount` without a `prePaged` flag treat the source as **already paged** (`prePaged: true`) — i.e. they assume `source` is exactly the slice for `pageIndex`, and do not re-slice it. This is the fast path for data you've already paged at the database level.
 - The `prePaged` flag lets you be explicit either way.
-- A `pageIndex` past the last page returns the last page. A pre-paged source that came back empty keeps its `TotalItemCount` and `TotalPageCount`.
+- A `pageIndex` past the last page returns the last page. A pre-paged source that came back empty keeps its `TotalItemCount` and `TotalPageCount`. An empty source keeps the `PageSize` it was asked for. A `pageSize` of `0` returns an empty page with a `TotalItemCount` of `0`, without counting or reading the source.
 
 ```csharp
 // In-memory paging
@@ -78,7 +78,7 @@ The core package declares these on `IEnumerable<T>` and runs the synchronous log
 
 | Call | Queries |
 | --- | --- |
-| `ToPageAsync(pageIndex, pageSize)`, `ToPageAsync(pageFilter)` | `CountAsync`, then the page with `Skip`/`Take` (no second query when the count is 0) |
+| `ToPageAsync(pageIndex, pageSize)`, `ToPageAsync(pageFilter)` | `CountAsync`, then the page with `Skip`/`Take` (no second query when the count is 0, none at all for a page size of 0) |
 | `ToPageAsync(pageIndex, pageSize, totalItemCount)` (pre-paged) | `ToListAsync` of the query as it is (none when the total is 0) |
 | `ToPageAsync(..., totalItemCount, prePaged: false)` | the page with `Skip`/`Take`, no count |
 | `ToPageAsync()`, `ToPagedListAsync(...)` | one `ToListAsync` |

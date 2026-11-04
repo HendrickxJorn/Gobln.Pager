@@ -40,6 +40,36 @@ public class HtmlDisplayExtensionTest
         return mock.Object;
     }
 
+    /// <summary>
+    /// The framework's own HtmlHelper, given a view context. DisplayNameFor delegates to its
+    /// DisplayNameForInnerType, which a mocked IHtmlHelper can't answer.
+    /// </summary>
+    private static IHtmlHelper<TModel> CreateViewHelper<TModel>()
+    {
+        var services = new ServiceCollection()
+            .AddLogging()
+            .AddMvcCore()
+            .AddViews()
+            .AddDataAnnotations()
+            .Services
+            .BuildServiceProvider();
+
+        var helper = services.GetRequiredService<IHtmlHelper<TModel>>();
+        var metadataProvider = services.GetRequiredService<IModelMetadataProvider>();
+
+        var viewContext = new ViewContext(
+            HelperHtml.CreateMockActionContext(services: services),
+            new Mock<Microsoft.AspNetCore.Mvc.ViewEngines.IView>().Object,
+            new ViewDataDictionary<TModel>(metadataProvider, new ModelStateDictionary()),
+            new Mock<ITempDataDictionary>().Object,
+            TextWriter.Null,
+            new HtmlHelperOptions());
+
+        ((IViewContextAware)helper).Contextualize(viewContext);
+
+        return helper;
+    }
+
     #region DescriptionFor
 
     [Fact]
@@ -95,15 +125,34 @@ public class HtmlDisplayExtensionTest
 
     #region DisplayNameFor
 
-    // On ASP.NET Core, DisplayNameFor is a null-guard plus a one-line delegation to the
-    // framework's DisplayNameForInnerType, which resolves display text through view
-    // infrastructure a mocked IHtmlHelper cannot supply (it returns null here). Only the
-    // guards are unit-testable; covering the resolved text needs an end-to-end test
-    // rendering a real view, e.g. against test/site/WebApplicationMvc.
-    //
-    // The .NET Framework branch does compute the name itself
-    // (metadata.DisplayName ?? metadata.PropertyName ?? ...) and is worth covering in
-    // Gobln.Pager.Mvc48Test, which now actually runs.
+    // On ASP.NET Core, DisplayNameFor delegates to the framework's DisplayNameForInnerType,
+    // which resolves the name through view infrastructure: these use the framework's own
+    // HtmlHelper (CreateViewHelper). The .NET Framework branch computes the name itself and
+    // is covered in Gobln.Pager.Mvc48Test.
+
+    [Fact]
+    public void DisplayNameFor_ReadsTheDisplayName()
+    {
+        var html = CreateViewHelper<Page<DescribedModel>>();
+
+        Assert.Equal("Friendly name", html.DisplayNameFor(m => m.WithDisplayName));
+    }
+
+    [Fact]
+    public void DisplayNameFor_WithoutADisplayName_IsThePropertyName()
+    {
+        var html = CreateViewHelper<Page<DescribedModel>>();
+
+        Assert.Equal("Plain", html.DisplayNameFor(m => m.Plain));
+    }
+
+    [Fact]
+    public void DisplayNameFor_WorksOnPagedListModel()
+    {
+        var html = CreateViewHelper<PagedList<DescribedModel>>();
+
+        Assert.Equal("Friendly name", html.DisplayNameFor(m => m.WithDisplayName));
+    }
 
     [Fact]
     public void DisplayNameFor_NullExpression_Throws()

@@ -147,6 +147,60 @@ public class Bootstrap5ExtraTest
     }
 
     [Fact]
+    public void PageSizeZeroPagerTest01()
+    {
+        // ToPage with a page size of 0 gives an empty page on page 1 of 1, so there is nothing to page
+        var target = "";
+
+        var page = new int[] { 1, 2, 3 }.ToPage(1, 0);
+
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+        var result = mockHtmlHelper.Pager(page);
+
+        Assert.Equal(target, result.ToHtmlString());
+    }
+
+    [Fact]
+    public void PageSizeZeroPagerTest02()
+    {
+        // With Always, the empty page still gets a pager: page 1 of 1
+        var target = """
+         <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item disabled">
+                    <span class="page-link">Previous</span>
+                </li>
+                <li class="page-item active">
+                    <a aria-current="page" class="page-link" href="#">1</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Next</span>
+                </li>
+            </ul>
+         </nav>
+         """;
+
+        var page = new int[] { 1, 2, 3 }.ToPage(1, 0);
+
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+        var result = mockHtmlHelper.Pager(page, new PagerOptions()
+        {
+            NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+
+            ShowPager = WhenToShowEnum.Always,
+
+            HRefUrl = "#",
+
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
+        });
+
+        Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+    }
+
+    [Fact]
     public void UrlContextPagerTest01()
     {
         var target = """
@@ -255,6 +309,20 @@ public class Bootstrap5ExtraTest
         Assert.Contains("""href="/orders?customer=1&amp;pageIndex=2">2</a>""", first);
         Assert.Contains("""href="/products?pageIndex=2">2</a>""", second);
         Assert.DoesNotContain("orders", second);
+    }
+
+    [Fact]
+    public void UrlContextAjaxParametersTest01()
+    {
+        // The markers of an ajax request tell how this request was made, not how to ask for
+        // another page: the links leave them out and keep the rest of the query
+        var result = _helperHtml.CreateHtmlHelper(url: "http://pager.com/orders?sort=name&x-requested-with=XMLHttpRequest&xmlhttprequest=true")
+            .Pager(_page3, new PagerOptions())
+            .ToHtmlString();
+
+        Assert.Contains("""href="/orders?sort=name&amp;pageIndex=2">2</a>""", result);
+        Assert.DoesNotContain("requested", result, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("xmlhttprequest", result, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -570,6 +638,21 @@ public class Bootstrap5ExtraTest
 
         Assert.StartsWith("""<nav aria-label="Search results pages">""", labelled.ToHtmlString());
         Assert.StartsWith("""<nav aria-labelledby="results-heading">""", labelledBy.ToHtmlString());
+    }
+
+    [Fact]
+    public void DictionaryAttributesTest01()
+    {
+        // The attributes can be a dictionary too, for names that aren't C# identifiers
+        var result = _helperHtml.CreateHtmlHelper().Pager(_page3, new PagerOptions()
+        {
+            NavTagHtmlAttributes = new Dictionary<string, string?> { ["aria-label"] = "Search results pages", ["data-pager"] = "results" },
+            UlTagHtmlAttributes = new Dictionary<string, string?> { ["class"] = "pagination-sm" },
+
+            HRefUrl = "#",
+        });
+
+        Assert.StartsWith("""<nav aria-label="Search results pages" data-pager="results"><ul class="pagination pagination-sm">""", result.ToHtmlString());
     }
 
     [Fact]

@@ -1,4 +1,5 @@
-﻿using Gobln.Pager.TestHelper.Comparer;
+﻿using Gobln.Pager;
+using Gobln.Pager.TestHelper.Comparer;
 using Gobln.Pager.TestHelper.Data;
 using Gobln.Pager.TestHelper.EFHelper;
 using Gobln.Pager.TestHelper.Model;
@@ -36,5 +37,18 @@ public class PageListAsyncTest
         var expected = data;
 
         Assert.Equal(expected, result, new UserComparer());
+    }
+
+    /// <summary>
+    /// A cancelled token cancels the work before it starts
+    /// </summary>
+    [Fact]
+    public async Task Create_PagedList_Cancelled_01()
+    {
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => UserData.UserList.ToPagedListAsync(cancellation.Token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => UserData.UserList.ToPagedListAsync(10, cancellation.Token));
     }
 }

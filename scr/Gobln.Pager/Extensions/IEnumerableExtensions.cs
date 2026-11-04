@@ -46,12 +46,13 @@ public static class IEnumerableExtensions
         /// <param name="pageIndex">Index of the page, from 1. Past the last page, the last page is returned.</param>
         /// <param name="pageSize">Number of items on a page</param>
         /// <returns>The page, with the totals of the whole collection</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> is less than 1, or <paramref name="pageSize"/> less than 0. A <paramref name="pageSize"/> of 0 gives an empty page with a total of 0, without counting or reading the collection.</exception>
         public Page<T> ToPage(int pageIndex, int pageSize)
         {
             Validator.Validate(pageIndex, pageSize);
 
-            return PrivateToPage(source, pageIndex, pageSize, source.Count());
+            // A page size of 0 makes an empty page, as with a total of 0, so the collection isn't counted
+            return PrivateToPage(source, pageIndex, pageSize, pageSize == 0 ? 0 : source.Count());
         }
 
         /// <summary>
@@ -60,12 +61,12 @@ public static class IEnumerableExtensions
         /// <param name="pagerFilter">The page index and page size</param>
         /// <returns>The page, with the totals of the whole collection</returns>
         /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index is less than 1, or the page size less than 0. A page size of 0 gives an empty page with a total of 0, without counting or reading the collection.</exception>
         public Page<T> ToPage(IPageFilter pagerFilter)
         {
             Validator.Validate(pagerFilter);
 
-            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, source.Count());
+            return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, pagerFilter.PageSize == 0 ? 0 : source.Count());
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ public static class IEnumerableExtensions
         /// <param name="pageSize">Number of items on a page</param>
         /// <param name="totalItemCount">Number of items on all pages together</param>
         /// <returns>The page, holding the collection as it is</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0. A <paramref name="pageSize"/> of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount)
         {
             Validator.Validate(pageIndex, pageSize, totalItemCount);
@@ -90,7 +91,7 @@ public static class IEnumerableExtensions
         /// <param name="totalItemCount">Number of items on all pages together</param>
         /// <returns>The page, holding the collection as it is</returns>
         /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0. A page size of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount)
         {
             Validator.Validate(pagerFilter, totalItemCount);
@@ -106,7 +107,7 @@ public static class IEnumerableExtensions
         /// <param name="totalItemCount">Number of items on all pages together</param>
         /// <param name="prePaged">Whether the collection is already paged. If so, it is used as it is.</param>
         /// <returns>The page</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0. A <paramref name="pageSize"/> of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public Page<T> ToPage(int pageIndex, int pageSize, int totalItemCount, bool prePaged)
         {
             Validator.Validate(pageIndex, pageSize, totalItemCount);
@@ -122,7 +123,7 @@ public static class IEnumerableExtensions
         /// <param name="prePaged">Whether the collection is already paged. If so, it is used as it is.</param>
         /// <returns>The page</returns>
         /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0. A page size of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public Page<T> ToPage(IPageFilter pagerFilter, int totalItemCount, bool prePaged)
         {
             Validator.Validate(pagerFilter, totalItemCount);
@@ -181,7 +182,7 @@ public static class IEnumerableExtensions
         /// <param name="pageSize">Number of items on a page</param>
         /// <param name="cancellationToken">Cancels the work before it starts</param>
         /// <returns>The page, with the totals of the whole collection</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> is less than 1, or <paramref name="pageSize"/> less than 0. A <paramref name="pageSize"/> of 0 gives an empty page with a total of 0, without counting or reading the collection.</exception>
         /// <remarks>
         /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
         /// </remarks>
@@ -197,6 +198,12 @@ public static class IEnumerableExtensions
                         return query.ToPage(pageIndex, pageSize);
                     }
 
+                    // A page size of 0 makes an empty page, as with a total of 0, so the collection isn't read
+                    if (pageSize == 0)
+                    {
+                        return PrivateToPage(source, pageIndex, pageSize, 0);
+                    }
+
                     var list = source.ToList();
                     return PrivateToPage(list, pageIndex, pageSize, list.Count);
                 }, cancellationToken)
@@ -210,7 +217,7 @@ public static class IEnumerableExtensions
         /// <param name="cancellationToken">Cancels the work before it starts</param>
         /// <returns>The page, with the totals of the whole collection</returns>
         /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index is less than 1, or the page size less than 0. A page size of 0 gives an empty page with a total of 0, without counting or reading the collection.</exception>
         /// <remarks>
         /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
         /// </remarks>
@@ -223,6 +230,11 @@ public static class IEnumerableExtensions
                     if (source is IQueryable<T> query)
                     {
                         return query.ToPage(pagerFilter);
+                    }
+
+                    if (pagerFilter.PageSize == 0)
+                    {
+                        return PrivateToPage(source, pagerFilter.PageIndex, pagerFilter.PageSize, 0);
                     }
 
                     var list = source.ToList();
@@ -239,7 +251,7 @@ public static class IEnumerableExtensions
         /// <param name="totalItemCount">Number of items on all pages together</param>
         /// <param name="cancellationToken">Cancels the work before it starts</param>
         /// <returns>The page, holding the collection as it is</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0. A <paramref name="pageSize"/> of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public async Task<Page<T>> ToPageAsync(int pageIndex, int pageSize, int totalItemCount, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pageIndex, pageSize, totalItemCount);
@@ -256,7 +268,7 @@ public static class IEnumerableExtensions
         /// <param name="cancellationToken">Cancels the work before it starts</param>
         /// <returns>The page, holding the collection as it is</returns>
         /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0. A page size of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         public async Task<Page<T>> ToPageAsync(IPageFilter pagerFilter, int totalItemCount, CancellationToken cancellationToken = default)
         {
             Validator.Validate(pagerFilter, totalItemCount);
@@ -274,7 +286,7 @@ public static class IEnumerableExtensions
         /// <param name="prePaged">Whether the collection is already paged. If so, it is used as it is.</param>
         /// <param name="cancellationToken">Cancels the work before it starts</param>
         /// <returns>The page</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0. A <paramref name="pageSize"/> of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         /// <remarks>
         /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
         /// </remarks>
@@ -297,7 +309,7 @@ public static class IEnumerableExtensions
         /// <param name="cancellationToken">Cancels the work before it starts</param>
         /// <returns>The page</returns>
         /// <exception cref="ArgumentNullException"><paramref name="pagerFilter"/> is null</exception>
-        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The page index or page size is less than 1, or <paramref name="totalItemCount"/> less than 0. A page size of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
         /// <remarks>
         /// Runs on the thread pool. A query is paged in the query. Gobln.Pager.EntityFrameworkCore makes this truly asynchronous for Entity Framework Core.
         /// </remarks>

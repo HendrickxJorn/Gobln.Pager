@@ -76,6 +76,27 @@ public class PageNumbersTest
         Assert.Equal(["1 - 5", "6 - 10", "11 - 12"], numbers);
     }
 
+    [Theory]
+    [InlineData(10)]
+    [InlineData(0)]
+    public void ShowIndexAsRange_WithoutItems_ShowsThePageIndex(int pageSize)
+    {
+        // A page without items has no range to show: "1 - 0" would read as items 1 to 0
+        var page = Array.Empty<int>().ToPage(1, pageSize);
+
+        var numbers = RenderPageNumbers(page, o => o.ShowIndexAsRange = true);
+
+        Assert.Equal(["1"], numbers);
+    }
+
+    [Fact]
+    public void ShowPagerButtonLinksNever_ShowsNoNumbers()
+    {
+        var numbers = RenderPageNumbers(3, 1, o => o.ShowPagerButtonLinks = WhenToShowEnum.Never);
+
+        Assert.Empty(numbers);
+    }
+
     [Fact]
     public void ShowPagerButtonLinksIfNecessary_ShowsTheNumbersOnlyWhenThereIsMoreThanOnePage()
     {

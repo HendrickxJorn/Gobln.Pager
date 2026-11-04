@@ -112,7 +112,7 @@ An options object can be shared between views and requests (for example a `stati
 | `SiblingCount` | `1` | Page numbers shown on each side of the current page. |
 | `BoundaryCount` | `1` | Page numbers always shown at the start and the end. |
 | `ShowEllipsis` | `true` | Show `...` where page numbers are skipped. |
-| `ShowIndexAsRange` | `false` | Show the item range (`11 - 20`) instead of the page number. |
+| `ShowIndexAsRange` | `false` | Show the item range (`11 - 20`) instead of the page number. A page without items shows its page number. |
 | `ButtonFirstLinkLabel`, `ButtonPreviousLinkLabel`, `ButtonNextLinkLabel`, `ButtonLastLinkLabel` | `"First"`, `"Previous"`, `"Next"`, `"Last"` | Button text. Inserted as text, so `&` and `<` are escaped. |
 | `ButtonFirstLinkIcon`, `ButtonPreviousLinkIcon`, `ButtonNextLinkIcon`, `ButtonLastLinkIcon` | `null` | Shown instead of the label. Inserted as markup, not escaped. The label becomes the button's `aria-label`. |
 | `DisplayActive` | `true` | Mark the current page number: `active` on its `<li>` and `aria-current="page"` on its link. It stays a working link, as in Bootstrap 5.3. |

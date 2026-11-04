@@ -91,7 +91,7 @@ public class Page<T> : IPage<T>, IReadOnlyList<T>
     /// <param name="pageIndex">The currently selected page in the original collection</param>
     /// <param name="pageSize">Size of an individual page</param>
     /// <param name="totalItemCount">Total item count in the original collection</param>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1, or <paramref name="totalItemCount"/> less than 0. A <paramref name="pageSize"/> of 0 is allowed when <paramref name="totalItemCount"/> is 0.</exception>
     public Page(IEnumerable<T> collection, int pageIndex, int pageSize, int totalItemCount)
     {
         Validator.Validate(pageIndex, pageSize, totalItemCount);
@@ -115,6 +115,14 @@ public class Page<T> : IPage<T>, IReadOnlyList<T>
 
     private void FillPageData(IEnumerable<T> collection, PageDefinition pageDefinitions)
     {
+        // Kept when the items are empty too: a pre-paged page that came back empty still
+        // has to tell a pager how many pages there are, and an empty source keeps its page size.
+        // A null collection counts as an empty one.
+        PageIndex = pageDefinitions.PageIndex;
+        TotalPageCount = pageDefinitions.PageCount;
+        PageSize = pageDefinitions.PageSize;
+        TotalItemCount = pageDefinitions.TotalItemCount;
+
         if (collection is null || pageDefinitions.TotalItemCount < 1)
         {
             return;
@@ -122,13 +130,6 @@ public class Page<T> : IPage<T>, IReadOnlyList<T>
 
         // Read once: the collection may be a query, and enumerating the page must not run it again
         _items = collection.ToList();
-
-        // Kept when the items are empty too: a pre-paged page that came back empty still
-        // has to tell a pager how many pages there are
-        PageIndex = pageDefinitions.PageIndex;
-        TotalPageCount = pageDefinitions.PageCount;
-        PageSize = pageDefinitions.PageSize;
-        TotalItemCount = pageDefinitions.TotalItemCount;
     }
 
     #region Implementation of IEnumerable
@@ -210,15 +211,14 @@ public class Page: IPage
     /// <param name="source">The elements of <typeparamref name="T"/> of the current page</param>
     /// <param name="pageIndex">The currently selected page in the original collection</param>
     /// <param name="pageSize">Size of an individual page</param>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> or <paramref name="pageSize"/> is less than 1</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="pageIndex"/> is less than 1, or <paramref name="pageSize"/> less than 0. A <paramref name="pageSize"/> of 0 gives an empty page with a total of 0, without counting or reading <paramref name="source"/>.</exception>
     /// <returns></returns>
     public static Page<T> FromEnumerable<T>(IEnumerable<T> source, int pageIndex, int pageSize)
     {
         Validator.Validate(pageIndex, pageSize);
 
-        return source == null
-            ? new Page<T>()
-            : new Page<T>(source, new PageDefinition(pageIndex, pageSize, source.Count()));
+        // A null source counts as an empty one, as in the constructor
+        return new Page<T>(source, new PageDefinition(pageIndex, pageSize, pageSize == 0 || source is null ? 0 : source.Count()));
     }
 
     /// <summary>
@@ -234,8 +234,6 @@ public class Page: IPage
     {
         Validator.Validate(pageIndex, pageSize, totalItemCount);
 
-        return source == null
-            ? new Page<T>()
-            : new Page<T>(source, new PageDefinition(pageIndex, pageSize, totalItemCount));
+        return new Page<T>(source, new PageDefinition(pageIndex, pageSize, totalItemCount));
     }
 }

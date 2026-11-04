@@ -12,7 +12,10 @@ internal static class Validator
             throw new ArgumentOutOfRangeException(nameof(pageIndex), pageIndex, GreaterThanZero);
         }
 
-        ValidatePageSize(pageSize);
+        if (!IsWithoutPageSize(pageSize, totalItemCount))
+        {
+            ValidatePageSize(pageSize);
+        }
 
         if (totalItemCount is not null)
         {
@@ -33,7 +36,7 @@ internal static class Validator
             throw new ArgumentOutOfRangeException($"{nameof(pagerFilter)}.{nameof(IPageFilter.PageIndex)}", pagerFilter.PageIndex, GreaterThanZero);
         }
 
-        if (pagerFilter.PageSize < 1)
+        if (pagerFilter.PageSize < 1 && !IsWithoutPageSize(pagerFilter.PageSize, totalItemCount))
         {
             throw new ArgumentOutOfRangeException($"{nameof(pagerFilter)}.{nameof(IPageFilter.PageSize)}", pagerFilter.PageSize, GreaterThanZero);
         }
@@ -43,6 +46,11 @@ internal static class Validator
             ValidateTotalItemCount(totalItemCount.Value);
         }
     }
+
+    // A PageSize of 0 is what a page without a page size reports, such as new Page<T>(). It is allowed
+    // with a total of 0 items, so such a page can be made again from its own values, and without a
+    // total, which then is 0: the page is empty, and nothing is counted or read.
+    private static bool IsWithoutPageSize(int pageSize, int? totalItemCount) => pageSize == 0 && totalItemCount is null or 0;
 
     internal static void ValidatePageSize(int pageSize)
     {

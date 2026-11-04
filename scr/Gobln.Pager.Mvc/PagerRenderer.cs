@@ -203,7 +203,8 @@ public class PagerRenderer() : IPagerRenderer<IPagerOptions>
     {
         var isActive = PagerOptions.DisplayActive && InternalPage.PageIndex == index;
 
-        var text = PagerOptions.ShowIndexAsRange
+        // A page without items has no range to show, so it shows its index
+        var text = PagerOptions.ShowIndexAsRange && InternalPage.TotalItemCount > 0
             ? $"{((index - 1) * InternalPage.PageSize) + 1} - {Math.Min(index * InternalPage.PageSize, InternalPage.TotalItemCount)}"
             : index.ToString();
 
