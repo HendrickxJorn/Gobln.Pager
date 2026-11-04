@@ -9,7 +9,7 @@
 - **Sort an `IQueryable<T>` before paging it.** Without an `OrderBy` the database picks the order, so pages can repeat or skip items.
 - **Validate pagination input at your application boundary** (controller/API parameters) before calling into the library — the library will throw `ArgumentOutOfRangeException` for `pageIndex < 1`, `pageSize < 0`, or `totalItemCount < 0`, but a friendlier validation message at the boundary is usually better UX than an unhandled exception. A `pageIndex` past the last page doesn't throw: it returns the last page. A `pageSize` of `0` doesn't throw either: it returns an empty page with a `TotalItemCount` of `0`. A `PageFilter` bound from a request without a `pageSize` has a `PageSize` of `0`, so check for it if a missing page size should be an error.
 - **`PagedList<T>` is not thread-safe.** Guard concurrent access yourself if a `PagedList<T>` instance is shared across requests/threads.
-- **Pick one JSON package's wire format and stick to it end-to-end** if `Page<T>` payloads cross a service boundary — see the interop note in [JSON Serialization](Json-Serialization.md).
+- **Register the `PageJsonConverter` on both ends** if `Page<T>` payloads cross a service boundary. Without it, a `Page<T>` is written as a plain array of its items, and its page index, page size and total item count are lost. Which JSON package each end uses doesn't matter: both write the same format and read each other's JSON — see [JSON Serialization](Json-Serialization.md).
 
 ## Troubleshooting
 
@@ -25,7 +25,7 @@ Since 2.0 a `Page<T>` reads its rows when `ToPage` runs and keeps them, so enume
 
 ### `ArgumentOutOfRangeException` when creating a `Page<T>` or calling `ToPage(...)`
 
-Check that `pageIndex >= 1`, `pageSize >= 0`, and (where applicable) `totalItemCount >= 0`. A `pageSize` of `0` throws only together with a `totalItemCount` above `0`. These are validated on every entry point (constructors and extension methods).
+Check that `pageIndex >= 1`, `pageSize >= 0`, and (where applicable) `totalItemCount >= 0`. A `pageSize` of `0` throws only together with a `totalItemCount` above `0`, and on a `PagedList<T>` or in `ToPagedList(pageSize)`, which need a `pageSize` of at least `1`. These are validated on every entry point (constructors and extension methods).
 
 ### `ArgumentNullException: Page parameter is required` in the Blazor `<Pager>` component
 

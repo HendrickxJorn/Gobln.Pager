@@ -38,7 +38,7 @@ Install-Package Gobln.Pager
 ## Verifying installation
 
 - **References:** confirm `Gobln.Pager` (and any extension packages you installed) appear in your project references.
-- **Version:** all six packages are released together under one version number, currently `2.0.0`.
+- **Version:** all six packages are released together under one version number, currently `2.0.1`.
 
 ## Minimal example
 

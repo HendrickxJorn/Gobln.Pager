@@ -37,15 +37,15 @@ Implements `IPagerOptions`; construct directly or via `Clone()`. Defaults shown:
 | Property | Default | Description |
 | --- | --- | --- |
 | `ShowPager` | `IfNecessary` | Whether to render the pager at all (`Never` / `IfNecessary` / `Always`). |
-| `ShowButtonFirstLink` | `Always` | Show the "First" link. |
-| `ShowButtonPreviousLink` | `Always` | Show the "Previous" link. |
+| `ShowButtonFirstLink` | `Always` | Show the "First" link. `IfNecessary` shows it only when not on the first page. |
+| `ShowButtonPreviousLink` | `Always` | Show the "Previous" link. `IfNecessary` shows it only when not on the first page. |
 | `ShowPagerButtonLinks` | `Always` | Show numbered page links. `IfNecessary` shows them only when there is more than one page. |
-| `ShowButtonNextLink` | `Always` | Show the "Next" link. |
-| `ShowButtonLastLink` | `Always` | Show the "Last" link. |
+| `ShowButtonNextLink` | `Always` | Show the "Next" link. `IfNecessary` shows it only when not on the last page. |
+| `ShowButtonLastLink` | `Always` | Show the "Last" link. `IfNecessary` shows it only when not on the last page. |
 | `SiblingCount` | `1` | Page links shown on each side of the current page. |
 | `BoundaryCount` | `1` | Page links always shown at the start/end. |
 | `ShowEllipsis` | `true` | Render a disabled `...` item where page numbers are skipped. An ellipsis that would hide a single page shows that page instead, the same as the Blazor pager. |
-| `ShowIndexAsRange` | `false` | Show the item range (`11 - 20`) instead of the page index. The last range ends at the last item. |
+| `ShowIndexAsRange` | `false` | Show the item range (`11 - 20`) instead of the page index. The last range ends at the last item. A page without items has no range, so it shows its page index. |
 | `ButtonFirstLinkLabel` / `ButtonPreviousLinkLabel` / `ButtonNextLinkLabel` / `ButtonLastLinkLabel` | `"First"` / `"Previous"` / `"Next"` / `"Last"` | Link text. Escaped on every target. |
 | `ButtonFirstLinkIcon` / `ButtonPreviousLinkIcon` / `ButtonNextLinkIcon` / `ButtonLastLinkIcon` | `null` | Icon markup rendered in place of the link text, not escaped (for example `&laquo;` or `<i class="bi bi-chevron-left"></i>`); the label then becomes the `aria-label`. |
 | `HRefUrl` | `null` | Explicit URL for page links. `null` = the current request's path and query, as a relative link; `"#"` = all links point to `#`. |

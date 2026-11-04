@@ -210,6 +210,7 @@ Pagination parameters are validated wherever they're accepted (constructors, ext
 - `pageIndex < 1` → throws `ArgumentOutOfRangeException`
 - `pageSize < 0` → throws `ArgumentOutOfRangeException`
 - `pageSize` of `0` → an empty page with a `TotalItemCount` of `0`, without counting or reading the source. It throws only with a `totalItemCount` above `0`.
+- `PagedList<T>` (its constructors and `PageSize` setter) and `ToPagedList(pageSize)` / `ToPagedListAsync(pageSize)` are the exception: a list needs a page size to divide its items over pages, so there a `pageSize < 1` throws `ArgumentOutOfRangeException`.
 - `totalItemCount < 0` → throws `ArgumentOutOfRangeException`
 
 ## Interfaces
@@ -226,6 +227,6 @@ Pagination parameters are validated wherever they're accepted (constructors, ext
 
 ## Thread safety
 
-- **`Page<T>`**: its properties never change, but enumerating it enumerates its source. It is as thread-safe as that source: fine for an in-memory list that nobody changes, not for a query on a `DbContext`, which doesn't allow two operations at once.
+- **`Page<T>`**: safe to read from several threads at once. Nothing about it changes after it is made, and it keeps its own list of the items, so enumerating it never goes back to the source: a page made from a `DbContext` query can be shared between threads too. The items themselves are only as thread-safe as their own type.
 - **`PagedList<T>`**: **not** thread-safe — use external locking or a concurrent wrapper in multi-threaded scenarios.
 - **Extension methods**: thread-safe (stateless).
