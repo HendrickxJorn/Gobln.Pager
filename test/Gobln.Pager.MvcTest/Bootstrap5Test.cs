@@ -154,6 +154,50 @@ public class Bootstrap5Test
     }
 
     [Fact]
+    public void WithIconsDisabled01()
+    {
+        // A disabled button keeps its icon: the span gets the label as its aria-label, as a link does
+        var target = """
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            <li class="disabled page-item">
+              <span aria-label="Previous" class="page-link">
+                <span aria-hidden="true">&laquo;</span>
+              </span>
+            </li>
+            <li class="active page-item">
+              <a aria-current="page" class="page-link" href="#">1</a>
+            </li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+              <a aria-label="Next" class="page-link" href="#">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        """;
+
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+        var result = mockHtmlHelper.Pager(_page3, new PagerOptions()
+        {
+            NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+
+            ButtonPreviousLinkIcon = "&laquo;",
+            ButtonNextLinkIcon = "&raquo;",
+
+            HRefUrl = "#",
+
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
+        });
+
+        Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+    }
+
+    [Fact]
     public void DisabledAndActive01()
     {
         var target = """

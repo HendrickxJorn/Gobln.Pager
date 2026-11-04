@@ -54,6 +54,22 @@ public class PagerRendererTest
         Assert.Equal("3|Volgende|/orders", result);
     }
 
+    /// <summary>
+    /// A renderer that needs nothing but the page
+    /// </summary>
+    private sealed class PageOnlyRenderer : IPagerRenderer
+    {
+        public IHtmlContent Render(IPage page) => new HtmlString($"page {page.PageIndex} of {page.TotalPageCount}");
+    }
+
+    [Fact]
+    public void Pager_WithAPageOnlyRenderer_HandsItThePage()
+    {
+        var result = _helperHtml.CreateHtmlHelper().Pager(_page3, new PageOnlyRenderer()).ToHtmlString();
+
+        Assert.Equal("page 1 of 3", result);
+    }
+
     [Fact]
     public void Render_BuildsTheLinksOnTheUrlItIsHanded()
     {

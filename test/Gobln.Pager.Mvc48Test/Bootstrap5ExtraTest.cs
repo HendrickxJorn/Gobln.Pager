@@ -312,6 +312,20 @@ public class Bootstrap5ExtraTest
     }
 
     [Fact]
+    public void UrlContextAjaxParametersTest01()
+    {
+        // The markers of an ajax request tell how this request was made, not how to ask for
+        // another page: the links leave them out and keep the rest of the query
+        var result = _helperHtml.CreateHtmlHelper(url: "http://pager.com/orders?sort=name&x-requested-with=XMLHttpRequest&xmlhttprequest=true")
+            .Pager(_page3, new PagerOptions())
+            .ToHtmlString();
+
+        Assert.Contains("""href="/orders?sort=name&amp;pageIndex=2">2</a>""", result);
+        Assert.DoesNotContain("requested", result, StringComparison.OrdinalIgnoreCase);
+        Assert.DoesNotContain("xmlhttprequest", result, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void UrlContextHostHeaderTest01()
     {
         // The links are relative. Request.Url gets its host from the request's Host header,
@@ -624,6 +638,21 @@ public class Bootstrap5ExtraTest
 
         Assert.StartsWith("""<nav aria-label="Search results pages">""", labelled.ToHtmlString());
         Assert.StartsWith("""<nav aria-labelledby="results-heading">""", labelledBy.ToHtmlString());
+    }
+
+    [Fact]
+    public void DictionaryAttributesTest01()
+    {
+        // The attributes can be a dictionary too, for names that aren't C# identifiers
+        var result = _helperHtml.CreateHtmlHelper().Pager(_page3, new PagerOptions()
+        {
+            NavTagHtmlAttributes = new Dictionary<string, string?> { ["aria-label"] = "Search results pages", ["data-pager"] = "results" },
+            UlTagHtmlAttributes = new Dictionary<string, string?> { ["class"] = "pagination-sm" },
+
+            HRefUrl = "#",
+        });
+
+        Assert.StartsWith("""<nav aria-label="Search results pages" data-pager="results"><ul class="pagination pagination-sm">""", result.ToHtmlString());
     }
 
     [Fact]

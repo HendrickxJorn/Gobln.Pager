@@ -201,6 +201,51 @@ public class PageAsyncTest
     }
 
     /// <summary>
+    /// A cancelled token cancels the work before it starts, on every overload
+    /// </summary>
+    [Fact]
+    public async Task Create_Page_Cancelled_01()
+    {
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+
+        var token = cancellation.Token;
+        var data = UserData.UserList;
+        var filter = new PageFilter(1, 10);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => data.ToPageAsync(token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => data.ToPageAsync(1, 10, token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => data.ToPageAsync(filter, token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => data.ToPageAsync(1, 10, 29, token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => data.ToPageAsync(filter, 29, token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => data.ToPageAsync(1, 10, 29, false, token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => data.ToPageAsync(filter, 29, false, token));
+    }
+
+    /// <summary>
+    /// Create a Page from a list, with a total and an explicit prePaged flag
+    /// </summary>
+    [Fact]
+    public async Task Create_Page_With_Prepaged_Flag_01()
+    {
+        var data = UserData.UserList.ToList();
+        var rows = data.Skip(10).Take(10).ToList();
+        var filterModel = new PageFilter(2, 10);
+
+        // prePaged: false takes the page out of the list, prePaged: true takes the list as the page
+        var sliced = await data.ToPageAsync(2, 10, data.Count, prePaged: false);
+        var slicedByFilter = await data.ToPageAsync(filterModel, data.Count, prePaged: false);
+        var prePaged = await rows.ToPageAsync(2, 10, data.Count, prePaged: true);
+        var prePagedByFilter = await rows.ToPageAsync(filterModel, data.Count, prePaged: true);
+
+        Assert.Equal(rows, sliced, new UserComparer());
+        Assert.Equal(rows, slicedByFilter, new UserComparer());
+        Assert.Equal(rows, prePaged, new UserComparer());
+        Assert.Equal(rows, prePagedByFilter, new UserComparer());
+        Assert.All(new[] { sliced, slicedByFilter, prePaged, prePagedByFilter }, page => Assert.Equal(3, page.TotalPageCount));
+    }
+
+    /// <summary>
     /// Create a Page without a page size from a List with items
     /// </summary>
     [Fact]

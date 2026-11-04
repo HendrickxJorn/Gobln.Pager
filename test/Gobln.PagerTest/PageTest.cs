@@ -372,6 +372,79 @@ public class PageTest
     }
 
     /// <summary>
+    /// Page.FromEnumerable and the constructor of null make an empty Page
+    /// </summary>
+    [Fact]
+    public void Create_Page_From_Null_01()
+    {
+        IEnumerable<User>? data = null;
+
+        var pages = new[]
+        {
+            Page.FromEnumerable(data!),
+            Page.FromEnumerable(data!, 2, 10),
+            Page.FromEnumerable(data!, 2, 10, 25),
+            // There is no collection to read: the totals that were given aren't kept either
+            new Page<User>(data!, 2, 10, 25),
+        };
+
+        Assert.All(pages, page =>
+        {
+            Assert.Empty(page);
+            Assert.Equal(1, page.PageIndex);
+            Assert.Equal(0, page.PageSize);
+            Assert.Equal(0, page.TotalItemCount);
+            Assert.Equal(1, page.TotalPageCount);
+        });
+    }
+
+    /// <summary>
+    /// Create a Page with a PageFilter, a total and an explicit prePaged flag
+    /// </summary>
+    [Fact]
+    public void Create_Page_With_PageFilter_PrePaged_02()
+    {
+        var data = UserData.UserList.ToList();
+
+        var filterModel = new PageFilter(2, 10);
+
+        // prePaged: false takes the page out of the collection, prePaged: true takes the collection as the page
+        var sliced = data.ToPage(filterModel, data.Count, prePaged: false);
+        var prePaged = data.Skip(10).Take(10).ToList().ToPage(filterModel, data.Count, prePaged: true);
+
+        var expected = data.Skip(10).Take(10).ToList();
+
+        Assert.Equal(expected, sliced, new UserComparer());
+        Assert.Equal(expected, prePaged, new UserComparer());
+        Assert.Equal(2, sliced.PageIndex);
+        Assert.Equal(3, prePaged.TotalPageCount);
+    }
+
+    /// <summary>
+    /// Put a whole query on one Page
+    /// </summary>
+    [Fact]
+    public void Create_Page_From_IQueryable_01()
+    {
+        var data = UserData.UserList.AsQueryable();
+
+        var result = data.ToPage();
+
+        Assert.Equal(data, result, new UserComparer());
+        Assert.Equal(1, result.PageIndex);
+        Assert.Equal(29, result.PageSize);
+        Assert.Equal(29, result.TotalItemCount);
+        Assert.Equal(1, result.TotalPageCount);
+
+        // As ToPage() of an empty collection: not asked for a page size, so there is none
+        var empty = new List<User>().AsQueryable().ToPage();
+
+        Assert.Empty(empty);
+        Assert.Equal(0, empty.PageSize);
+        Assert.Equal(0, empty.TotalItemCount);
+    }
+
+    /// <summary>
     /// Create page form EF
     /// </summary>
     [Fact]

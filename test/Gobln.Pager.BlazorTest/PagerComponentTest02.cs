@@ -118,6 +118,46 @@ public class PagerComponentTests02 : BunitContext
         Assert.Equal("page", activePage.GetAttribute("aria-current"));
     }
 
+    [Theory]
+    [InlineData("First", 1)]
+    [InlineData("Previous", 4)]
+    [InlineData("Next", 6)]
+    [InlineData("Last", 10)]
+    public void Buttons_GoToTheirPage(string button, int expected)
+    {
+        var testPage = new TestPage { PageIndex = 5, TotalPageCount = 10, HasPaging = true };
+
+        var pageChanged = 0;
+
+        var cut = Render<Blazor.Pager>(
+          parameters =>
+            parameters
+              .Add(c => c.Page, testPage)
+              .Add(c => c.PageIndexChanged, (int i) => { pageChanged = i; })
+        );
+
+        cut.FindAll("a").First(a => a.TextContent.Trim() == button).Click();
+
+        Assert.Equal(expected, pageChanged);
+        Assert.Equal(expected.ToString(), cut.Find("li.active > a").TextContent.Trim());
+    }
+
+    [Theory]
+    [InlineData(null, "pagination")]
+    [InlineData("   ", "pagination")]
+    [InlineData(" pagination-lg justify-content-center ", "pagination pagination-lg justify-content-center")]
+    public void ClassName_IsAddedNextToPagination(string? className, string expected)
+    {
+        var cut = Render<Blazor.Pager>(
+          parameters =>
+            parameters
+              .Add(c => c.Page, new TestPage { PageIndex = 1, TotalPageCount = 10, HasPaging = true })
+              .Add(c => c.ClassName, className)
+        );
+
+        Assert.Equal(expected, cut.Find("ul").GetAttribute("class"));
+    }
+
     [Fact]
     public void NewPage_FromTheParent_IsAdopted_EvenWithTheSameIndex()
     {

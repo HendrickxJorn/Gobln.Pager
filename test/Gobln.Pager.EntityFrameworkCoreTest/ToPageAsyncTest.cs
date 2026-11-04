@@ -191,6 +191,24 @@ public class ToPageAsyncTest
     }
 
     [Fact]
+    public async Task ToPageAsync_OnANonEfQuery_FallsBackToTheCore_ForTheOtherOverloads()
+    {
+        // EF Core's ToListAsync throws on a query that isn't from EF Core, so these only pass
+        // when the package hands the query to the core
+        var query = Enumerable.Range(1, 25).AsQueryable();
+
+        var whole = await query.ToPageAsync();
+        var sliced = await query.ToPageAsync(3, 10, 25, prePaged: false);
+        var list = await query.ToPagedListAsync();
+
+        Assert.Equal(Enumerable.Range(1, 25), whole);
+        Assert.Equal(Enumerable.Range(21, 5), sliced);
+        Assert.Equal(3, sliced.TotalPageCount);
+        Assert.Equal(Enumerable.Range(1, 25), list);
+        Assert.Equal(10, list.PageSize);
+    }
+
+    [Fact]
     public async Task ToPageAsync_Cancelled_Throws()
     {
         using var db = new TestDatabase();

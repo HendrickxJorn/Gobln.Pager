@@ -146,4 +146,44 @@ public class JsonWireFormatTest
         Assert.Equal(0, result.TotalItemCount);
         Assert.Equal(1, result.TotalPageCount);
     }
+
+    [Fact]
+    public void Deserialize_EmptyObject_IsAnEmptyPage()
+    {
+        // {} has no PageIndex either: it is read as new Page<T>(), not rejected
+        var result = JsonConvert.DeserializeObject<Page<int>>("{}", Options());
+
+        Assert.NotNull(result);
+        Assert.True(result.IsEmpty);
+        Assert.Equal(1, result.PageIndex);
+        Assert.Equal(0, result.PageSize);
+        Assert.Equal(0, result.TotalItemCount);
+    }
+
+    [Fact]
+    public void Deserialize_PageWithoutPageItems_KeepsItsValues()
+    {
+        var result = JsonConvert.DeserializeObject<Page<int>>(
+            """{"PageIndex":3,"PageSize":10,"TotalItemCount":25}""", Options());
+
+        Assert.NotNull(result);
+        Assert.Empty(result);
+        Assert.Equal(3, result.PageIndex);
+        Assert.Equal(10, result.PageSize);
+        Assert.Equal(25, result.TotalItemCount);
+        Assert.Equal(3, result.TotalPageCount);
+    }
+
+    [Fact]
+    public void Deserialize_PagedListFromAnObject_IsRejected()
+    {
+        // A PagedList is written as a plain array: an object, such as a page, isn't one
+        Assert.ThrowsAny<JsonException>(() => JsonConvert.DeserializeObject<PagedList<int>>(PageJson, Options()));
+    }
+
+    [Fact]
+    public void Deserialize_NullPagedList_IsNull()
+    {
+        Assert.Null(JsonConvert.DeserializeObject<PagedList<int>>("null", Options()));
+    }
 }

@@ -90,6 +90,14 @@ public class PageNumbersTest
     }
 
     [Fact]
+    public void ShowPagerButtonLinksNever_ShowsNoNumbers()
+    {
+        var numbers = RenderPageNumbers(3, 1, o => o.ShowPagerButtonLinks = WhenToShowEnum.Never);
+
+        Assert.Empty(numbers);
+    }
+
+    [Fact]
     public void ShowPagerButtonLinksIfNecessary_ShowsTheNumbersOnlyWhenThereIsMoreThanOnePage()
     {
         // Same meaning as IfNecessary on ShowPager: only when there is somewhere else to go
