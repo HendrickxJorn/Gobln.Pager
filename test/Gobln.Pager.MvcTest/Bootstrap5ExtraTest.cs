@@ -147,6 +147,60 @@ public class Bootstrap5ExtraTest
     }
 
     [Fact]
+    public void PageSizeZeroPagerTest01()
+    {
+        // ToPage with a page size of 0 gives an empty page on page 1 of 1, so there is nothing to page
+        var target = "";
+
+        var page = new int[] { 1, 2, 3 }.ToPage(1, 0);
+
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+        var result = mockHtmlHelper.Pager(page);
+
+        Assert.Equal(target, result.ToHtmlString());
+    }
+
+    [Fact]
+    public void PageSizeZeroPagerTest02()
+    {
+        // With Always, the empty page still gets a pager: page 1 of 1
+        var target = """
+         <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="disabled page-item">
+                    <span class="page-link">Previous</span>
+                </li>
+                <li class="active page-item">
+                    <a aria-current="page" class="page-link" href="#">1</a>
+                </li>
+                <li class="disabled page-item">
+                    <span class="page-link">Next</span>
+                </li>
+            </ul>
+         </nav>
+         """;
+
+        var page = new int[] { 1, 2, 3 }.ToPage(1, 0);
+
+        var mockHtmlHelper = _helperHtml.CreateHtmlHelper();
+
+        var result = mockHtmlHelper.Pager(page, new PagerOptions()
+        {
+            NavTagHtmlAttributes = new { aria_label = "Page navigation example" },
+
+            ShowPager = WhenToShowEnum.Always,
+
+            HRefUrl = "#",
+
+            ShowButtonFirstLink = WhenToShowEnum.Never,
+            ShowButtonLastLink = WhenToShowEnum.Never,
+        });
+
+        Assert.Equal(HtmlStringHelper.Minify(target), result.ToHtmlString());
+    }
+
+    [Fact]
     public void UrlContextPagerTest01()
     {
         var target = """

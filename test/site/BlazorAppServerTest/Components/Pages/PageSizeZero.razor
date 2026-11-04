@@ -1,0 +1,61 @@
+@page "/pagesizezero"
+@using Gobln.Pager
+@using Gobln.Pager.Blazor
+
+<PageTitle>Page size 0</PageTitle>
+
+<h1>Page size 0</h1>
+
+<p>
+    <code>ToPageAsync(1, 0)</code> on a list of @Items.Count() items: an empty page with a total of 0, as with <code>ToPageAsync(1, 0, 0)</code>.
+</p>
+
+@if (TestPage is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <dl class="row">
+        <dt class="col-sm-3">PageIndex</dt>
+        <dd class="col-sm-9">@TestPage.PageIndex</dd>
+
+        <dt class="col-sm-3">PageSize</dt>
+        <dd class="col-sm-9">@TestPage.PageSize</dd>
+
+        <dt class="col-sm-3">TotalItemCount</dt>
+        <dd class="col-sm-9">@TestPage.TotalItemCount</dd>
+
+        <dt class="col-sm-3">TotalPageCount</dt>
+        <dd class="col-sm-9">@TestPage.TotalPageCount</dd>
+
+        <dt class="col-sm-3">IsEmpty</dt>
+        <dd class="col-sm-9">@TestPage.IsEmpty</dd>
+
+        <dt class="col-sm-3">Page content</dt>
+        <dd class="col-sm-9">@string.Join(", ", TestPage)</dd>
+    </dl>
+
+    <h2>ShowPager Always (the default)</h2>
+
+    <Gobln.Pager.Blazor.Pager Page="TestPage" />
+
+    <h2>ShowPager IfNecessary</h2>
+
+    <p>Renders nothing: there is only one page.</p>
+
+    <Gobln.Pager.Blazor.Pager Page="TestPage"
+                              ShowPager="WhenToShowEnum.IfNecessary" />
+}
+
+@code{
+
+    private IEnumerable<int> Items { get; set; } = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 ];
+
+    private IPage<int>? TestPage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        TestPage = await Items.ToPageAsync(1, 0);
+    }
+}

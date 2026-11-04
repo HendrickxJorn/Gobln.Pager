@@ -274,6 +274,32 @@ public class PagerComponentTests02 : BunitContext
         Assert.Equal(rendered, cut.FindAll("nav").Count == 1);
     }
 
+    [Fact]
+    public void PageSizeZero_RendersASinglePage()
+    {
+        // ToPage with a page size of 0 gives an empty page on page 1 of 1, whatever the source holds
+        var page = Enumerable.Range(1, 50).ToPage(1, 0);
+
+        var cut = Render<Blazor.Pager>(parameters => parameters.Add(c => c.Page, page));
+
+        Assert.Equal(["First", "Previous", "1", "Next", "Last"], Items(cut));
+        Assert.Equal("1", cut.Find("li.active > a").TextContent.Trim());
+        Assert.Equal(["First", "Previous", "Next", "Last"], cut.FindAll("li.disabled").Select(li => li.TextContent.Trim()));
+    }
+
+    [Fact]
+    public void PageSizeZero_WithShowPagerIfNecessary_RendersNothing()
+    {
+        var cut = Render<Blazor.Pager>(
+          parameters =>
+            parameters
+              .Add(c => c.Page, Enumerable.Range(1, 50).ToPage(1, 0))
+              .Add(c => c.ShowPager, WhenToShowEnum.IfNecessary)
+        );
+
+        Assert.Equal("", cut.Markup.Trim());
+    }
+
     /// <summary>
     /// The texts of all items in order, First/Previous/Next/Last included
     /// </summary>
